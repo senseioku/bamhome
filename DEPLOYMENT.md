@@ -78,17 +78,18 @@ After deployment, you can configure custom domains:
 
 ### ✅ Vite Build Error 
 - **Issue**: Rollup failed to resolve import "/src/main.tsx" during Vercel build
-- **Solution**: Simplified Vercel configuration to use direct `vite build` command
+- **Solution**: Created custom `vite.build.config.ts` with proper root and build paths for Vercel deployment
 
 ### ✅ 404 Not Found Error
 - **Issue**: Static files not properly served
 - **Solution**: Simplified to static deployment with proper routing fallback
 
 ### Build Process
-1. Vercel runs `npm run build` 
-2. Vite builds React app to `dist/public/`
-3. All routes fallback to `index.html` for SPA routing
-4. Static assets served directly from CDN
+1. Vercel runs `npm install` to install dependencies
+2. Executes `vite build --config vite.build.config.ts` 
+3. Custom config properly resolves client directory structure
+4. Builds React app to `dist/public/` with all assets
+5. BAM Token logo and static files served directly from CDN
 
 ### Simplified Static Deployment
 - Uses `@vercel/static-build` for optimal React SPA deployment
