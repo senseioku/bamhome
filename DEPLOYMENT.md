@@ -70,19 +70,25 @@ After deployment, you can configure custom domains:
 - **Build Success**: All components build without errors
 - **Runtime Error**: Fixed invalid runtime specification in vercel.json
 
-## Common Issues
+## Common Issues Fixed
 
-### Function Runtime Error
-If you see "Function Runtimes must have a valid version" error:
-- The configuration now uses `@vercel/node` instead of custom runtime specs
-- Vercel automatically detects Node.js version from package.json
+### ✅ Function Runtime Error
+- **Issue**: "Function Runtimes must have a valid version"
+- **Solution**: Switched to `@vercel/static-build` for pure React SPA deployment
+
+### ✅ Vite Build Error 
+- **Issue**: Rollup failed to resolve import "/src/main.tsx"
+- **Solution**: Changed script src from "/src/main.tsx" to "./src/main.tsx" in index.html
+
+### ✅ 404 Not Found Error
+- **Issue**: Static files not properly served
+- **Solution**: Simplified to static deployment with proper routing fallback
 
 ### Build Process
 1. Vercel runs `npm run build` 
-2. Frontend builds to `dist/public/`
-3. Backend builds to `dist/index.js`
-4. Static files served via @vercel/static
-5. API routes handled by @vercel/node
+2. Vite builds React app to `dist/public/`
+3. All routes fallback to `index.html` for SPA routing
+4. Static assets served directly from CDN
 
 ### Simplified Static Deployment
 - Uses `@vercel/static-build` for optimal React SPA deployment
