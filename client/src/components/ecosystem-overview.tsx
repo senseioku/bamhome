@@ -6,33 +6,33 @@ export default function EcosystemOverview() {
     {
       icon: <Coins className="h-10 w-10" />,
       title: "BAM Token",
-      description: "Native utility token powering the entire ecosystem with staking rewards, governance rights, and exclusive access benefits.",
+      description: "Community-driven wealth multiplier token where members build and multiply wealth together through collective DeFi strategies.",
       features: [
         "100B Fixed Supply",
         "BSC Network",
-        "Deflationary Mechanism"
+        "Community Governance"
       ],
       color: "text-primary"
     },
     {
       icon: <Pickaxe className="h-10 w-10" />,
       title: "BAM ApexMiner",
-      description: "Revolutionary mining platform combining traditional mining with DeFi yield strategies for maximum returns.",
+      description: "Revolutionary mining platform where communities combine resources for maximum collective returns and shared prosperity.",
       features: [
-        "24/7 Mining Operations",
-        "Auto-Compounding",
-        "Multi-Asset Mining"
+        "Community Mining Pools",
+        "Shared Rewards System",
+        "Collective Growth Strategy"
       ],
       color: "text-secondary"
     },
     {
       icon: <Crown className="h-10 w-10" />,
       title: "BAM VIP Access",
-      description: "Exclusive membership program offering premium features, higher rewards, and early access to new products.",
+      description: "Elite community tier offering premium collective opportunities and enhanced wealth multiplication strategies.",
       features: [
-        "Premium Staking Rates",
-        "Exclusive NFT Access",
-        "Priority Support"
+        "Premium Community Access",
+        "Enhanced Multiplier Rates",
+        "Exclusive Growth Opportunities"
       ],
       color: "text-[hsl(45,90%,55%)]"
     }
@@ -46,7 +46,7 @@ export default function EcosystemOverview() {
             <span className="gradient-text">BAM Ecosystem</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            A comprehensive DeFi ecosystem designed to multiply your investments through innovative staking, mining, and community-driven growth strategies.
+            A comprehensive community-driven ecosystem where members build and multiply wealth together through innovative DeFi strategies, collective staking, and shared growth opportunities.
           </p>
         </div>
         

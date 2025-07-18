@@ -15,19 +15,19 @@ export default function ProjectsSection() {
     {
       icon: <ArrowLeftRight className="h-10 w-10" />,
       title: "BAM DEX",
-      description: "Decentralized exchange with advanced trading features and liquidity mining rewards.",
+      description: "Community-driven decentralized exchange where collective trading strategies multiply wealth for all members.",
       color: "text-primary"
     },
     {
       icon: <MessageSquare className="h-10 w-10" />,
       title: "BAM Talk",
-      description: "Community platform for discussions, governance, and ecosystem updates.",
+      description: "Community platform where members collaborate, share strategies, and build collective wealth together.",
       color: "text-secondary"
     },
     {
       icon: <Sprout className="h-10 w-10" />,
-      title: "Staking & Pools",
-      description: "High-yield staking opportunities and liquidity pool farming with competitive APY.",
+      title: "Community Staking",
+      description: "Collective staking pools where communities combine resources to maximize shared returns and growth.",
       color: "text-accent"
     },
     {
@@ -67,10 +67,10 @@ export default function ProjectsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="gradient-text">Ecosystem Projects</span>
+            <span className="gradient-text">Community Projects</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Comprehensive suite of DeFi products and services designed to maximize your crypto potential.
+            Comprehensive suite of community-driven DeFi products where members build and multiply wealth together through collective strategies.
           </p>
         </div>
         

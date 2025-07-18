@@ -6,10 +6,10 @@ export default function CTASection() {
     <section className="py-20 bg-gradient-to-br from-primary via-accent to-secondary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-          Ready to Build And Multiply?
+          Ready to Build And Multiply Together?
         </h2>
         <p className="text-xl text-white opacity-90 mb-8 max-w-3xl mx-auto">
-          Join the BAM ecosystem today and start maximizing your crypto potential with our comprehensive suite of DeFi products.
+          Join the BAM community today where we build and multiply wealth together through collective DeFi strategies and shared prosperity.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button

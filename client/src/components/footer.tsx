@@ -5,14 +5,14 @@ export default function Footer() {
     { label: "BAM Token", href: "#" },
     { label: "BAM ApexMiner", href: "https://apex.bam-ecosystem.com" },
     { label: "BAM VIP Access", href: "https://vip.bam-ecosystem.com" },
-    { label: "Staking", href: "#" }
+    { label: "Community Staking", href: "#" }
   ];
 
   const productLinks = [
     { label: "BAM DEX", href: "#" },
     { label: "NFT Marketplace", href: "#" },
     { label: "Play 2 Earn", href: "#" },
-    { label: "DAO", href: "#" }
+    { label: "BAM DAO", href: "#" }
   ];
 
   const socialLinks = [
@@ -32,7 +32,7 @@ export default function Footer() {
               <span className="text-sm text-muted-foreground ml-2">Ecosystem</span>
             </div>
             <p className="text-muted-foreground text-sm">
-              Building the future of decentralized finance through innovative token utilities and community-driven growth.
+              Where Communities Build and Multiply Wealth Together. Creating collective prosperity through community-driven DeFi strategies and shared growth.
             </p>
           </div>
           
@@ -88,7 +88,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2024 BAM Ecosystem. All rights reserved. Built for the community, by the community.</p>
+          <p>&copy; 2024 BAM Ecosystem. All rights reserved. Where Communities Build and Multiply Wealth Together.</p>
         </div>
       </div>
     </footer>

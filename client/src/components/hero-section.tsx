@@ -26,10 +26,12 @@ export default function HeroSection() {
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             <span className="gradient-text">Build And Multiply</span>
             <br />
-            <span className="text-foreground">Your Wealth</span>
+            <span className="text-foreground">Wealth Together</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            BAM Ecosystem - The ultimate DeFi utility token combining staking, mining, NFTs, and community-driven growth on BSC
+            <span className="text-primary font-semibold">BAM Token—Where Communities Build and Multiply Wealth Together.</span>
+            <br />
+            Community-driven wealth multiplier on BSC combining staking, DeFi utility, and collective growth.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
