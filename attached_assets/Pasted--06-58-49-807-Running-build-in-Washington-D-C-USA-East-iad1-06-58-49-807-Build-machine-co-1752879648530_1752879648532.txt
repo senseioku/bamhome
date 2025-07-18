@@ -1,0 +1,55 @@
+[06:58:49.807] Running build in Washington, D.C., USA (East) – iad1
+[06:58:49.807] Build machine configuration: 4 cores, 8 GB
+[06:58:49.823] Cloning github.com/senseioku/bamhome (Branch: main, Commit: 6a6a0eb)
+[06:58:50.078] Cloning completed: 254.000ms
+[06:58:50.119] Found .vercelignore
+[06:58:50.131] Removed 76 ignored files defined in .vercelignore
+[06:58:50.131]   /.replit
+[06:58:50.131]   /client/src/App.tsx
+[06:58:50.131]   /client/src/components/cta-section.tsx
+[06:58:50.131]   /client/src/components/ecosystem-overview.tsx
+[06:58:50.131]   /client/src/components/footer.tsx
+[06:58:50.131]   /client/src/components/hero-section.tsx
+[06:58:50.131]   /client/src/components/navigation.tsx
+[06:58:50.131]   /client/src/components/projects-section.tsx
+[06:58:50.131]   /client/src/components/roadmap-section.tsx
+[06:58:50.131]   /client/src/components/tokenomics-section.tsx
+[06:58:50.904] Restored build cache from previous deployment (Fjq4iVdkLjSgBG6dcu7hyf5XkUGq)
+[06:58:51.452] Running "vercel build"
+[06:58:52.168] Vercel CLI 44.4.3
+[06:58:53.054] Running "install" command: `npm install`...
+[06:58:55.335] 
+[06:58:55.336] up to date, audited 482 packages in 2s
+[06:58:55.336] 
+[06:58:55.336] 64 packages are looking for funding
+[06:58:55.336]   run `npm fund` for details
+[06:58:55.364] 
+[06:58:55.364] 11 vulnerabilities (3 low, 8 moderate)
+[06:58:55.364] 
+[06:58:55.364] To address issues that do not require attention, run:
+[06:58:55.364]   npm audit fix
+[06:58:55.364] 
+[06:58:55.364] To address all issues (including breaking changes), run:
+[06:58:55.365]   npm audit fix --force
+[06:58:55.365] 
+[06:58:55.365] Run `npm audit` for details.
+[06:58:55.908] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[06:58:56.234] transforming...
+[06:58:56.249] [32m✓[39m 2 modules transformed.
+[06:58:56.254] [31mx[39m Build failed in 51ms
+[06:58:56.255] [31merror during build:
+[06:58:56.255] [31m[vite]: Rollup failed to resolve import "/src/main.tsx" from "/vercel/path0/client/index.html".
+[06:58:56.255] This is most likely unintended because it can break your application at runtime.
+[06:58:56.255] If you do want to externalize this module explicitly add it to
+[06:58:56.255] `build.rollupOptions.external`[31m
+[06:58:56.255]     at viteWarn (file:///vercel/path0/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65839:17)
+[06:58:56.255]     at onwarn (file:///vercel/path0/node_modules/@vitejs/plugin-react/dist/index.mjs:280:9)
+[06:58:56.255]     at onRollupWarning (file:///vercel/path0/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65869:5)
+[06:58:56.256]     at onwarn (file:///vercel/path0/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65534:7)
+[06:58:56.256]     at file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:19452:13
+[06:58:56.256]     at Object.logger [as onLog] (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:21178:9)
+[06:58:56.256]     at ModuleLoader.handleInvalidResolvedId (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:20067:26)
+[06:58:56.256]     at file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:20025:26[39m
+[06:58:56.264] Error: Command "vite build --config vite.build.config.ts --emptyOutDir" exited with 1
+[06:58:56.527] 
+[06:59:00.502] Exiting build container
