@@ -40,25 +40,25 @@ export default function ProjectsSection() {
       icon: <Palette className="h-10 w-10" />,
       title: "NFT Marketplace",
       description: "Trade, mint, and showcase unique NFTs with BAM token integration.",
-      color: "text-purple-500"
+      color: "text-[hsl(51,100%,65%)]"
     },
     {
       icon: <Vote className="h-10 w-10" />,
       title: "BAM DAO",
       description: "Decentralized governance allowing community-driven ecosystem development.",
-      color: "text-red-500"
+      color: "text-[hsl(38,85%,50%)]"
     },
     {
       icon: <Key className="h-10 w-10" />,
       title: "Token Gate Access",
       description: "Exclusive access system providing premium features based on BAM holdings.",
-      color: "text-orange-500"
+      color: "text-[hsl(45,90%,55%)]"
     },
     {
       icon: <PlusCircle className="h-10 w-10" />,
       title: "More Projects",
       description: "Continuous development of new ecosystem features and integrations.",
-      color: "text-cyan-500"
+      color: "text-[hsl(51,100%,65%)]"
     }
   ];
 
