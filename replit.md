@@ -4,6 +4,14 @@
 
 This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build And Multiply) token ecosystem. The project is a full-stack web application built with React on the frontend and Express.js on the backend, featuring a modern UI library, database integration, and a complete token ecosystem with multiple DeFi products.
 
+## Recent Changes (July 18, 2025)
+
+✓ Enhanced tokenomics section with professional vesting schedules and anti-dump mechanisms
+✓ Added comprehensive vesting timeline visualization with progress indicators
+✓ Implemented token metrics overview showcasing deflationary and utility features
+✓ Created detailed allocation cards with TGE unlock percentages and cliff periods
+✓ Added best-practice vesting highlights for investor confidence
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
