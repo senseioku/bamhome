@@ -77,7 +77,7 @@ export default function Navigation() {
                       className="flex items-center"
                     >
                       <span className="mr-2">⛏️</span>
-                      apex.bam-ecosystem.com
+                      BAM ApexMiner
                     </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
@@ -88,7 +88,7 @@ export default function Navigation() {
                       className="flex items-center"
                     >
                       <span className="mr-2">👑</span>
-                      vip.bam-ecosystem.com
+                      BAM VIP Access
                     </a>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -123,7 +123,7 @@ export default function Navigation() {
                       rel="noopener noreferrer"
                       className="block py-2 text-foreground hover:text-primary"
                     >
-                      ⛏️ ApexMiner
+                      ⛏️ BAM ApexMiner
                     </a>
                     <a
                       href="https://vip.bam-ecosystem.com"
@@ -131,7 +131,7 @@ export default function Navigation() {
                       rel="noopener noreferrer"
                       className="block py-2 text-foreground hover:text-primary"
                     >
-                      👑 VIP Program
+                      👑 BAM VIP Access
                     </a>
                   </div>
                 </div>

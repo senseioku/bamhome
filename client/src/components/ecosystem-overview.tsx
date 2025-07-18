@@ -27,7 +27,7 @@ export default function EcosystemOverview() {
     },
     {
       icon: <Crown className="h-10 w-10" />,
-      title: "BAM VIP Program",
+      title: "BAM VIP Access",
       description: "Exclusive membership program offering premium features, higher rewards, and early access to new products.",
       features: [
         "Premium Staking Rates",

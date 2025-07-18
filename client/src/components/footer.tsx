@@ -3,8 +3,8 @@ import { Github, Twitter, MessageCircle, Zap } from "lucide-react";
 export default function Footer() {
   const ecosystemLinks = [
     { label: "BAM Token", href: "#" },
-    { label: "ApexMiner", href: "https://apex.bam-ecosystem.com" },
-    { label: "VIP Program", href: "https://vip.bam-ecosystem.com" },
+    { label: "BAM ApexMiner", href: "https://apex.bam-ecosystem.com" },
+    { label: "BAM VIP Access", href: "https://vip.bam-ecosystem.com" },
     { label: "Staking", href: "#" }
   ];
 
