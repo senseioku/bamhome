@@ -23,6 +23,13 @@ export default function HeroSection() {
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16">
         <div className="animate-float">
+          <div className="flex justify-center mb-8">
+            <img 
+              src="/assets/bamToken_1752877645023.png" 
+              alt="BAM Token Logo" 
+              className="h-24 w-24 md:h-32 md:w-32 rounded-full shadow-2xl"
+            />
+          </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             <span className="gradient-text">Build And Multiply</span>
             <br />

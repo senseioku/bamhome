@@ -44,9 +44,16 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <span className="text-2xl font-bold gradient-text">BAM</span>
-              <span className="text-sm text-muted-foreground ml-2">Ecosystem</span>
+            <div className="flex-shrink-0 flex items-center gap-3">
+              <img 
+                src="/assets/bamToken_1752877645023.png" 
+                alt="BAM Token" 
+                className="h-10 w-10 rounded-full"
+              />
+              <div>
+                <span className="text-2xl font-bold gradient-text">BAM</span>
+                <span className="text-sm text-muted-foreground ml-2">Ecosystem</span>
+              </div>
             </div>
           </div>
 

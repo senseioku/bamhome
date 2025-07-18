@@ -4,7 +4,7 @@ import { Coins, Pickaxe, Crown, Check } from "lucide-react";
 export default function EcosystemOverview() {
   const ecosystemFeatures = [
     {
-      icon: <Coins className="h-10 w-10" />,
+      icon: <img src="/assets/bamToken_1752877645023.png" alt="BAM Token" className="h-10 w-10 rounded-full" />,
       title: "BAM Token",
       description: "Community-driven wealth multiplier token where members build and multiply wealth together through collective DeFi strategies.",
       features: [

@@ -27,9 +27,16 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center mb-4">
-              <span className="text-2xl font-bold gradient-text">BAM</span>
-              <span className="text-sm text-muted-foreground ml-2">Ecosystem</span>
+            <div className="flex items-center mb-4 gap-3">
+              <img 
+                src="/assets/bamToken_1752877645023.png" 
+                alt="BAM Token" 
+                className="h-8 w-8 rounded-full"
+              />
+              <div>
+                <span className="text-2xl font-bold gradient-text">BAM</span>
+                <span className="text-sm text-muted-foreground ml-2">Ecosystem</span>
+              </div>
             </div>
             <p className="text-muted-foreground text-sm">
               Where Communities Build and Multiply Wealth Together. Creating collective prosperity through community-driven DeFi strategies and shared growth.
