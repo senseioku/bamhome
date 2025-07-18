@@ -1,10 +1,15 @@
 {
   "version": 2,
-  "functions": {
-    "dist/index.js": {
-      "runtime": "nodejs18.x"
+  "builds": [
+    {
+      "src": "dist/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "dist/public/**/*",
+      "use": "@vercel/static"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
@@ -15,7 +20,5 @@
       "dest": "/dist/public/$1"
     }
   ],
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/public",
-  "installCommand": "npm install"
+  "buildCommand": "npm run build"
 }

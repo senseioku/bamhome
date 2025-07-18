@@ -65,8 +65,23 @@ After deployment, you can configure custom domains:
 
 ## Troubleshooting
 
-- **Functions Configuration**: Fixed conflicting Vercel configuration
-- **Asset Serving**: Logo and static files properly routed
+- **Functions Configuration**: Using @vercel/node for serverless functions
+- **Asset Serving**: Logo and static files properly routed with @vercel/static
 - **Build Success**: All components build without errors
+- **Runtime Error**: Fixed invalid runtime specification in vercel.json
 
-Ready for production deployment! 🚀
+## Common Issues
+
+### Function Runtime Error
+If you see "Function Runtimes must have a valid version" error:
+- The configuration now uses `@vercel/node` instead of custom runtime specs
+- Vercel automatically detects Node.js version from package.json
+
+### Build Process
+1. Vercel runs `npm run build` 
+2. Frontend builds to `dist/public/`
+3. Backend builds to `dist/index.js`
+4. Static files served via @vercel/static
+5. API routes handled by @vercel/node
+
+Ready for production deployment!

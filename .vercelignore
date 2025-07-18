@@ -10,6 +10,6 @@ coverage
 client/src
 server
 shared
-*.md
+replit.md
 .replit
 package-lock.json
