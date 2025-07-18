@@ -84,4 +84,16 @@ If you see "Function Runtimes must have a valid version" error:
 4. Static files served via @vercel/static
 5. API routes handled by @vercel/node
 
+### Simplified Static Deployment
+- Uses `@vercel/static-build` for optimal React SPA deployment
+- All routes fallback to `index.html` for client-side routing
+- Static assets (BAM Token logo, CSS, JS) served directly from CDN
+- No server-side routing complexity - pure static deployment
+
+### Benefits
+- Faster loading with CDN distribution
+- Simpler deployment configuration
+- Better caching for static assets
+- No server functions needed for this landing page
+
 Ready for production deployment!
