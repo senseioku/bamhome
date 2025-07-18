@@ -78,7 +78,7 @@ After deployment, you can configure custom domains:
 
 ### ✅ Vite Build Error 
 - **Issue**: Rollup failed to resolve import "/src/main.tsx" during Vercel build
-- **Solution**: Created custom `vite.build.config.ts` with proper root and build paths for Vercel deployment
+- **Solution**: Created custom `vite.build.config.ts` with proper ES module path resolution using `fileURLToPath(import.meta.url)`
 
 ### ✅ 404 Not Found Error
 - **Issue**: Static files not properly served
