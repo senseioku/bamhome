@@ -1,0 +1,77 @@
+[07:06:36.236] Running build in Washington, D.C., USA (East) – iad1
+[07:06:36.236] Build machine configuration: 4 cores, 8 GB
+[07:06:36.271] Cloning github.com/senseioku/bamhome (Branch: main, Commit: b84ef75)
+[07:06:36.520] Cloning completed: 249.000ms
+[07:06:36.559] Found .vercelignore
+[07:06:36.578] Removed 76 ignored files defined in .vercelignore
+[07:06:36.578]   /.replit
+[07:06:36.578]   /client/src/App.tsx
+[07:06:36.578]   /client/src/components/cta-section.tsx
+[07:06:36.578]   /client/src/components/ecosystem-overview.tsx
+[07:06:36.579]   /client/src/components/footer.tsx
+[07:06:36.579]   /client/src/components/hero-section.tsx
+[07:06:36.579]   /client/src/components/navigation.tsx
+[07:06:36.579]   /client/src/components/projects-section.tsx
+[07:06:36.579]   /client/src/components/roadmap-section.tsx
+[07:06:36.579]   /client/src/components/tokenomics-section.tsx
+[07:06:37.812] Restored build cache from previous deployment (Fjq4iVdkLjSgBG6dcu7hyf5XkUGq)
+[07:06:38.817] Running "vercel build"
+[07:06:39.645] Vercel CLI 44.4.3
+[07:06:40.404] Running "install" command: `npm install`...
+[07:06:42.750] 
+[07:06:42.750] up to date, audited 482 packages in 2s
+[07:06:42.750] 
+[07:06:42.750] 64 packages are looking for funding
+[07:06:42.750]   run `npm fund` for details
+[07:06:42.778] 
+[07:06:42.778] 11 vulnerabilities (3 low, 8 moderate)
+[07:06:42.778] 
+[07:06:42.778] To address issues that do not require attention, run:
+[07:06:42.778]   npm audit fix
+[07:06:42.778] 
+[07:06:42.778] To address all issues (including breaking changes), run:
+[07:06:42.778]   npm audit fix --force
+[07:06:42.779] 
+[07:06:42.779] Run `npm audit` for details.
+[07:06:43.271] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[07:06:43.603] transforming...
+[07:06:43.613] [32m✓[39m 2 modules transformed.
+[07:06:43.619] [31mx[39m Build failed in 48ms
+[07:06:43.619] [31merror during build:
+[07:06:43.620] [31m[vite]: Rollup failed to resolve import "/src/main.tsx" from "/vercel/path0/client/index.html".
+[07:06:43.620] This is most likely unintended because it can break your application at runtime.
+[07:06:43.620] If you do want to externalize this module explicitly add it to
+[07:06:43.620] `build.rollupOptions.external`[31m
+[07:06:43.620]     at viteWarn (file:///vercel/path0/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65839:17)
+[07:06:43.620]     at onwarn (file:///vercel/path0/node_modules/@vitejs/plugin-react/dist/index.mjs:280:9)
+[07:06:43.620]     at onRollupWarning (file:///vercel/path0/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65869:5)
+[07:06:43.620]     at onwarn (file:///vercel/path0/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65534:7)
+[07:06:43.620]     at file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:19452:13
+[07:06:43.620]     at Object.logger [as onLog] (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:21178:9)
+[07:06:43.620]     at ModuleLoader.handleInvalidResolvedId (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:20067:26)
+[07:06:43.621]     at file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:20025:26[39m
+[07:06:43.629] node:internal/errors:983
+[07:06:43.629]   const err = new Error(message);
+[07:06:43.629]               ^
+[07:06:43.629] 
+[07:06:43.629] Error: Command failed: vite build --outDir ../dist/public --emptyOutDir
+[07:06:43.629]     at genericNodeError (node:internal/errors:983:15)
+[07:06:43.629]     at wrappedFn (node:internal/errors:537:14)
+[07:06:43.629]     at checkExecSyncError (node:child_process:883:11)
+[07:06:43.629]     at execSync (node:child_process:955:15)
+[07:06:43.629]     at file:///vercel/path0/build.js:10:1
+[07:06:43.629]     at ModuleJob.run (node:internal/modules/esm/module_job:329:25)
+[07:06:43.629]     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)
+[07:06:43.630]     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+[07:06:43.630]   status: 1,
+[07:06:43.630]   signal: null,
+[07:06:43.630]   output: [ null, null, null ],
+[07:06:43.630]   pid: 92,
+[07:06:43.630]   stdout: null,
+[07:06:43.630]   stderr: null
+[07:06:43.630] }
+[07:06:43.630] 
+[07:06:43.630] Node.js v22.17.1
+[07:06:43.634] Error: Command "node build.js" exited with 1
+[07:06:43.861] 
+[07:06:46.587] Exiting build container

@@ -104,9 +104,11 @@ After deployment, you can configure custom domains:
 - No server functions needed for this landing page
 
 ### ✅ **FINAL BUILD CONFIRMATION**
-- Build command confirmed working: `vite build --config vite.build.config.ts --emptyOutDir`
+- Build command confirmed working: `node build.js` 
+- Custom build script properly executes from client directory with all configs
 - BAM Token logo (212KB) successfully included in production assets
 - All React components, Tailwind styling, and functionality working correctly
+- Updated .vercelignore to include necessary client source files
 - Production build tested and verified locally
 
-**Ready for production deployment!**
+**✅ Ready for production deployment on Vercel!**
