@@ -1,0 +1,47 @@
+[06:46:31.502] Running build in Washington, D.C., USA (East) – iad1
+[06:46:31.503] Build machine configuration: 4 cores, 8 GB
+[06:46:31.519] Cloning github.com/senseioku/bamhome (Branch: main, Commit: 9886aa5)
+[06:46:31.757] Cloning completed: 238.000ms
+[06:46:31.789] Found .vercelignore
+[06:46:31.801] Removed 76 ignored files defined in .vercelignore
+[06:46:31.801]   /.replit
+[06:46:31.801]   /client/src/App.tsx
+[06:46:31.801]   /client/src/components/cta-section.tsx
+[06:46:31.801]   /client/src/components/ecosystem-overview.tsx
+[06:46:31.801]   /client/src/components/footer.tsx
+[06:46:31.801]   /client/src/components/hero-section.tsx
+[06:46:31.801]   /client/src/components/navigation.tsx
+[06:46:31.801]   /client/src/components/projects-section.tsx
+[06:46:31.802]   /client/src/components/roadmap-section.tsx
+[06:46:31.802]   /client/src/components/tokenomics-section.tsx
+[06:46:31.844] Restored build cache from previous deployment (iH1tgDwXrmbg9pKDBenoQSC7Xo22)
+[06:46:33.668] Running "vercel build"
+[06:46:34.142] Vercel CLI 44.4.3
+[06:46:34.304] WARN! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+[06:46:34.758] Installing dependencies...
+[06:47:01.610] npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[06:47:01.610] npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[06:47:07.561] 
+[06:47:07.561] added 495 packages in 33s
+[06:47:07.561] 
+[06:47:07.561] 66 packages are looking for funding
+[06:47:07.561]   run `npm fund` for details
+[06:47:07.632] Running "npm run build"
+[06:47:07.747] 
+[06:47:07.748] > rest-express@1.0.0 build
+[06:47:07.748] > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+[06:47:07.748] 
+[06:47:08.005] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[06:47:08.057] transforming...
+[06:47:08.075] [32m✓[39m 2 modules transformed.
+[06:47:08.077] [31mx[39m Build failed in 47ms
+[06:47:08.077] [31merror during build:
+[06:47:08.077] [31mCould not resolve "./src/main.tsx" from "client/index.html"[31m
+[06:47:08.077] file: [36m/vercel/path0/client/index.html[31m
+[06:47:08.077]     at getRollupError (file:///vercel/path0/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
+[06:47:08.077]     at error (file:///vercel/path0/node_modules/rollup/dist/es/shared/parseAst.js:397:42)
+[06:47:08.077]     at ModuleLoader.handleInvalidResolvedId (file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:21442:24)
+[06:47:08.077]     at file:///vercel/path0/node_modules/rollup/dist/es/shared/node-entry.js:21402:26[39m
+[06:47:08.091] Error: Command "npm run build" exited with 1
+[06:47:08.361] 
+[06:47:11.359] Exiting build container

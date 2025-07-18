@@ -77,8 +77,8 @@ After deployment, you can configure custom domains:
 - **Solution**: Switched to `@vercel/static-build` for pure React SPA deployment
 
 ### ✅ Vite Build Error 
-- **Issue**: Rollup failed to resolve import "/src/main.tsx"
-- **Solution**: Changed script src from "/src/main.tsx" to "./src/main.tsx" in index.html
+- **Issue**: Rollup failed to resolve import "/src/main.tsx" during Vercel build
+- **Solution**: Simplified Vercel configuration to use direct `vite build` command
 
 ### ✅ 404 Not Found Error
 - **Issue**: Static files not properly served
