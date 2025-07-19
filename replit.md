@@ -29,6 +29,9 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ FINAL FIX: Completely resolved white background by adding dark classes to HTML and body elements
 ✓ Updated all hardcoded color classes in projects section to use golden theme variants
 ✓ Confirmed site loads with proper dark background and golden BAM branding from start
+✓ Updated tokenomics allocation: Public Sale 35%, Ecosystem 20%, Advisors 15%, Treasury 10%, Community 10%, CEX 10%
+✓ Implemented new vesting schedules with proper TGE unlock percentages and cliff periods
+✓ Updated community allocation metric to 45% reflecting combined public and community allocations
 
 ## User Preferences
 

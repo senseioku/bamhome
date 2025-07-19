@@ -1,2 +1,2 @@
-Build timestamp: 2025-07-18T23:51:21Z
-Force rebuild - FINAL DARK BACKGROUND FIX
+Build timestamp: 2025-07-19T00:02:51Z
+Updated tokenomics: 35% Public Sale, new vesting schedules
