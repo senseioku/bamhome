@@ -14,42 +14,29 @@ export interface TokenomicsData {
 
 export const tokenomicsData: TokenomicsData[] = [
   {
-    name: "Ecosystem Growth",
-    value: 25,
-    percentage: 25,
-    amount: 25000000000,
-    color: "hsl(195, 100%, 50%)", // primary
+    name: "Public Sale (Liquidity)",
+    value: 35,
+    percentage: 35,
+    amount: 35000000000,
+    color: "hsl(45, 90%, 55%)", // primary gold
     vestingSchedule: {
-      tgeUnlock: 5, // 5% at TGE
-      vestingPeriod: 60, // 5 years total
-      cliffPeriod: 12, // 1 year cliff
-      description: "5% at TGE, 12-month cliff, then linear vesting over 48 months"
+      tgeUnlock: 50, // 50% at TGE
+      vestingPeriod: 6, // remaining over 6 months
+      cliffPeriod: 0, // no cliff
+      description: "50% unlocked at TGE, remaining vested over 6 months"
     }
   },
   {
-    name: "Public Sale",
+    name: "Ecosystem Growth",
     value: 20,
     percentage: 20,
     amount: 20000000000,
-    color: "hsl(160, 100%, 50%)", // secondary
+    color: "hsl(38, 85%, 50%)", // secondary gold
     vestingSchedule: {
       tgeUnlock: 20, // 20% at TGE
       vestingPeriod: 40, // remaining over 40 months
       cliffPeriod: 0, // no cliff
-      description: "20% at TGE, remaining vested linearly over 40 months"
-    }
-  },
-  {
-    name: "Treasury",
-    value: 20,
-    percentage: 20,
-    amount: 20000000000,
-    color: "hsl(240, 60%, 60%)", // accent
-    vestingSchedule: {
-      tgeUnlock: 0, // 0% at TGE
-      vestingPeriod: 72, // 6 years
-      cliffPeriod: 6, // 6 months cliff
-      description: "0% at TGE, 6-month cliff, then linear vesting over 66 months"
+      description: "20% unlocked at TGE, remaining vested over 40 months"
     }
   },
   {
@@ -57,12 +44,25 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 15,
     percentage: 15,
     amount: 15000000000,
-    color: "hsl(45, 90%, 55%)", // gold
+    color: "hsl(51, 100%, 65%)", // accent gold
     vestingSchedule: {
       tgeUnlock: 0, // 0% at TGE
-      vestingPeriod: 42, // 3.5 years
+      vestingPeriod: 48, // 48 months
+      cliffPeriod: 0, // no cliff
+      description: "Vesting Period: 48 months, Unlocked at TGE: 0%"
+    }
+  },
+  {
+    name: "Treasury",
+    value: 10,
+    percentage: 10,
+    amount: 10000000000,
+    color: "hsl(42, 95%, 60%)", // lighter gold
+    vestingSchedule: {
+      tgeUnlock: 0, // 0% at TGE
+      vestingPeriod: 36, // 36 months vesting
       cliffPeriod: 6, // 6 months cliff
-      description: "0% at TGE, 6-month cliff, then linear vesting over 36 months"
+      description: "Cliff 6 months, Vested 36 months, Unlocked at TGE: 0%"
     }
   },
   {
@@ -70,12 +70,12 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 10,
     percentage: 10,
     amount: 10000000000,
-    color: "hsl(270, 60%, 60%)", // purple
+    color: "hsl(48, 85%, 58%)", // warm gold
     vestingSchedule: {
       tgeUnlock: 100, // 100% at TGE
       vestingPeriod: 0, // no vesting
       cliffPeriod: 0, // no cliff
-      description: "100% unlocked at TGE for immediate community rewards"
+      description: "Vesting Period: None, Unlocked at TGE: 100%"
     }
   },
   {
@@ -83,12 +83,12 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 10,
     percentage: 10,
     amount: 10000000000,
-    color: "hsl(0, 84%, 60%)", // red
+    color: "hsl(50, 90%, 62%)", // bright gold
     vestingSchedule: {
       tgeUnlock: 100, // 100% at TGE
       vestingPeriod: 0, // no vesting
       cliffPeriod: 0, // no cliff
-      description: "100% unlocked at TGE for exchange liquidity provision"
+      description: "Vesting Period: None, Unlocked at TGE: 100%"
     }
   }
 ];
@@ -96,9 +96,9 @@ export const tokenomicsData: TokenomicsData[] = [
 export const totalSupply = 100000000000; // 100 billion BAM tokens
 
 export const vestingHighlights = [
-  "Fair Launch with 20% public allocation unlocked at TGE",
-  "Long-term aligned team and advisor vesting with cliff periods",
-  "Treasury funds secured with 6-year gradual release",
-  "Immediate liquidity for community rewards and exchange listings",
+  "Fair Launch with 35% public sale allocation and 50% TGE unlock",
+  "Long-term aligned advisor vesting over 48 months with 0% TGE unlock",
+  "Treasury funds secured with 6-month cliff and 36-month vesting",
+  "Immediate liquidity for community incentives and CEX listings (100% TGE)",
   "Anti-dump mechanisms protect token value and community interests"
 ];

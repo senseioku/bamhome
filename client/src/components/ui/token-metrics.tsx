@@ -21,8 +21,8 @@ export default function TokenMetrics() {
     {
       icon: <Users className="h-6 w-6" />,
       title: "Community",
-      value: "30% Allocation",
-      description: "Public sale + community incentives combined",
+      value: "45% Allocation",
+      description: "Public sale + community incentives + CEX listings combined",
       color: "text-accent"
     },
     {
