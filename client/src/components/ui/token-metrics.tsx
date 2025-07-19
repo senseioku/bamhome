@@ -7,8 +7,8 @@ export default function TokenMetrics() {
     {
       icon: <TrendingUp className="h-6 w-6" />,
       title: "Deflationary",
-      value: "Built-in Burn",
-      description: "Regular token burns from ecosystem fees",
+      value: "Mechanism in Place",
+      description: "Ecosystem-driven deflationary mechanisms through platform usage",
       color: "text-primary"
     },
     {
