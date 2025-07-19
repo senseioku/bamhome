@@ -23,7 +23,12 @@ export default function CTASection() {
           </Button>
           <Button
             size="lg"
-            className="bg-white text-primary border-2 border-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
+            className="px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300"
+            style={{ 
+              background: 'linear-gradient(135deg, hsl(45, 90%, 55%), hsl(38, 85%, 50%))', 
+              color: 'hsl(220, 30%, 5%)',
+              border: '2px solid hsl(45, 90%, 55%)'
+            }}
           >
             <BookOpen className="mr-2 h-5 w-5" />
             Read Whitepaper
