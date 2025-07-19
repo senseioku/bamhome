@@ -72,7 +72,8 @@ export default function RoadmapSection() {
                     <div className="flex-1 pr-8 text-right">
                       <Card className="glass-card border-border">
                         <CardContent className="p-6">
-                          <h3 className={`text-xl font-bold mb-2 text-primary`}>{item.quarter}</h3>
+                          <h3 className="text-xl font-bold mb-2" 
+                              style={{ color: index === 0 ? 'hsl(45, 90%, 55%)' : index === 2 ? 'hsl(51, 100%, 65%)' : 'hsl(45, 90%, 55%)' }}>{item.quarter}</h3>
                           <h4 className="text-lg font-semibold mb-2">{item.title}</h4>
                           <ul className="text-sm text-muted-foreground space-y-1">
                             {item.items.map((listItem, listIndex) => (
@@ -94,7 +95,8 @@ export default function RoadmapSection() {
                     <div className="flex-1 pl-8">
                       <Card className="glass-card border-border">
                         <CardContent className="p-6">
-                          <h3 className={`text-xl font-bold mb-2 text-secondary`}>{item.quarter}</h3>
+                          <h3 className="text-xl font-bold mb-2" 
+                              style={{ color: index === 1 ? 'hsl(38, 85%, 50%)' : 'hsl(45, 90%, 55%)' }}>{item.quarter}</h3>
                           <h4 className="text-lg font-semibold mb-2">{item.title}</h4>
                           <ul className="text-sm text-muted-foreground space-y-1">
                             {item.items.map((listItem, listIndex) => (
