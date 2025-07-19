@@ -21,10 +21,8 @@ export default function CTASection() {
             Get Started
           </Button>
           <Button
-            variant="outline"
             size="lg"
-            className="border-2 bg-white/10 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-primary transition-all duration-300"
-            style={{ borderColor: 'white' }}
+            className="bg-white text-primary border-2 border-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
           >
             <BookOpen className="mr-2 h-5 w-5" />
             Read Whitepaper

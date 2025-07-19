@@ -1,2 +1,2 @@
-Build timestamp: 2025-07-19T03:14:25Z
-COMPLETE FIX: Fixed background animations with inline styles + made all buttons visible
+Build timestamp: 2025-07-19T03:17:30Z
+COMPLETE FIX: Solid white button + roadmap timeline dots with inline colors

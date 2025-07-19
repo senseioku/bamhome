@@ -61,7 +61,8 @@ export default function RoadmapSection() {
         </div>
         
         <div className="relative">
-          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-primary to-secondary"></div>
+          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full"
+               style={{ background: 'linear-gradient(to bottom, hsl(45, 90%, 55%), hsl(38, 85%, 50%))' }}></div>
           
           <div className="space-y-12">
             {roadmapItems.map((item, index) => (
@@ -81,13 +82,15 @@ export default function RoadmapSection() {
                         </CardContent>
                       </Card>
                     </div>
-                    <div className={`w-6 h-6 ${item.color} rounded-full border-4 border-background z-10`}></div>
+                    <div className="w-6 h-6 rounded-full border-4 border-background z-10"
+                         style={{ backgroundColor: index === 0 ? 'hsl(45, 90%, 55%)' : index === 2 ? 'hsl(51, 100%, 65%)' : 'hsl(45, 90%, 55%)' }}></div>
                     <div className="flex-1 pl-8"></div>
                   </>
                 ) : (
                   <>
                     <div className="flex-1 pr-8"></div>
-                    <div className={`w-6 h-6 ${item.color} rounded-full border-4 border-background z-10`}></div>
+                    <div className="w-6 h-6 rounded-full border-4 border-background z-10"
+                         style={{ backgroundColor: index === 1 ? 'hsl(38, 85%, 50%)' : 'hsl(45, 90%, 55%)' }}></div>
                     <div className="flex-1 pl-8">
                       <Card className="glass-card border-border">
                         <CardContent className="p-6">
