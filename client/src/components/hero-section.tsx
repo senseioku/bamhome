@@ -16,9 +16,12 @@ export default function HeroSection() {
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary rounded-full opacity-10 animate-pulse-slow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-secondary rounded-full opacity-10 animate-float"></div>
-        <div className="absolute top-1/2 right-1/3 w-32 h-32 bg-accent rounded-full opacity-10 animate-pulse-slow"></div>
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-20 animate-pulse-slow"
+             style={{ backgroundColor: 'hsl(45, 90%, 55%, 0.15)' }}></div>
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full opacity-20 animate-float"
+             style={{ backgroundColor: 'hsl(38, 85%, 50%, 0.15)' }}></div>
+        <div className="absolute top-1/2 right-1/3 w-32 h-32 rounded-full opacity-20 animate-pulse-slow"
+             style={{ backgroundColor: 'hsl(51, 100%, 65%, 0.15)' }}></div>
       </div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16">
@@ -52,7 +55,7 @@ export default function HeroSection() {
             <Button
               variant="outline"
               size="lg"
-              className="border-2 border-primary text-primary font-semibold text-lg px-8 py-4 rounded-full hover:bg-primary hover:text-background transition-all duration-300"
+              className="border-2 border-primary bg-primary/10 text-primary font-semibold text-lg px-8 py-4 rounded-full hover:bg-primary hover:text-white transition-all duration-300"
               onClick={() => scrollToSection("tokenomics")}
             >
               <TrendingUp className="mr-2 h-5 w-5" />

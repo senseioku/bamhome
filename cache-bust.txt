@@ -1,2 +1,2 @@
-Build timestamp: 2025-07-19T01:53:15Z
-FINAL FIX: Made "Read Whitepaper" button visible with golden border and background
+Build timestamp: 2025-07-19T03:14:25Z
+COMPLETE FIX: Fixed background animations with inline styles + made all buttons visible
