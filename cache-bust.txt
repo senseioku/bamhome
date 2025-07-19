@@ -1,2 +1,2 @@
-Build timestamp: 2025-07-19T01:20:35Z
-REVERTED: Back to working glass card styles with proper contrast
+Build timestamp: 2025-07-19T01:53:15Z
+FINAL FIX: Made "Read Whitepaper" button visible with golden border and background
