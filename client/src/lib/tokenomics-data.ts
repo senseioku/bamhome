@@ -18,7 +18,7 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 35,
     percentage: 35,
     amount: 35000000000,
-    color: "hsl(45, 90%, 55%)", // primary gold
+    color: "hsl(45, 90%, 55%)", // primary golden
     vestingSchedule: {
       tgeUnlock: 50, // 50% at TGE
       vestingPeriod: 6, // remaining over 6 months
@@ -31,7 +31,7 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 20,
     percentage: 20,
     amount: 20000000000,
-    color: "hsl(38, 85%, 50%)", // secondary gold
+    color: "hsl(38, 85%, 50%)", // darker amber
     vestingSchedule: {
       tgeUnlock: 20, // 20% at TGE
       vestingPeriod: 40, // remaining over 40 months
@@ -44,7 +44,7 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 15,
     percentage: 15,
     amount: 15000000000,
-    color: "hsl(51, 100%, 65%)", // accent gold
+    color: "hsl(51, 100%, 65%)", // bright yellow-gold
     vestingSchedule: {
       tgeUnlock: 0, // 0% at TGE
       vestingPeriod: 48, // 48 months
@@ -57,7 +57,7 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 10,
     percentage: 10,
     amount: 10000000000,
-    color: "hsl(42, 95%, 60%)", // lighter gold
+    color: "hsl(35, 80%, 45%)", // bronze-gold
     vestingSchedule: {
       tgeUnlock: 0, // 0% at TGE
       vestingPeriod: 36, // 36 months vesting
@@ -83,7 +83,7 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 10,
     percentage: 10,
     amount: 10000000000,
-    color: "hsl(50, 90%, 62%)", // bright gold
+    color: "hsl(55, 95%, 70%)", // light champagne gold
     vestingSchedule: {
       tgeUnlock: 100, // 100% at TGE
       vestingPeriod: 0, // no vesting
