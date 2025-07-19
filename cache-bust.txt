@@ -1,2 +1,2 @@
-Build timestamp: 2025-07-19T01:17:45Z
-VISIBILITY FIX: Fixed invisible elements and modal overlays
+Build timestamp: 2025-07-19T01:20:35Z
+REVERTED: Back to working glass card styles with proper contrast
