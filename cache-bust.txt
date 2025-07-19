@@ -1,2 +1,2 @@
-Build timestamp: 2025-07-19T00:02:51Z
-Updated tokenomics: 35% Public Sale, new vesting schedules
+Build timestamp: 2025-07-19T00:12:30Z
+FORCE DEPLOY: Dark background fix with updated tokenomics
