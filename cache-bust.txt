@@ -1,2 +1,2 @@
-Build timestamp: 2025-07-19T00:12:30Z
-FORCE DEPLOY: Dark background fix with updated tokenomics
+Build timestamp: 2025-07-19T01:11:46Z
+CRITICAL FIX: Added !important CSS rules to force dark background

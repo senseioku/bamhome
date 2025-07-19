@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force dark background immediately */
+html {
+  background-color: hsl(220, 30%, 5%) !important;
+  color: hsl(0, 0%, 98%) !important;
+}
+
+body {
+  background-color: hsl(220, 30%, 5%) !important;
+  color: hsl(0, 0%, 98%) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#root {
+  background-color: hsl(220, 30%, 5%) !important;
+  min-height: 100vh !important;
+}
+
 :root {
   --background: hsl(220, 30%, 5%);
   --foreground: hsl(0, 0%, 98%);
