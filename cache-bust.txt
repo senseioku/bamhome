@@ -1,2 +1,2 @@
-Build timestamp: 2025-07-19T01:11:46Z
-CRITICAL FIX: Added !important CSS rules to force dark background
+Build timestamp: 2025-07-19T01:17:45Z
+VISIBILITY FIX: Fixed invisible elements and modal overlays
