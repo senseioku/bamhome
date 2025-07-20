@@ -887,35 +887,35 @@ const SwapPage = () => {
             </div>
           </Button>
         </DialogTrigger>
-        <DialogContent className="bg-gray-900 border-gray-700 max-w-lg mx-4 sm:mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center space-x-2">
-              <span>Select a token</span>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-sm mx-2 sm:max-w-md sm:mx-auto max-h-[85vh] overflow-hidden p-4">
+          <DialogHeader className="pb-3">
+            <DialogTitle className="text-white text-base">
+              Select a token
             </DialogTitle>
           </DialogHeader>
           
           {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <div className="relative mb-3">
+            <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
             <Input
               type="text"
-              placeholder="Search name or paste address"
+              placeholder="Search or paste address"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
+              className="pl-8 py-2 text-sm bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
             />
           </div>
 
           {/* Popular Tokens Section */}
           {!searchQuery && (
-            <div className="space-y-3">
-              <div className="text-sm text-gray-400 font-medium">Popular tokens</div>
-              <div className="grid grid-cols-4 gap-2">
+            <div className="mb-3">
+              <div className="text-xs text-gray-400 font-medium mb-2">Popular</div>
+              <div className="grid grid-cols-4 gap-1">
                 {popularTokens.slice(0, 4).map((tokenOption) => (
                   <Button
                     key={tokenOption.symbol}
                     variant="ghost"
-                    className="flex flex-col items-center p-3 h-auto bg-gray-800/50 hover:bg-gray-700/50 rounded-lg border border-gray-700"
+                    className="flex flex-col items-center p-1.5 h-auto bg-gray-800/50 hover:bg-gray-700/50 rounded-md border border-gray-700"
                     onClick={() => {
                       onSelect(tokenOption);
                       setIsOpen(false);
@@ -923,9 +923,9 @@ const SwapPage = () => {
                     }}
                   >
                     {typeof tokenOption.icon === 'string' && (tokenOption.icon.includes('.png') || tokenOption.icon.includes('.jpg') || tokenOption.icon.includes('.jpeg') || tokenOption.icon.startsWith('/') || tokenOption.icon.startsWith('data:')) ? (
-                      <img src={tokenOption.icon} alt={tokenOption.symbol} className="w-8 h-8 rounded-full mb-1" />
+                      <img src={tokenOption.icon} alt={tokenOption.symbol} className="w-5 h-5 rounded-full mb-1" />
                     ) : (
-                      <div className="text-xl mb-1">{tokenOption.icon}</div>
+                      <div className="text-base mb-1">{tokenOption.icon}</div>
                     )}
                     <span className="text-xs font-medium text-white">{tokenOption.symbol}</span>
                   </Button>
@@ -935,8 +935,8 @@ const SwapPage = () => {
           )}
 
           {/* Token List */}
-          <div className="space-y-1 max-h-80 overflow-y-auto">
-            {!searchQuery && <div className="text-sm text-gray-400 font-medium mb-3">Your tokens</div>}
+          <div className="space-y-0.5 max-h-64 overflow-y-auto">
+            {!searchQuery && <div className="text-xs text-gray-400 font-medium mb-2">Your tokens</div>}
             
             {filteredTokens.length === 0 ? (
               <div className="text-center py-8">
@@ -956,7 +956,7 @@ const SwapPage = () => {
                     key={tokenOption.symbol}
                     variant="ghost"
                     disabled={isInvalidPair}
-                    className={`w-full justify-start p-4 h-auto hover:bg-gray-800 ${
+                    className={`w-full justify-start p-2 h-auto hover:bg-gray-800 ${
                       isInvalidPair ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                     onClick={() => {
@@ -967,32 +967,32 @@ const SwapPage = () => {
                       }
                     }}
                   >
-                    <div className="flex items-center space-x-3 w-full">
+                    <div className="flex items-center space-x-2 w-full">
                       {typeof tokenOption.icon === 'string' && (tokenOption.icon.includes('.png') || tokenOption.icon.includes('.jpg') || tokenOption.icon.includes('.jpeg') || tokenOption.icon.startsWith('/') || tokenOption.icon.startsWith('data:')) ? (
-                        <img src={tokenOption.icon} alt={tokenOption.symbol} className="w-8 h-8 rounded-full" />
+                        <img src={tokenOption.icon} alt={tokenOption.symbol} className="w-6 h-6 rounded-full flex-shrink-0" />
                       ) : (
-                        <div className="text-2xl">{tokenOption.icon}</div>
+                        <div className="text-lg flex-shrink-0">{tokenOption.icon}</div>
                       )}
-                      <div className="flex-1 text-left">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-semibold text-white">{tokenOption.symbol}</span>
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="flex items-center space-x-1.5">
+                          <span className="font-semibold text-white text-sm">{tokenOption.symbol}</span>
                           {tokenOption.symbol === 'BAM' && (
-                            <Badge variant="secondary" className="text-xs bg-yellow-500/20 text-yellow-400">
+                            <Badge variant="secondary" className="text-xs bg-yellow-500/20 text-yellow-400 px-1 py-0">
                               $0.0000001
                             </Badge>
                           )}
                         </div>
-                        <div className="text-sm text-gray-400">{tokenOption.name}</div>
+                        <div className="text-xs text-gray-400 truncate">{tokenOption.name}</div>
                         {isInvalidPair && (
-                          <div className="text-xs text-red-400 mt-1">
-                            Direct BNB↔USDT swaps not supported
+                          <div className="text-xs text-red-400">
+                            Direct BNB↔USDT not supported
                           </div>
                         )}
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0">
                         {balances[tokenOption.symbol] !== undefined ? (
                           <>
-                            <div className="text-sm font-medium text-white">
+                            <div className="text-xs font-medium text-white">
                               {parseFloat(balances[tokenOption.symbol] || '0') > 0 ? 
                                 formatDisplayAmount(balances[tokenOption.symbol], tokenOption.symbol) : 
                                 '0'
@@ -1016,7 +1016,7 @@ const SwapPage = () => {
                           </div>
                         ) : (
                           <div className="text-xs text-gray-500">
-                            Connect wallet
+                            Connect
                           </div>
                         )}
                       </div>
@@ -1028,16 +1028,9 @@ const SwapPage = () => {
           </div>
 
           {/* Manage Token Lists */}
-          <div className="border-t border-gray-700 pt-3">
-            <Button
-              variant="ghost"
-              className="w-full justify-center text-gray-400 hover:text-white text-sm"
-              onClick={() => {
-                // Could open token list management
-                console.log('Manage token lists');
-              }}
-            >
-              <Settings className="w-4 h-4 mr-2" />
+          <div className="mt-3 pt-2 border-t border-gray-700">
+            <Button variant="ghost" className="w-full text-gray-400 hover:text-white py-2 text-xs">
+              <Settings className="w-3 h-3 mr-1.5" />
               Manage token lists
             </Button>
           </div>
