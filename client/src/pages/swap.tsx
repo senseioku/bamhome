@@ -485,10 +485,31 @@ const SwapPage = () => {
             method: 'eth_call', 
             params: [{
               to: BAM_SWAP_ADDRESS,
-              data: '0x' + web3Utils.keccak256('swapUSDTToUSDBPaused()').substring(2) // swapUSDTToUSDBPaused()
+              data: '0x9fc8f73a' // swapUSDTToUSDBPaused() selector
             }, 'latest']
           });
           console.log('USDT→USDB swap paused:', usdtToUsdbPausedCheck);
+          
+          // Check if contract has sufficient USDB balance
+          const usdbBalanceCheck = await window.ethereum.request({
+            method: 'eth_call',
+            params: [{
+              to: TOKEN_ADDRESSES.USDB,
+              data: '0x70a08231000000000000000000000000' + BAM_SWAP_ADDRESS.substring(2) // balanceOf(contract)
+            }, 'latest']
+          });
+          console.log('Contract USDB balance:', parseInt(usdbBalanceCheck, 16));
+          
+          // Check user USDT balance
+          const userUsdtBalance = await window.ethereum.request({
+            method: 'eth_call',
+            params: [{
+              to: TOKEN_ADDRESSES.USDT,
+              data: '0x70a08231000000000000000000000000' + walletAddress.substring(2) // balanceOf(user)
+            }, 'latest']
+          });
+          console.log('User USDT balance:', parseInt(userUsdtBalance, 16));
+          
         } catch (error) {
           console.log('Contract state check failed:', error);
         }
@@ -546,8 +567,29 @@ const SwapPage = () => {
       // Update balances after successful transaction
       setTimeout(() => updateBalances(walletAddress), 3000);
       
-    } catch (err: any) {
-      setError(err.message || 'Transaction failed');
+    } catch (error: any) {
+      console.error('=== SWAP TRANSACTION FAILED ===');
+      console.error('Error details:', error);
+      
+      // Extract meaningful error message
+      let errorMessage = 'Transaction failed';
+      if (error && error.message) {
+        errorMessage = error.message;
+        // Check for specific contract errors
+        if (error.message.includes('execution reverted')) {
+          if (error.message.includes('insufficient')) {
+            errorMessage = 'Insufficient balance or liquidity';
+          } else if (error.message.includes('paused')) {
+            errorMessage = 'Contract function is paused';
+          } else if (error.message.includes('allowance')) {
+            errorMessage = 'Token approval required';
+          } else {
+            errorMessage = 'Contract execution failed - check requirements';
+          }
+        }
+      }
+      
+      setError(errorMessage);
       setTxStatus('error');
     } finally {
       setIsLoading(false);
