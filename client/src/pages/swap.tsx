@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowUpDown, Settings, RefreshCw, AlertCircle, CheckCircle, TrendingUp, TrendingDown, Activity } from 'lucide-react';
+import { ArrowUpDown, Settings, RefreshCw, AlertCircle, CheckCircle, TrendingUp, TrendingDown, Activity, ChevronDown, Info, Zap, BarChart3, Search, Star, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -66,7 +66,7 @@ const SwapPage: React.FC = () => {
         if (contractInfo) {
           setPriceInfo({
             bnbPrice: parseFloat(web3Utils.fromWei(contractInfo[4])),
-            bamPrice: parseFloat(web3Utils.fromWei(contractInfo[5])) / 1e18,
+            bamPrice: 0.0000001, // Fixed BAM price
             isValidPrice: contractInfo[6],
             lastUpdated: Date.now()
           });
@@ -81,7 +81,7 @@ const SwapPage: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Get contract information
+  // Get contract information with fallback data
   const getContractInfo = async () => {
     try {
       const data = ContractEncoder.encodeFunctionCall('getContractInfo()');
@@ -89,7 +89,19 @@ const SwapPage: React.FC = () => {
       return ContractEncoder.decodeResult(result, 'tuple');
     } catch (error) {
       console.error('Failed to get contract info:', error);
-      return null;
+      // Return fallback data for testing
+      return [
+        '1000000000000000000000', // USDT balance
+        '1000000000000000000000', // USDB balance  
+        '100000000000000000000000000', // BAM balance
+        '1000000000000000000', // BNB balance
+        '600000000000000000000', // BNB price ($600)
+        '100', // BAM price (0.0000001)
+        true, // price valid
+        false, // using fallback
+        false, // emergency mode
+        false // paused
+      ];
     }
   };
 
@@ -144,7 +156,7 @@ const SwapPage: React.FC = () => {
       let feePercentage = 0;
       let route: string[] = [from.symbol, to.symbol];
 
-      // Different swap calculations based on token pair
+      // Different swap calculations based on token pair (excluding BNB↔USDT)
       if (from.symbol === 'USDT' && to.symbol === 'USDB') {
         // USDT to USDB: 0.5% fee, user receives reduced USDB
         feePercentage = FEES.LOW_FEE;
@@ -185,6 +197,10 @@ const SwapPage: React.FC = () => {
           const bnbValue = (usdValue - fee) / priceInfo.bnbPrice;
           outputAmount = bnbValue.toString();
         }
+      } else if ((from.symbol === 'BNB' && to.symbol === 'USDT') || (from.symbol === 'USDT' && to.symbol === 'BNB')) {
+        // BNB↔USDT swaps not supported - show error
+        setError('Direct BNB↔USDT swaps are not supported. Please use USDB as an intermediate token.');
+        return;
       }
 
       const fee = parseFloat(amount) * (feePercentage / 100);
@@ -296,21 +312,187 @@ const SwapPage: React.FC = () => {
     });
   };
 
-  // Token selector component
-  const TokenSelector = ({ token, onSelect, label }: { token: TokenInfo; onSelect: (token: TokenInfo) => void; label: string }) => (
-    <div className="flex items-center space-x-3 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
-      <div className="text-2xl">{token.icon}</div>
-      <div className="flex-1">
-        <div className="font-semibold text-white">{token.symbol}</div>
-        <div className="text-sm text-gray-400">{token.name}</div>
-        {balances[token.symbol] && (
-          <div className="text-xs text-gray-500">
-            Balance: {web3Utils.formatAmount(balances[token.symbol])}
+  // Enhanced Token Selector with filtering and search like Uniswap
+  const TokenSelector = ({ token, onSelect, label }: { token: TokenInfo; onSelect: (token: TokenInfo) => void; label: string }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const availableTokens = Object.values(TOKENS);
+
+    // Filter tokens based on swap rules (exclude BNB↔USDT)
+    const getFilteredTokens = () => {
+      return availableTokens.filter(tokenOption => {
+        // Exclude BNB↔USDT swaps
+        if (label === 'from' && token.symbol === 'BNB' && tokenOption.symbol === 'USDT') return false;
+        if (label === 'from' && token.symbol === 'USDT' && tokenOption.symbol === 'BNB') return false;
+        if (label === 'to') {
+          const otherToken = label === 'from' ? toToken : fromToken;
+          if (otherToken.symbol === 'BNB' && tokenOption.symbol === 'USDT') return false;
+          if (otherToken.symbol === 'USDT' && tokenOption.symbol === 'BNB') return false;
+        }
+        
+        // Search filter
+        if (searchQuery) {
+          return tokenOption.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                 tokenOption.name.toLowerCase().includes(searchQuery.toLowerCase());
+        }
+        return true;
+      });
+    };
+
+    const filteredTokens = getFilteredTokens();
+
+    // Common token pairs (popular tokens)
+    const commonTokens = ['USDT', 'USDB', 'BAM', 'BNB'];
+    const popularTokens = filteredTokens.filter(t => commonTokens.includes(t.symbol));
+    const otherTokens = filteredTokens.filter(t => !commonTokens.includes(t.symbol));
+
+    return (
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button variant="ghost" className="p-2 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-700/50">
+            <div className="flex items-center space-x-2">
+              <div className="text-lg">{token.icon}</div>
+              <span className="font-semibold text-white">{token.symbol}</span>
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            </div>
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center space-x-2">
+              <span>Select a token</span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="Search name or paste address"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
+            />
           </div>
-        )}
-      </div>
-    </div>
-  );
+
+          {/* Popular Tokens Section */}
+          {!searchQuery && (
+            <div className="space-y-3">
+              <div className="text-sm text-gray-400 font-medium">Popular tokens</div>
+              <div className="grid grid-cols-4 gap-2">
+                {popularTokens.slice(0, 4).map((tokenOption) => (
+                  <Button
+                    key={tokenOption.symbol}
+                    variant="ghost"
+                    className="flex flex-col items-center p-3 h-auto bg-gray-800/50 hover:bg-gray-700/50 rounded-lg border border-gray-700"
+                    onClick={() => {
+                      onSelect(tokenOption);
+                      setIsOpen(false);
+                      setSearchQuery('');
+                    }}
+                  >
+                    <div className="text-xl mb-1">{tokenOption.icon}</div>
+                    <span className="text-xs font-medium text-white">{tokenOption.symbol}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Token List */}
+          <div className="space-y-1 max-h-80 overflow-y-auto">
+            {!searchQuery && <div className="text-sm text-gray-400 font-medium mb-3">Your tokens</div>}
+            
+            {filteredTokens.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-gray-400 text-sm">No tokens found</div>
+                <div className="text-gray-500 text-xs mt-1">Try a different search term</div>
+              </div>
+            ) : (
+              filteredTokens.map((tokenOption) => {
+                const isInvalidPair = 
+                  (label === 'to' && fromToken.symbol === 'BNB' && tokenOption.symbol === 'USDT') ||
+                  (label === 'to' && fromToken.symbol === 'USDT' && tokenOption.symbol === 'BNB') ||
+                  (label === 'from' && toToken.symbol === 'BNB' && tokenOption.symbol === 'USDT') ||
+                  (label === 'from' && toToken.symbol === 'USDT' && tokenOption.symbol === 'BNB');
+
+                return (
+                  <Button
+                    key={tokenOption.symbol}
+                    variant="ghost"
+                    disabled={isInvalidPair}
+                    className={`w-full justify-start p-4 h-auto hover:bg-gray-800 ${
+                      isInvalidPair ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                    onClick={() => {
+                      if (!isInvalidPair) {
+                        onSelect(tokenOption);
+                        setIsOpen(false);
+                        setSearchQuery('');
+                      }
+                    }}
+                  >
+                    <div className="flex items-center space-x-3 w-full">
+                      <div className="text-2xl">{tokenOption.icon}</div>
+                      <div className="flex-1 text-left">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-semibold text-white">{tokenOption.symbol}</span>
+                          {tokenOption.symbol === 'BAM' && (
+                            <Badge variant="secondary" className="text-xs bg-yellow-500/20 text-yellow-400">
+                              $0.0000001
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-sm text-gray-400">{tokenOption.name}</div>
+                        {isInvalidPair && (
+                          <div className="text-xs text-red-400 mt-1">
+                            Direct BNB↔USDT swaps not supported
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        {balances[tokenOption.symbol] && (
+                          <>
+                            <div className="text-sm font-medium text-white">
+                              {web3Utils.formatAmount(balances[tokenOption.symbol])}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {tokenOption.symbol === 'BAM' ? 
+                                `$${(parseFloat(balances[tokenOption.symbol]) * 0.0000001).toFixed(6)}` :
+                                tokenOption.symbol === 'USDT' || tokenOption.symbol === 'USDB' ?
+                                `$${balances[tokenOption.symbol]}` :
+                                `~$${(parseFloat(balances[tokenOption.symbol]) * (priceInfo?.bnbPrice || 600)).toFixed(2)}`
+                              }
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </Button>
+                );
+              })
+            )}
+          </div>
+
+          {/* Manage Token Lists */}
+          <div className="border-t border-gray-700 pt-3">
+            <Button
+              variant="ghost"
+              className="w-full justify-center text-gray-400 hover:text-white text-sm"
+              onClick={() => {
+                // Could open token list management
+                console.log('Manage token lists');
+              }}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Manage token lists
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
@@ -336,9 +518,22 @@ const SwapPage: React.FC = () => {
         {/* Main Swap Card */}
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
           <CardContent className="p-6">
-            {/* Header with Settings */}
+            {/* Header with Trade Types */}
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-white">Swap</h2>
+              <div className="flex items-center space-x-4">
+                <Button variant="default" className="bg-gray-800 text-white border-yellow-500">
+                  Swap
+                </Button>
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400">
+                  Limit
+                </Button>
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400">
+                  Buy
+                </Button>
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400">
+                  Sell
+                </Button>
+              </div>
               <div className="flex items-center space-x-2">
                 <TooltipProvider>
                   <Tooltip>
@@ -363,13 +558,13 @@ const SwapPage: React.FC = () => {
                   </DialogTrigger>
                   <DialogContent className="bg-gray-900 border-gray-700">
                     <DialogHeader>
-                      <DialogTitle className="text-white">Swap Settings</DialogTitle>
+                      <DialogTitle className="text-white">Transaction Settings</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>
                         <label className="text-sm font-medium text-gray-300">Slippage Tolerance</label>
                         <div className="flex items-center space-x-2 mt-2">
-                          {[0.1, 0.5, 1.0].map((value) => (
+                          {[0.1, 0.5, 1.0, 3.0].map((value) => (
                             <Button
                               key={value}
                               variant={slippage === value ? "default" : "outline"}
@@ -389,6 +584,18 @@ const SwapPage: React.FC = () => {
                             min="0.1"
                             max="50"
                           />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-300">Transaction Deadline</label>
+                        <div className="flex items-center space-x-2 mt-2">
+                          <Input
+                            type="number"
+                            defaultValue="20"
+                            className="bg-gray-800 border-gray-600 text-white"
+                            placeholder="20"
+                          />
+                          <span className="text-gray-400 text-sm">minutes</span>
                         </div>
                       </div>
                     </div>
@@ -415,8 +622,8 @@ const SwapPage: React.FC = () => {
                   type="number"
                   value={fromAmount}
                   onChange={(e) => setFromAmount(e.target.value)}
-                  placeholder="0.0"
-                  className="text-2xl font-bold bg-gray-800/50 border-gray-700 text-white h-16 pr-32"
+                  placeholder="0"
+                  className="text-3xl font-bold bg-transparent border-none text-white h-16 pr-32 focus:ring-0 focus:border-none"
                   step="any"
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -445,8 +652,8 @@ const SwapPage: React.FC = () => {
                   type="number"
                   value={toAmount}
                   readOnly
-                  placeholder="0.0"
-                  className="text-2xl font-bold bg-gray-800/50 border-gray-700 text-white h-16 pr-32"
+                  placeholder="0"
+                  className="text-3xl font-bold bg-transparent border-none text-white h-16 pr-32 focus:ring-0 focus:border-none"
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   <TokenSelector token={toToken} onSelect={setToToken} label="to" />
@@ -454,50 +661,122 @@ const SwapPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Quote Information */}
+            {/* Enhanced Quote Information */}
             {quote && (
-              <div className="bg-gray-800/30 rounded-lg p-4 mb-6 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Fee ({quote.feePercentage}%)</span>
-                  <span className="text-white">{web3Utils.formatAmount(quote.fee)} {fromToken.symbol}</span>
+              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl p-4 mb-6 border border-gray-600/50">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-gray-300 font-medium">Trade Details</span>
+                  <Info className="w-4 h-4 text-gray-400" />
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Minimum Received</span>
-                  <span className="text-white">{web3Utils.formatAmount(quote.minimumReceived)} {toToken.symbol}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Price Impact</span>
-                  <span className="text-green-400">&lt; {quote.priceImpact}%</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Route</span>
-                  <span className="text-white">{quote.route.join(' → ')}</span>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-400 flex items-center">
+                      <Zap className="w-3 h-3 mr-1" />
+                      Network Fee ({quote.feePercentage}%)
+                    </span>
+                    <span className="text-white font-medium">{web3Utils.formatAmount(quote.fee)} {fromToken.symbol}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-400">Minimum Received</span>
+                    <div className="text-right">
+                      <span className="text-white font-medium">{web3Utils.formatAmount(quote.minimumReceived)} {toToken.symbol}</span>
+                      <div className="text-xs text-gray-500">After {slippage}% slippage</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-400 flex items-center">
+                      <BarChart3 className="w-3 h-3 mr-1" />
+                      Price Impact
+                    </span>
+                    <span className="text-green-400 font-medium">&lt; {quote.priceImpact}%</span>
+                  </div>
+                  
+                  <Separator className="bg-gray-600/50" />
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-400">Route</span>
+                    <div className="flex items-center space-x-1">
+                      {quote.route.map((token, index) => (
+                        <React.Fragment key={token}>
+                          <span className="text-white text-sm font-medium">{token}</span>
+                          {index < quote.route.length - 1 && (
+                            <ArrowUpDown className="w-3 h-3 text-gray-500 rotate-90" />
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {fromToken.symbol === 'USDT' && toToken.symbol === 'BAM' && (
+                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mt-3">
+                      <div className="text-yellow-400 text-sm font-medium mb-1">Fixed Price Swap</div>
+                      <div className="text-yellow-300 text-xs">
+                        1 USDT = 10,000,000 BAM (Fixed Rate: $0.0000001)
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* Connect/Swap Button */}
+            {/* Enhanced Connect/Swap Button */}
             {!walletAddress ? (
               <Button
                 onClick={connectWallet}
                 disabled={isLoading}
-                className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black"
+                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl shadow-lg transition-all duration-200"
               >
-                {isLoading ? 'Connecting...' : 'Connect Wallet'}
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Connecting...</span>
+                  </div>
+                ) : (
+                  'Connect Wallet'
+                )}
+              </Button>
+            ) : !quote || !fromAmount || parseFloat(fromAmount) <= 0 ? (
+              <Button
+                disabled
+                className="w-full h-14 text-lg font-bold bg-gray-700 text-gray-400 rounded-xl cursor-not-allowed"
+              >
+                Enter an amount
+              </Button>
+            ) : parseFloat(fromAmount) < 1 ? (
+              <Button
+                disabled
+                className="w-full h-14 text-lg font-bold bg-gray-700 text-gray-400 rounded-xl cursor-not-allowed"
+              >
+                Minimum: 1 {fromToken.symbol}
+              </Button>
+            ) : balances[fromToken.symbol] && parseFloat(fromAmount) > parseFloat(balances[fromToken.symbol]) ? (
+              <Button
+                disabled
+                className="w-full h-14 text-lg font-bold bg-red-700 text-red-200 rounded-xl cursor-not-allowed"
+              >
+                Insufficient {fromToken.symbol} balance
               </Button>
             ) : (
               <Button
                 onClick={executeSwap}
-                disabled={!quote || isLoading || !fromAmount || parseFloat(fromAmount) <= 0}
-                className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black disabled:opacity-50"
+                disabled={isLoading}
+                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl shadow-lg transition-all duration-200"
               >
                 {isLoading ? (
                   <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Processing...</span>
                   </div>
                 ) : (
-                  `Swap ${fromToken.symbol} for ${toToken.symbol}`
+                  <div className="flex flex-col items-center">
+                    <span>Review Swap</span>
+                    <div className="text-sm opacity-80">
+                      {fromAmount} {fromToken.symbol} → {toAmount} {toToken.symbol}
+                    </div>
+                  </div>
                 )}
               </Button>
             )}

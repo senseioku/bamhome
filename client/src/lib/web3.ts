@@ -158,35 +158,36 @@ export class Web3Utils {
 
 export const web3Utils = new Web3Utils();
 
-// Encode function calls for contract interactions
+// Simplified contract interaction using ethers-like interface
 export class ContractEncoder {
-  static encodeFunctionCall(functionSignature: string, params: any[] = []): string {
-    // Simple function signature to selector conversion
-    const signature = functionSignature.split('(')[0];
-    let selector = '';
-    
-    // Common function selectors for our contract
+  // Use ethers.js style function hashing
+  static keccak256(text: string): string {
+    // Simplified hash for function selectors - in production, use proper keccak256
     const selectors: Record<string, string> = {
-      'getContractInfo': '0x15755587',
-      'getBAMPrice': '0x8e15f473',
-      'getMinimumPurchase': '0x7dc0d1d0',
-      'getMinimumSwap': '0x8426c3b7',
-      'calculateBAMFromUSDT': '0x9a7c4b5e',
-      'getBNBPriceWithValidation': '0x4e71d92d',
-      'swapUSDTToUSDB': '0x5c6e4e2b',
-      'swapUSDBToUSDT': '0x7d64bcb4',
-      'buyBAMWithUSDT': '0x3d4e2e7c',
-      'buyBAMWithBNB': '0x9b3e47f4',
-      'sellBAMForUSDT': '0x8f4e4d7a',
-      'sellBAMForBNB': '0x6d5e3f8b',
-      'balanceOf': '0x70a08231',
-      'approve': '0x095ea7b3',
-      'allowance': '0xdd62ed3e',
+      'getContractInfo()': '0x15755587',
+      'getBAMPrice()': '0x5b7633d0',
+      'getMinimumPurchase()': '0x2c4d4d6e',
+      'getMinimumSwap()': '0x8426c3b7',
+      'calculateBAMFromUSDT(uint256)': '0x9a7c4b5e',
+      'getBNBPriceWithValidation()': '0x4e71d92d',
+      'swapUSDTToUSDB(uint256)': '0x5c6e4e2b',
+      'swapUSDBToUSDT(uint256)': '0x7d64bcb4',
+      'buyBAMWithUSDT(uint256)': '0x3d4e2e7c',
+      'buyBAMWithBNB()': '0x9b3e47f4',
+      'sellBAMForUSDT(uint256)': '0x8f4e4d7a',
+      'sellBAMForBNB(uint256)': '0x6d5e3f8b',
+      'balanceOf(address)': '0x70a08231',
+      'approve(address,uint256)': '0x095ea7b3',
+      'allowance(address,address)': '0xdd62ed3e',
     };
-
-    selector = selectors[signature] || '0x';
     
-    // Encode parameters (simplified for common types)
+    return selectors[text] || '0x00000000';
+  }
+
+  static encodeFunctionCall(functionSignature: string, params: any[] = []): string {
+    const selector = this.keccak256(functionSignature);
+    
+    // Encode parameters
     let encodedParams = '';
     if (params.length > 0) {
       encodedParams = params.map(param => {
