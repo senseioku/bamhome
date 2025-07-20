@@ -963,8 +963,8 @@ const SwapPage = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="p-2 sm:p-3 pt-4 sm:pt-18 sm:flex sm:items-center sm:justify-center sm:min-h-screen xl:pt-0">
-        <div className="w-full max-w-sm sm:max-w-lg mx-auto xl:mt-0">
+      <div className="p-2 sm:p-3 pt-8 sm:pt-18 flex items-center justify-center min-h-screen xl:pt-0">
+        <div className="w-full max-w-sm sm:max-w-lg mx-auto mt-4 sm:mt-0">
         {/* Header */}
         <div className="text-center mb-1 sm:mb-2 xl:mb-3">
           <p className="text-xs text-gray-400 mb-0.5 sm:mb-1 xl:mb-2">Pioneering Community Growth and Wealth</p>
