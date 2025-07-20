@@ -859,18 +859,18 @@ const SwapPage = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="p-2 sm:p-4 pt-24 sm:pt-28">
-        <div className="max-w-md sm:max-w-lg mx-auto">
+      <div className="p-2 sm:p-4 pt-20 sm:pt-22">
+        <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="text-center mb-6 sm:mb-8">
-          <p className="text-sm sm:text-base text-gray-400 mb-6">Pioneering Community Growth and Wealth</p>
+        <div className="text-center mb-3 sm:mb-4">
+          <p className="text-xs sm:text-sm text-gray-400 mb-3">Pioneering Community Growth and Wealth</p>
           {priceInfo && (
-            <div className="flex justify-center items-center space-x-2 sm:space-x-4 mb-6 text-xs sm:text-sm">
-              <Badge variant="outline" className="text-green-400 border-green-400 px-3 py-1.5">
+            <div className="flex justify-center items-center space-x-2 mb-3 text-xs">
+              <Badge variant="outline" className="text-green-400 border-green-400 px-2 py-1">
                 <TrendingUp className="w-3 h-3 mr-1" />
                 BNB ${priceInfo.bnbPrice.toFixed(2)}
               </Badge>
-              <Badge variant="outline" className="text-yellow-400 border-yellow-400 px-3 py-1.5">
+              <Badge variant="outline" className="text-yellow-400 border-yellow-400 px-2 py-1">
                 <Activity className="w-3 h-3 mr-1" />
                 BAM $0.0000001
               </Badge>
@@ -880,9 +880,9 @@ const SwapPage = () => {
 
         {/* Main Swap Card */}
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
-          <CardContent className="p-4 sm:p-6">
+          <CardContent className="p-3 sm:p-4">
             {/* Header with Trade Types */}
-            <div className="flex justify-between items-center mb-4 sm:mb-6">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
               <div className="flex items-center space-x-2 sm:space-x-4">
                 <Button variant="default" className="bg-gray-800 text-white border-yellow-500 text-sm sm:text-base px-3 sm:px-4">
                   Swap
@@ -933,9 +933,9 @@ const SwapPage = () => {
             </div>
 
             {/* From Token */}
-            <div className="space-y-2 mb-4">
+            <div className="space-y-1 mb-3">
               <div className="flex justify-between items-center">
-                <label className="text-sm font-medium text-gray-300">From</label>
+                <label className="text-xs font-medium text-gray-300">From</label>
                 {balances[fromToken.symbol] && (
                   <button
                     onClick={() => setFromAmount(balances[fromToken.symbol])}
@@ -951,22 +951,22 @@ const SwapPage = () => {
                   value={fromAmount}
                   onChange={(e) => setFromAmount(e.target.value)}
                   placeholder="0"
-                  className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-transparent border-none text-white h-14 sm:h-16 lg:h-20 pr-28 sm:pr-32 focus:ring-0 focus:border-none"
+                  className="text-xl sm:text-2xl font-bold bg-transparent border-none text-white h-12 sm:h-14 pr-24 sm:pr-28 focus:ring-0 focus:border-none"
                   step="any"
                 />
-                <div className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2">
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                   <TokenSelector token={fromToken} onSelect={setFromToken} label="from" />
                 </div>
               </div>
               {fromAmount && parseFloat(fromAmount) > 0 && (
-                <div className="text-sm text-gray-400 mt-2 px-1">
+                <div className="text-xs text-gray-400 px-1">
                   {calculateUSDValue(fromAmount, fromToken.symbol)}
                 </div>
               )}
             </div>
 
             {/* Swap Button */}
-            <div className="flex justify-center my-4">
+            <div className="flex justify-center my-2">
               <Button
                 variant="ghost"
                 size="sm"
@@ -978,22 +978,22 @@ const SwapPage = () => {
             </div>
 
             {/* To Token */}
-            <div className="space-y-2 mb-6">
-              <label className="text-sm font-medium text-gray-300">To</label>
+            <div className="space-y-1 mb-4">
+              <label className="text-xs font-medium text-gray-300">To</label>
               <div className="relative">
                 <Input
                   type="number"
                   value={toAmount}
                   readOnly
                   placeholder="0"
-                  className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-transparent border-none text-white h-14 sm:h-16 lg:h-20 pr-28 sm:pr-32 focus:ring-0 focus:border-none"
+                  className="text-xl sm:text-2xl font-bold bg-transparent border-none text-white h-12 sm:h-14 pr-24 sm:pr-28 focus:ring-0 focus:border-none"
                 />
-                <div className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2">
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                   <TokenSelector token={toToken} onSelect={setToToken} label="to" />
                 </div>
               </div>
               {toAmount && parseFloat(toAmount) > 0 && (
-                <div className="text-sm text-gray-400 mt-2 px-1">
+                <div className="text-xs text-gray-400 px-1">
                   {calculateUSDValue(toAmount, toToken.symbol)}
                 </div>
               )}
@@ -1001,47 +1001,47 @@ const SwapPage = () => {
 
             {/* Enhanced Quote Information */}
             {quote && (
-              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl p-4 mb-6 border border-gray-600/50">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-gray-300 font-medium">Trade Details</span>
+              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-lg p-3 mb-4 border border-gray-600/50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-300 font-medium">Trade Details</span>
                   <Info className="w-4 h-4 text-gray-400" />
                 </div>
                 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-400 flex items-center">
+                    <span className="text-xs text-gray-400 flex items-center">
                       <Zap className="w-3 h-3 mr-1" />
                       Network Fee ({quote.feePercentage}%)
                     </span>
                     <div className="text-right">
-                      <span className="text-white font-medium">{formatDisplayAmount(quote.fee, fromToken.symbol)} {fromToken.symbol}</span>
+                      <span className="text-sm text-white font-medium">{formatDisplayAmount(quote.fee, fromToken.symbol)} {fromToken.symbol}</span>
                       <div className="text-xs text-gray-500">{calculateUSDValue(quote.fee, fromToken.symbol)}</div>
                     </div>
                   </div>
                   
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-400">You Receive</span>
+                    <span className="text-xs text-gray-400">You Receive</span>
                     <div className="text-right">
-                      <span className="text-white font-medium">{formatDisplayAmount(quote.outputAmount, toToken.symbol)} {toToken.symbol}</span>
+                      <span className="text-sm text-white font-medium">{formatDisplayAmount(quote.outputAmount, toToken.symbol)} {toToken.symbol}</span>
                       <div className="text-xs text-gray-500">{calculateUSDValue(quote.outputAmount, toToken.symbol)}</div>
                     </div>
                   </div>
                   
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-400 flex items-center">
+                    <span className="text-xs text-gray-400 flex items-center">
                       <BarChart3 className="w-3 h-3 mr-1" />
                       Price Impact
                     </span>
-                    <span className="text-green-400 font-medium">~0%</span>
+                    <span className="text-sm text-green-400 font-medium">~0%</span>
                   </div>
                   
                   <Separator className="bg-gray-600/50" />
                   
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-400">Route</span>
+                    <span className="text-xs text-gray-400">Route</span>
                     <div className="flex items-center space-x-1">
                       {quote.route.map((token, index) => [
-                        <span key={`token-${index}`} className="text-white text-sm font-medium">{token}</span>,
+                        <span key={`token-${index}`} className="text-white text-xs font-medium">{token}</span>,
                         index < quote.route.length - 1 && (
                           <ArrowUpDown key={`arrow-${index}`} className="w-3 h-3 text-gray-500 rotate-90" />
                         )
@@ -1050,8 +1050,8 @@ const SwapPage = () => {
                   </div>
                   
                   {fromToken.symbol === 'USDT' && toToken.symbol === 'BAM' && (
-                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mt-3">
-                      <div className="text-yellow-400 text-sm font-medium mb-1">Fixed Price Swap</div>
+                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-2 mt-2">
+                      <div className="text-yellow-400 text-xs font-medium mb-1">Fixed Price Swap</div>
                       <div className="text-yellow-300 text-xs">
                         1 USDT = 10,000,000 BAM (Rate: $0.0000001)
                       </div>
@@ -1059,8 +1059,8 @@ const SwapPage = () => {
                   )}
                   
                   {(fromToken.symbol === 'BAM' && (toToken.symbol === 'USDT' || toToken.symbol === 'BNB')) && (
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-3">
-                      <div className="text-blue-400 text-sm font-medium mb-1">BAM Sale</div>
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-2 mt-2">
+                      <div className="text-blue-400 text-xs font-medium mb-1">BAM Sale</div>
                       <div className="text-blue-300 text-xs">
                         Higher fees apply (1.5%) for selling BAM tokens
                       </div>
@@ -1075,11 +1075,11 @@ const SwapPage = () => {
               <Button
                 onClick={connectWallet}
                 disabled={isLoading}
-                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl shadow-lg transition-all duration-200"
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-lg shadow-lg transition-all duration-200"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Connecting...</span>
                   </div>
                 ) : (
@@ -1089,21 +1089,21 @@ const SwapPage = () => {
             ) : !quote || !fromAmount || parseFloat(fromAmount) <= 0 ? (
               <Button
                 disabled
-                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gray-700 text-gray-400 rounded-xl cursor-not-allowed"
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gray-700 text-gray-400 rounded-lg cursor-not-allowed"
               >
                 Enter an amount
               </Button>
             ) : parseFloat(fromAmount) < 1 ? (
               <Button
                 disabled
-                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gray-700 text-gray-400 rounded-xl cursor-not-allowed"
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gray-700 text-gray-400 rounded-lg cursor-not-allowed"
               >
                 Minimum: 1 {fromToken.symbol}
               </Button>
             ) : balances[fromToken.symbol] && parseFloat(fromAmount) > parseFloat(balances[fromToken.symbol]) ? (
               <Button
                 disabled
-                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-red-700 text-red-200 rounded-xl cursor-not-allowed"
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-red-700 text-red-200 rounded-lg cursor-not-allowed"
               >
                 Insufficient {fromToken.symbol} balance
               </Button>
@@ -1111,17 +1111,17 @@ const SwapPage = () => {
               <Button
                 onClick={executeSwap}
                 disabled={isLoading}
-                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl shadow-lg transition-all duration-200"
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-lg shadow-lg transition-all duration-200"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Processing...</span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
                     <span>Review Swap</span>
-                    <div className="text-xs sm:text-sm opacity-80 mt-0.5">
+                    <div className="text-xs opacity-80 mt-0.5">
                       {formatDisplayAmount(fromAmount, fromToken.symbol)} {fromToken.symbol} → {formatDisplayAmount(toAmount, toToken.symbol)} {toToken.symbol}
                     </div>
                   </div>
