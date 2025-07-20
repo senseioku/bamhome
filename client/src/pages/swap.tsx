@@ -60,52 +60,46 @@ const SwapPage = () => {
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
 
-  // Multi-source price fetching with proper CORS handling
+  // Chainlink-first price fetching with backend API
   const fetchReliablePrice = async (): Promise<{ price: number; source: string }> => {
-    const apiSources = [
-      // Binance API via CORS proxy (most reliable)
+    const dataSources = [
+      // Primary: Chainlink via our backend (most reliable and decentralized)
       {
-        name: 'Binance API',
+        name: 'Chainlink Oracle',
         fetch: async () => {
-          const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT'));
+          const response = await fetch('/api/prices/bnb');
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
-          return parseFloat(data?.price || '0');
+          return { price: data.price, source: data.source };
         }
       },
-      // CoinCap API via CORS proxy
-      {
-        name: 'CoinCap API', 
-        fetch: async () => {
-          const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.coincap.io/v2/assets/binance-coin'));
-          const data = await response.json();
-          return parseFloat(data?.data?.priceUsd || '0');
-        }
-      },
-      // CoinGecko API via CORS proxy (backup)
+      // Backup: External APIs via CORS proxy
       {
         name: 'CoinGecko API',
         fetch: async () => {
           const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd'));
           const data = await response.json();
-          return data?.binancecoin?.usd || 0;
+          const price = data?.binancecoin?.usd || 0;
+          return { price, source: 'CoinGecko API' };
         }
       },
-      // Alternative CORS proxy service
+      // Additional backup
       {
-        name: 'CryptoCompare API',
+        name: 'Binance API',
         fetch: async () => {
-          const response = await fetch('https://corsproxy.io/?https://min-api.cryptocompare.com/data/price?fsym=BNB&tsyms=USD');
+          const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT'));
           const data = await response.json();
-          return parseFloat(data?.USD || '0');
+          const price = parseFloat(data?.price || '0');
+          return { price, source: 'Binance API' };
         }
       }
     ];
 
-    for (const source of apiSources) {
+    for (const source of dataSources) {
       try {
-        const price = await source.fetch();
-        if (price > 0 && price < 2000) { // Reasonable price range check
-          return { price, source: source.name };
+        const result = await source.fetch();
+        if (result.price > 100 && result.price < 2000) { // Reasonable BNB price range
+          return { price: result.price, source: result.source };
         }
       } catch (error) {
         console.error(`${source.name} failed:`, error);
@@ -113,13 +107,13 @@ const SwapPage = () => {
       }
     }
     
-    // Final fallback with current market range
+    // Final fallback
     return { price: 725, source: 'Static Fallback' };
   };
 
 
 
-  // Price Update Timer with improved error handling
+  // Enterprise price update system with Chainlink integration
   useEffect(() => {
     const updatePrices = async () => {
       try {
@@ -128,15 +122,20 @@ const SwapPage = () => {
         
         setPriceInfo({
           bnbPrice,
-          bamPrice: 0.0000001, // Fixed BAM price
+          bamPrice: 0.0000001, // Fixed BAM price from contract
           isValidPrice: priceSource !== 'Static Fallback',
           lastUpdated: Date.now()
         });
         
-        console.log(`💰 BNB/USD: $${bnbPrice.toFixed(2)} (${priceSource})`);
+        // Enhanced logging with source identification
+        const sourceIcon = priceSource.includes('Chainlink') ? '🔗' : 
+                          priceSource.includes('CoinGecko') ? '🦎' : 
+                          priceSource.includes('Binance') ? '🟡' : '💰';
+        
+        console.log(`${sourceIcon} BNB/USD: $${bnbPrice.toFixed(2)} (${priceSource})`);
       } catch (err) {
-        console.error('Failed to update prices:', err);
-        // Use last known good price or fallback
+        console.error('Price update failed:', err);
+        // Preserve last known good price or use fallback
         setPriceInfo(prev => prev || {
           bnbPrice: 725,
           bamPrice: 0.0000001,
@@ -149,8 +148,8 @@ const SwapPage = () => {
     // Initial price fetch
     updatePrices();
     
-    // Set up regular price updates every 45 seconds (less frequent to reduce API load)
-    const interval = setInterval(updatePrices, 45000);
+    // Update every 30 seconds (Chainlink updates every ~30 seconds on BSC)
+    const interval = setInterval(updatePrices, 30000);
     return () => clearInterval(interval);
   }, []);
 
