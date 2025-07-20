@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Coins, Pickaxe, Crown, Check } from "lucide-react";
+import { Coins, Pickaxe, Crown, Check, ArrowLeftRight } from "lucide-react";
 
 export default function EcosystemOverview() {
   const ecosystemFeatures = [
@@ -15,6 +15,17 @@ export default function EcosystemOverview() {
       color: "text-primary"
     },
     {
+      icon: <ArrowLeftRight className="h-10 w-10" />,
+      title: "BAM Swap",
+      description: "Advanced smart contract with differential fees, payment distribution system, and Chainlink price feeds - ready for BSC deployment.",
+      features: [
+        "Differential Fee Structure (0.5%/1.5%)",
+        "Chainlink Price Integration", 
+        "Individual Pause Controls"
+      ],
+      color: "text-secondary"
+    },
+    {
       icon: <Pickaxe className="h-10 w-10" />,
       title: "BAM ApexMiner",
       description: "Revolutionary mining platform where communities combine resources for maximum collective returns and shared prosperity.",
@@ -23,7 +34,7 @@ export default function EcosystemOverview() {
         "Shared Rewards System",
         "Collective Growth Strategy"
       ],
-      color: "text-secondary"
+      color: "text-accent"
     },
     {
       icon: <Crown className="h-10 w-10" />,
@@ -50,7 +61,7 @@ export default function EcosystemOverview() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {ecosystemFeatures.map((feature, index) => (
             <Card 
               key={index}

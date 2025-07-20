@@ -9,7 +9,7 @@ export default function Footer() {
   ];
 
   const productLinks = [
-    { label: "BAM DEX", href: "#" },
+    { label: "BAM Swap", href: "#" },
     { label: "NFT Marketplace", href: "#" },
     { label: "Play 2 Earn", href: "#" },
     { label: "BAM DAO", href: "#" }

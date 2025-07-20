@@ -14,8 +14,8 @@ export default function ProjectsSection() {
   const projects = [
     {
       icon: <ArrowLeftRight className="h-10 w-10" />,
-      title: "BAM DEX",
-      description: "Community-driven decentralized exchange where collective trading strategies multiply wealth for all members.",
+      title: "BAM Swap",
+      description: "Advanced token swap platform with differential fees, payment distribution, and Chainlink price feeds - now ready for deployment!",
       color: "text-primary"
     },
     {
