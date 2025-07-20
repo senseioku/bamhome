@@ -77,6 +77,13 @@ bamSwap.buyBAMWithBNB{value: bnbAmount}();
 - **Price in Wei**: 100 wei = $0.0000001
 - **Example**: 1 USDT = 10,000,000 BAM tokens
 
+### BNB Conversion
+- **Chainlink Oracle**: Automatic real-time BNB/USD price fetching
+- **Price Validation**: Multiple validation layers for data integrity
+- **Fallback System**: Automatic fallback if oracle fails
+- **Default Fallback**: $600 USD per BNB
+- **Process**: BNB → Live USD Price → BAM tokens
+
 
 
 ## Gas Optimization
@@ -89,10 +96,12 @@ The contract is optimized for minimal gas usage:
 
 ## Security Considerations
 
-1. **Price Oracle**: BNB price is manually updated by owner
-2. **Liquidity Risk**: Contract requires sufficient token liquidity
-3. **Access Control**: Only owner can perform administrative functions
-4. **Emergency Controls**: Pause functionality for critical situations
+1. **Chainlink Oracle**: Automatic BNB price feeds with comprehensive validation
+2. **Price Validation**: Multiple checks for data freshness and validity
+3. **Fallback System**: Automatic fallback to manual price if oracle fails
+4. **Liquidity Risk**: Contract requires sufficient token liquidity
+5. **Access Control**: Only owner can perform administrative functions
+6. **Emergency Controls**: Pause functionality and emergency mode for critical situations
 
 ## Events
 
@@ -100,8 +109,11 @@ The contract is optimized for minimal gas usage:
 event SwapUSDTToUSDB(address indexed user, uint256 amount);
 event SwapUSDBToUSDT(address indexed user, uint256 amount);
 event BuyBAMWithUSDT(address indexed user, uint256 usdtAmount, uint256 bamAmount);
-event BuyBAMWithBNB(address indexed user, uint256 bnbAmount, uint256 bamAmount);
-event BNBPriceUpdated(uint256 oldPrice, uint256 newPrice);
+event BuyBAMWithBNB(address indexed user, uint256 bnbAmount, uint256 bamAmount, uint256 bnbPrice);
+event PriceSourceChanged(bool isUsingFallback, uint256 price);
+event FallbackPriceUpdated(uint256 oldPrice, uint256 newPrice);
+event PriceFeedUpdated(address oldFeed, address newFeed);
+event EmergencyModeToggled(bool enabled);
 event EmergencyWithdraw(address indexed token, uint256 amount);
 ```
 
@@ -112,17 +124,19 @@ event EmergencyWithdraw(address indexed token, uint256 amount);
 - `swapUSDBToUSDT(uint256 amount)`: Swap USDB to USDT 1:1
 - `buyBAMWithUSDT(uint256 usdtAmount)`: Buy BAM tokens with USDT
 - `buyBAMWithBNB()`: Buy BAM tokens with BNB (payable)
-- `getUSDTToBAMQuote(uint256)`: Get BAM quote for USDT amount
-- `getBNBToBAMQuote(uint256)`: Get BAM quote for BNB amount
+- `getQuotes(uint256, uint256)`: Get quotes for USDT and BNB amounts
 
 ### View Functions
-- `getContractBalances()`: Get all token balances
-- `getPriceInfo()`: Get current pricing information
+- `getBNBPriceWithValidation()`: Get BNB price with validity check
+- `getContractInfo()`: Get comprehensive contract information
 - `calculateBAMFromUSDT(uint256)`: Calculate BAM from USDT
-- `calculateBAMFromBNB(uint256)`: Calculate BAM from BNB
+- `calculateBAMFromBNB(uint256, uint256)`: Calculate BAM from BNB with price
 
 ### Owner Functions
-- `updateBNBPrice(uint256)`: Update BNB/USD price
+- `updateFallbackPrice(uint256)`: Update fallback BNB price
+- `toggleFallbackPrice(bool)`: Switch between oracle and fallback
+- `updatePriceFeed(address)`: Update Chainlink oracle address
+- `toggleEmergencyMode(bool)`: Enable/disable emergency mode
 - `addLiquidity(address, uint256)`: Add token liquidity
 - `emergencyWithdraw(address, uint256)`: Emergency token withdrawal
 - `pause()`/`unpause()`: Pause/unpause contract
