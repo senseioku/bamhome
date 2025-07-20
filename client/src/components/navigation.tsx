@@ -87,6 +87,16 @@ export default function Navigation() {
                     </button>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
+                    <button
+                      onClick={() => scrollToSection("projects")}
+                      className="flex items-center w-full text-left"
+                    >
+                      <span className="mr-2">🎁</span>
+                      BAM Drops
+                      <span className="ml-auto text-xs bg-secondary/20 text-secondary px-2 py-1 rounded">Soon</span>
+                    </button>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
                     <a
                       href="https://apex.bam-ecosystem.com"
                       target="_blank"
@@ -139,6 +149,12 @@ export default function Navigation() {
                       className="block py-2 text-foreground hover:text-primary w-full text-left"
                     >
                       🔄 BAM Swap <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded ml-2">Ready</span>
+                    </button>
+                    <button
+                      onClick={() => scrollToSection("projects")}
+                      className="block py-2 text-foreground hover:text-primary w-full text-left"
+                    >
+                      🎁 BAM Drops <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded ml-2">Soon</span>
                     </button>
                     <a
                       href="https://apex.bam-ecosystem.com"
