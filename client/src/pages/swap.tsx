@@ -60,28 +60,28 @@ const SwapPage = () => {
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
 
-  // Simplified price fetching - API sources only to avoid CORS issues
+  // Multi-source price fetching with proper CORS handling
   const fetchReliablePrice = async (): Promise<{ price: number; source: string }> => {
     const apiSources = [
-      // Binance API (most reliable, direct exchange data)
+      // Binance API via CORS proxy (most reliable)
       {
         name: 'Binance API',
         fetch: async () => {
-          const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT');
+          const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT'));
           const data = await response.json();
           return parseFloat(data?.price || '0');
         }
       },
-      // CoinCap API (reliable alternative)
+      // CoinCap API via CORS proxy
       {
         name: 'CoinCap API', 
         fetch: async () => {
-          const response = await fetch('https://api.coincap.io/v2/assets/binance-coin');
+          const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.coincap.io/v2/assets/binance-coin'));
           const data = await response.json();
           return parseFloat(data?.data?.priceUsd || '0');
         }
       },
-      // CoinGecko via CORS proxy (backup)
+      // CoinGecko API via CORS proxy (backup)
       {
         name: 'CoinGecko API',
         fetch: async () => {
@@ -89,13 +89,22 @@ const SwapPage = () => {
           const data = await response.json();
           return data?.binancecoin?.usd || 0;
         }
+      },
+      // Alternative CORS proxy service
+      {
+        name: 'CryptoCompare API',
+        fetch: async () => {
+          const response = await fetch('https://corsproxy.io/?https://min-api.cryptocompare.com/data/price?fsym=BNB&tsyms=USD');
+          const data = await response.json();
+          return parseFloat(data?.USD || '0');
+        }
       }
     ];
 
     for (const source of apiSources) {
       try {
         const price = await source.fetch();
-        if (price > 0) {
+        if (price > 0 && price < 2000) { // Reasonable price range check
           return { price, source: source.name };
         }
       } catch (error) {
@@ -104,30 +113,32 @@ const SwapPage = () => {
       }
     }
     
-    return { price: 692, source: 'Fallback' }; // Static fallback
+    // Final fallback with current market range
+    return { price: 725, source: 'Static Fallback' };
   };
 
 
 
-  // Price Update Timer - Reliable API sources only
+  // Price Update Timer with improved error handling
   useEffect(() => {
     const updatePrices = async () => {
       try {
+        setError(''); // Clear previous errors
         const { price: bnbPrice, source: priceSource } = await fetchReliablePrice();
         
         setPriceInfo({
           bnbPrice,
           bamPrice: 0.0000001, // Fixed BAM price
-          isValidPrice: priceSource !== 'Fallback',
+          isValidPrice: priceSource !== 'Static Fallback',
           lastUpdated: Date.now()
         });
         
         console.log(`💰 BNB/USD: $${bnbPrice.toFixed(2)} (${priceSource})`);
       } catch (err) {
         console.error('Failed to update prices:', err);
-        // Final fallback
-        setPriceInfo({
-          bnbPrice: 692,
+        // Use last known good price or fallback
+        setPriceInfo(prev => prev || {
+          bnbPrice: 725,
           bamPrice: 0.0000001,
           isValidPrice: false,
           lastUpdated: Date.now()
@@ -135,8 +146,11 @@ const SwapPage = () => {
       }
     };
 
+    // Initial price fetch
     updatePrices();
-    const interval = setInterval(updatePrices, 30000); // Update every 30 seconds
+    
+    // Set up regular price updates every 45 seconds (less frequent to reduce API load)
+    const interval = setInterval(updatePrices, 45000);
     return () => clearInterval(interval);
   }, []);
 
