@@ -27,10 +27,10 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     IERC20 public constant BAM = IERC20(0xA779f03b752fa2442e6A23f145b007f2160F9a7D);
 
     // Price configuration - BAM token price: 0.0000001 USDT = 1 BAM
-    // If 1 USDT = 10M BAM, then bamPriceInUSD should be 1e11 to make the math work
+    // User requirement: 1 USDT = 10,000,000 BAM
+    // Working backwards: bamPriceInUSD = (1e18 * 1e18) / (10M * 1e18) = 1e11  
     // Formula: (usdtAmount * 1e18) / bamPriceInUSD = BAM amount
-    // For 1 USDT: (1e18 * 1e18) / 1e11 = 1e25 = 10M BAM (in wei with 18 decimals)
-    uint256 public bamPriceInUSD = 1e11; // Updated to give 10M BAM per USDT (updatable by owner)
+    uint256 public bamPriceInUSD = 1e11; // Correct value for 10M BAM per USDT (updatable by owner)
     uint256 public constant PRICE_DECIMALS = 18;
     uint256 public constant USD_DECIMALS = 18; // Both USDT and USDB use 18 decimals on BSC
     uint256 public constant MIN_BAM_PRICE = 1e10; // Minimum BAM price (more BAM per USDT)
