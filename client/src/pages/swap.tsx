@@ -419,6 +419,35 @@ const SwapPage = () => {
     }
   };
 
+  // Calculate exact BNB amount needed for 1 USDT equivalent
+  const calculateBNBForBAM = () => {
+    if (priceInfo && priceInfo.bnbPrice > 0) {
+      return (1 / priceInfo.bnbPrice).toFixed(6); // 1 USDT worth of BNB
+    }
+    return '';
+  };
+
+  // Auto-populate exact amounts for BAM purchases
+  const autoPopulateBamAmount = () => {
+    if (toToken.symbol === 'BAM') {
+      if (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') {
+        if (fromAmount !== '1') {
+          setFromAmount('1');
+        }
+      } else if (fromToken.symbol === 'BNB') {
+        const exactBnbAmount = calculateBNBForBAM();
+        if (exactBnbAmount && fromAmount !== exactBnbAmount) {
+          setFromAmount(exactBnbAmount);
+        }
+      }
+    }
+  };
+
+  // Auto-populate when token pair changes
+  useEffect(() => {
+    autoPopulateBamAmount();
+  }, [fromToken.symbol, toToken.symbol, priceInfo?.bnbPrice]);
+
   // Helper function to calculate USD value
   const calculateUSDValue = (amount: string, tokenSymbol: string): string => {
     const numAmount = parseFloat(amount || '0');
@@ -1258,6 +1287,7 @@ const SwapPage = () => {
                   placeholder="0"
                   className="text-xl sm:text-2xl lg:text-xl xl:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-14 lg:h-12 xl:h-14 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
                   step="any"
+                  readOnly={toToken.symbol === 'BAM' && fromToken.symbol === 'BNB'}
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                   <TokenSelector token={fromToken} onSelect={setFromToken} label="from" />
@@ -1310,12 +1340,20 @@ const SwapPage = () => {
                   </Alert>
                 ) : (
                   <Alert className="border-yellow-500/30 bg-yellow-500/10 mb-3">
-                    <AlertCircle className="h-4 w-4" />
+                    <AlertCircle className="h-4 w-4 text-yellow-400" />
                     <AlertDescription className="text-yellow-200 text-sm">
                       <div className="space-y-1">
-                        <div className="font-medium">⚠️ BAM Purchase Limits:</div>
+                        <div className="font-medium">⚠️ BAM Purchase Guide:</div>
                         <div className="text-xs">
-                          • Exactly 1 USDT per wallet • One-time purchase only
+                          {fromToken.symbol === 'BNB' ? (
+                            <>
+                              <div>Exact Amount: <span className="font-mono font-bold text-white">{calculateBNBForBAM()} BNB</span> (≈ $1.00 USD)</div>
+                              <div>Auto-filled based on BNB price: ${priceInfo?.bnbPrice.toFixed(2)}</div>
+                            </>
+                          ) : (
+                            '• Exactly 1 USDT per wallet • One-time purchase only'
+                          )}
+                          <div>→ Receive 10,000,000 BAM tokens</div>
                         </div>
                       </div>
                     </AlertDescription>
