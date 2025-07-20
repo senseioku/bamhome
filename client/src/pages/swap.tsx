@@ -963,13 +963,13 @@ const SwapPage = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="p-2 sm:p-3 pt-16 sm:pt-18">
-        <div className="max-w-md mx-auto">
+      <div className="p-2 sm:p-3 pt-16 sm:pt-18 xl:pt-0 xl:flex xl:items-center xl:justify-center xl:min-h-screen">
+        <div className="max-w-md mx-auto xl:mt-0">
         {/* Header */}
-        <div className="text-center mb-1">
-          <p className="text-xs text-gray-400 mb-1">Pioneering Community Growth and Wealth</p>
+        <div className="text-center mb-1 xl:mb-3">
+          <p className="text-xs text-gray-400 mb-1 xl:mb-2">Pioneering Community Growth and Wealth</p>
           {priceInfo && (
-            <div className="flex justify-center items-center space-x-2 mb-1 text-xs">
+            <div className="flex justify-center items-center space-x-2 mb-1 xl:mb-2 text-xs">
               <Badge variant="outline" className="text-green-400 border-green-400 px-1.5 py-0.5">
                 <TrendingUp className="w-2 h-2 mr-0.5" />
                 BNB ${priceInfo.bnbPrice.toFixed(2)}
