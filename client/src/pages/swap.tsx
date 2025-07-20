@@ -877,7 +877,7 @@ const SwapPage = () => {
         <DialogTrigger asChild>
           <Button variant="ghost" className="p-1.5 sm:p-2 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-700/50">
             <div className="flex items-center space-x-1.5 sm:space-x-2">
-              {typeof token.icon !== 'string' ? (
+              {typeof token.icon === 'string' && (token.icon.includes('.png') || token.icon.includes('.jpg') || token.icon.includes('.jpeg') || token.icon.startsWith('/') || token.icon.startsWith('data:')) ? (
                 <img src={token.icon} alt={token.symbol} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full" />
               ) : (
                 <div className="text-base sm:text-lg">{token.icon}</div>
@@ -922,7 +922,7 @@ const SwapPage = () => {
                       setSearchQuery('');
                     }}
                   >
-                    {typeof tokenOption.icon !== 'string' ? (
+                    {typeof tokenOption.icon === 'string' && (tokenOption.icon.includes('.png') || tokenOption.icon.includes('.jpg') || tokenOption.icon.includes('.jpeg') || tokenOption.icon.startsWith('/') || tokenOption.icon.startsWith('data:')) ? (
                       <img src={tokenOption.icon} alt={tokenOption.symbol} className="w-8 h-8 rounded-full mb-1" />
                     ) : (
                       <div className="text-xl mb-1">{tokenOption.icon}</div>
@@ -968,7 +968,7 @@ const SwapPage = () => {
                     }}
                   >
                     <div className="flex items-center space-x-3 w-full">
-                      {typeof tokenOption.icon !== 'string' ? (
+                      {typeof tokenOption.icon === 'string' && (tokenOption.icon.includes('.png') || tokenOption.icon.includes('.jpg') || tokenOption.icon.includes('.jpeg') || tokenOption.icon.startsWith('/') || tokenOption.icon.startsWith('data:')) ? (
                         <img src={tokenOption.icon} alt={tokenOption.symbol} className="w-8 h-8 rounded-full" />
                       ) : (
                         <div className="text-2xl">{tokenOption.icon}</div>
