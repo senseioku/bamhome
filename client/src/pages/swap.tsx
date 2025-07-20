@@ -1041,86 +1041,7 @@ const SwapPage = () => {
         </div>
       </nav>
 
-      {/* Contract Status Warnings - Outside Main Interface */}
-      {contractStatus && (
-        <div className="fixed top-20 left-4 right-4 z-50 space-y-2 pointer-events-none">
-          {/* Main Contract Paused */}
-          {contractStatus.isPaused && (
-            <Alert className="border-red-500/50 bg-red-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-red-200 text-sm">
-                <div className="font-medium">🚫 Contract Temporarily Paused</div>
-                <div className="text-xs mt-1">All swap functions are currently disabled. Please try again later.</div>
-              </AlertDescription>
-            </Alert>
-          )}
 
-          {/* Specific Function Paused Warnings */}
-          {!contractStatus.isPaused && (
-            <>
-              {/* USDT to BAM paused */}
-              {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
-                (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && 
-                contractStatus.functionPaused.usdtToBam && (
-                <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className="text-orange-200 text-sm">
-                    <div className="font-medium">⏸️ BAM Purchases Paused</div>
-                    <div className="text-xs mt-1">BAM token purchases are temporarily disabled.</div>
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {/* USDT to USDB paused */}
-              {fromToken.symbol === 'USDT' && toToken.symbol === 'USDB' && 
-                contractStatus.functionPaused.usdtToUsdb && (
-                <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className="text-orange-200 text-sm">
-                    <div className="font-medium">⏸️ USDT→USDB Swaps Paused</div>
-                    <div className="text-xs mt-1">This swap direction is temporarily disabled.</div>
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {/* USDB to USDT paused */}
-              {fromToken.symbol === 'USDB' && toToken.symbol === 'USDT' && 
-                contractStatus.functionPaused.usdbToUsdt && (
-                <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className="text-orange-200 text-sm">
-                    <div className="font-medium">⏸️ USDB→USDT Swaps Paused</div>
-                    <div className="text-xs mt-1">This swap direction is temporarily disabled.</div>
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {/* BAM selling paused */}
-              {fromToken.symbol === 'BAM' && 
-                (contractStatus.functionPaused.bamToUsdt || contractStatus.functionPaused.bamToBnb) && (
-                <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className="text-orange-200 text-sm">
-                    <div className="font-medium">⏸️ BAM Selling Paused</div>
-                    <div className="text-xs mt-1">BAM token sales are temporarily disabled.</div>
-                  </AlertDescription>
-                </Alert>
-              )}
-            </>
-          )}
-
-          {/* Connection Status */}
-          {!walletAddress && (
-            <Alert className="border-blue-500/50 bg-blue-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
-              <Info className="h-4 w-4" />
-              <AlertDescription className="text-blue-200 text-sm">
-                <div className="font-medium">💡 Connect Wallet</div>
-                <div className="text-xs mt-1">Connect your wallet to check current swap availability.</div>
-              </AlertDescription>
-            </Alert>
-          )}
-        </div>
-      )}
 
       {/* Main Content */}
       <div className="p-2 sm:p-3 pt-8 sm:pt-18 flex items-center justify-center min-h-screen xl:pt-0">
@@ -1575,6 +1496,87 @@ const SwapPage = () => {
           <p>🔒 Powered by BAM Smart Contracts on BSC</p>
           <p>💎 Professional-grade DeFi with minimal fees</p>
         </div>
+
+        {/* Contract Status Warnings - Below Main Interface */}
+        {contractStatus && (
+          <div className="mt-6 space-y-3 max-w-sm sm:max-w-lg mx-auto">
+            {/* Main Contract Paused */}
+            {contractStatus.isPaused && (
+              <Alert className="border-red-500/50 bg-red-500/20 backdrop-blur-sm">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-red-200 text-sm">
+                  <div className="font-medium">🚫 Contract Temporarily Paused</div>
+                  <div className="text-xs mt-1">All swap functions are currently disabled. Please try again later.</div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Specific Function Paused Warnings */}
+            {!contractStatus.isPaused && (
+              <>
+                {/* USDT to BAM paused */}
+                {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
+                  (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && 
+                  contractStatus.functionPaused.usdtToBam && (
+                  <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-orange-200 text-sm">
+                      <div className="font-medium">⏸️ BAM Purchases Paused</div>
+                      <div className="text-xs mt-1">BAM token purchases are temporarily disabled.</div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* USDT to USDB paused */}
+                {fromToken.symbol === 'USDT' && toToken.symbol === 'USDB' && 
+                  contractStatus.functionPaused.usdtToUsdb && (
+                  <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-orange-200 text-sm">
+                      <div className="font-medium">⏸️ USDT→USDB Swaps Paused</div>
+                      <div className="text-xs mt-1">This swap direction is temporarily disabled.</div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* USDB to USDT paused */}
+                {fromToken.symbol === 'USDB' && toToken.symbol === 'USDT' && 
+                  contractStatus.functionPaused.usdbToUsdt && (
+                  <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-orange-200 text-sm">
+                      <div className="font-medium">⏸️ USDB→USDT Swaps Paused</div>
+                      <div className="text-xs mt-1">This swap direction is temporarily disabled.</div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* BAM selling paused */}
+                {fromToken.symbol === 'BAM' && 
+                  (contractStatus.functionPaused.bamToUsdt || contractStatus.functionPaused.bamToBnb) && (
+                  <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-orange-200 text-sm">
+                      <div className="font-medium">⏸️ BAM Selling Paused</div>
+                      <div className="text-xs mt-1">BAM token sales are temporarily disabled.</div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </>
+            )}
+
+            {/* Connection Status */}
+            {!walletAddress && (
+              <Alert className="border-blue-500/50 bg-blue-500/20 backdrop-blur-sm">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="text-blue-200 text-sm">
+                  <div className="font-medium">💡 Connect Wallet</div>
+                  <div className="text-xs mt-1">Connect your wallet to check current swap availability.</div>
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+        )}
         </div>
       </div>
 
