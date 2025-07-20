@@ -28,9 +28,11 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
 
     // Price configuration - BAM token price: $0.0000001 USD
     // This represents 0.0000001 USD = 100 wei (in 18 decimal format)
-    uint256 public constant BAM_PRICE_IN_USD = 100; // 0.0000001 USD in smallest unit
+    uint256 public bamPriceInUSD = 100; // 0.0000001 USD in smallest unit (updatable by owner)
     uint256 public constant PRICE_DECIMALS = 18;
     uint256 public constant USD_DECIMALS = 18; // Both USDT and USDB use 18 decimals on BSC
+    uint256 public constant MIN_BAM_PRICE = 50; // Minimum BAM price: $0.00000005
+    uint256 public constant MAX_BAM_PRICE = 1000; // Maximum BAM price: $0.000001
     
     // Fee configuration
     uint256 public constant LOW_FEE_RATE = 50; // 0.5% (50 basis points) - for USDT→USDB, USDT→BAM, BNB→BAM
@@ -79,6 +81,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     event EmergencyModeToggled(bool enabled);
     event SwapFunctionPaused(string functionName, bool paused);
     event EmergencyWithdraw(address indexed token, uint256 amount);
+    event BAMPriceUpdated(uint256 oldPrice, uint256 newPrice);
 
     constructor() Ownable(msg.sender) {
         // BSC Mainnet BNB/USD Price Feed
@@ -352,36 +355,38 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * @dev Calculate BAM tokens from USDT amount
      * BAM price = $0.0000001, so 1 USDT = 10,000,000 BAM tokens
      */
-    function calculateBAMFromUSDT(uint256 usdtAmount) public pure returns (uint256) {
-        // usdtAmount is in 18 decimals, BAM_PRICE_IN_USD represents 0.0000001 USD
-        // 1 USDT (1e18) / 0.0000001 USD (100 wei) = 10,000,000 BAM tokens (1e25 wei)
-        return (usdtAmount * 1e18) / BAM_PRICE_IN_USD;
+    function calculateBAMFromUSDT(uint256 usdtAmount) public view returns (uint256) {
+        // usdtAmount is in 18 decimals, bamPriceInUSD represents current BAM price
+        // 1 USDT (1e18) / current BAM price = BAM tokens
+        return (usdtAmount * 1e18) / bamPriceInUSD;
     }
 
     /**
      * @dev Calculate BAM tokens from BNB amount with specific price
      */
-    function calculateBAMFromBNB(uint256 bnbAmount, uint256 bnbPrice) public pure returns (uint256) {
+    function calculateBAMFromBNB(uint256 bnbAmount, uint256 bnbPrice) public view returns (uint256) {
         // Convert BNB to USD value: bnbAmount (18 decimals) * bnbPrice (18 decimals) / 1e18
         uint256 usdValue = (bnbAmount * bnbPrice) / 1e18;
-        // Convert USD to BAM tokens
-        return calculateBAMFromUSDT(usdValue);
+        // Convert USD to BAM tokens using current BAM price
+        return (usdValue * 1e18) / bamPriceInUSD;
     }
 
     /**
      * @dev Calculate USDT amount from BAM tokens
      * BAM price = $0.0000001, so 10,000,000 BAM tokens = 1 USDT
      */
-    function calculateUSDTFromBAM(uint256 bamAmount) public pure returns (uint256) {
-        // bamAmount * BAM_PRICE_IN_USD / 1e18 to get USDT amount in 18 decimals
-        return (bamAmount * BAM_PRICE_IN_USD) / 1e18;
+    function calculateUSDTFromBAM(uint256 bamAmount) public view returns (uint256) {
+        // bamAmount * current BAM price / 1e18 to get USDT amount in 18 decimals
+        return (bamAmount * bamPriceInUSD) / 1e18;
     }
 
     /**
      * @dev Calculate BNB amount from BAM tokens
      */
-    function calculateBNBFromBAM(uint256 bamAmount, uint256 bnbPrice) public pure returns (uint256) {
-        uint256 usdValue = calculateUSDTFromBAM(bamAmount);
+    function calculateBNBFromBAM(uint256 bamAmount, uint256 bnbPrice) public view returns (uint256) {
+        // Convert BAM to USD value using current BAM price
+        uint256 usdValue = (bamAmount * bamPriceInUSD) / 1e18;
+        // Convert USD to BNB using provided BNB price
         return (usdValue * 1e18) / bnbPrice;
     }
 
@@ -452,6 +457,18 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     {
         toRecipient = (amount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
         remaining = amount - toRecipient;
+    }
+
+    /**
+     * @dev Update BAM token price (owner only)
+     * @param newPrice New BAM price in smallest unit (current: 100 = $0.0000001)
+     */
+    function updateBAMPrice(uint256 newPrice) external onlyOwner {
+        require(newPrice >= MIN_BAM_PRICE && newPrice <= MAX_BAM_PRICE, "BAM price out of valid range");
+        require(newPrice != bamPriceInUSD, "Price already set to this value");
+        uint256 oldPrice = bamPriceInUSD;
+        bamPriceInUSD = newPrice;
+        emit BAMPriceUpdated(oldPrice, newPrice);
     }
 
     /**
@@ -576,6 +593,13 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
+     * @dev Get current BAM price
+     */
+    function getBAMPrice() external view returns (uint256) {
+        return bamPriceInUSD;
+    }
+
+    /**
      * @dev Get comprehensive contract information
      */
     function getContractInfo() external view returns (
@@ -584,6 +608,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         uint256 bamBalance,
         uint256 bnbBalance,
         uint256 currentBNBPrice,
+        uint256 currentBAMPrice,
         bool priceIsValid,
         bool isUsingFallback,
         bool isEmergencyMode,
@@ -595,6 +620,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         bnbBalance = address(this).balance;
         
         (currentBNBPrice, priceIsValid) = getBNBPriceWithValidation();
+        currentBAMPrice = bamPriceInUSD;
         isUsingFallback = useFallbackPrice;
         isEmergencyMode = emergencyMode;
         isPaused = paused();
