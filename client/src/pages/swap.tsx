@@ -963,13 +963,13 @@ const SwapPage = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="p-2 sm:p-3 pt-18 sm:pt-20">
+      <div className="p-2 sm:p-3 pt-16 sm:pt-18">
         <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="text-center mb-2">
-          <p className="text-xs text-gray-400 mb-2">Pioneering Community Growth and Wealth</p>
+        <div className="text-center mb-1">
+          <p className="text-xs text-gray-400 mb-1">Pioneering Community Growth and Wealth</p>
           {priceInfo && (
-            <div className="flex justify-center items-center space-x-2 mb-2 text-xs">
+            <div className="flex justify-center items-center space-x-2 mb-1 text-xs">
               <Badge variant="outline" className="text-green-400 border-green-400 px-1.5 py-0.5">
                 <TrendingUp className="w-2 h-2 mr-0.5" />
                 BNB ${priceInfo.bnbPrice.toFixed(2)}
@@ -1037,7 +1037,7 @@ const SwapPage = () => {
             </div>
 
             {/* From Token */}
-            <div className="space-y-1 mb-3">
+            <div className="space-y-1 mb-2">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-medium text-gray-300">From</label>
                 {balances[fromToken.symbol] && (
@@ -1055,7 +1055,7 @@ const SwapPage = () => {
                   value={fromAmount}
                   onChange={(e) => setFromAmount(e.target.value)}
                   placeholder="0"
-                  className="text-xl sm:text-2xl font-bold bg-transparent border-none text-white h-12 sm:h-14 pr-24 sm:pr-28 focus:ring-0 focus:border-none"
+                  className="text-xl sm:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-12 pr-24 sm:pr-28 focus:ring-0 focus:border-none"
                   step="any"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
@@ -1070,19 +1070,19 @@ const SwapPage = () => {
             </div>
 
             {/* Swap Button */}
-            <div className="flex justify-center my-2">
+            <div className="flex justify-center my-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={swapTokens}
-                className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white border border-gray-600"
+                className="p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white border border-gray-600"
               >
-                <ArrowUpDown className="w-4 h-4" />
+                <ArrowUpDown className="w-3 h-3" />
               </Button>
             </div>
 
             {/* To Token */}
-            <div className="space-y-1 mb-4">
+            <div className="space-y-1 mb-2">
               <label className="text-xs font-medium text-gray-300">To</label>
               <div className="relative">
                 <Input
@@ -1090,7 +1090,7 @@ const SwapPage = () => {
                   value={toAmount}
                   readOnly
                   placeholder="0"
-                  className="text-xl sm:text-2xl font-bold bg-transparent border-none text-white h-12 sm:h-14 pr-24 sm:pr-28 focus:ring-0 focus:border-none"
+                  className="text-xl sm:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-12 pr-24 sm:pr-28 focus:ring-0 focus:border-none"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                   <TokenSelector token={toToken} onSelect={setToToken} label="to" />
@@ -1105,7 +1105,7 @@ const SwapPage = () => {
 
             {/* Enhanced Quote Information */}
             {quote && (
-              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-lg p-2 mb-3 border border-gray-600/50">
+              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-lg p-2 mb-2 border border-gray-600/50">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-300 font-medium">Trade Details</span>
                   <Info className="w-3 h-3 text-gray-400" />
