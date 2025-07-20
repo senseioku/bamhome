@@ -58,41 +58,88 @@ const SwapPage = () => {
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
 
-  // Direct Chainlink Price Fetching
+  // Direct Chainlink Price Fetching with fallback RPC
   const fetchChainlinkPrice = async (feedAddress: string): Promise<number> => {
-    try {
-      const data = ContractEncoder.encodeFunctionCall('latestRoundData()');
-      const result = await web3Utils.callContract(feedAddress, data);
-      
-      if (result && result !== '0x') {
-        // Decode the result: roundId, answer, startedAt, updatedAt, answeredInRound
-        const decoded = ContractEncoder.decodeResult(result, 'tuple');
-        if (decoded && decoded.length >= 2) {
-          // Chainlink prices have 8 decimals
-          const price = parseInt(decoded[1]) / 1e8;
-          return price;
+    const rpcEndpoints = [
+      'https://rpc.ankr.com/bsc',
+      'https://bsc-dataseed.bnbchain.org',
+      'https://bsc-dataseed-public.bnbchain.org'
+    ];
+
+    for (const rpcUrl of rpcEndpoints) {
+      try {
+        const response = await fetch(rpcUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'eth_call',
+            params: [{
+              to: feedAddress,
+              data: '0x50d25bcd' // latestRoundData() function selector
+            }, 'latest'],
+            id: 1
+          })
+        });
+
+        const result = await response.json();
+        if (result?.result && result.result !== '0x') {
+          // Decode the ABI encoded result
+          const hexResult = result.result.slice(2); // Remove 0x
+          if (hexResult.length >= 128) { // Ensure we have enough data
+            // Extract the price (2nd return value, 32 bytes each)
+            const priceHex = hexResult.slice(64, 128);
+            const price = parseInt(priceHex, 16) / 1e8; // Chainlink has 8 decimals
+            if (price > 0) {
+              return price;
+            }
+          }
         }
+      } catch (error) {
+        console.error(`Chainlink call failed for ${rpcUrl}:`, error);
+        continue;
       }
-      return 0;
-    } catch (error) {
-      console.error('Failed to fetch Chainlink price:', error);
-      return 0;
     }
+    
+    return 0;
   };
 
-  // Alternative API Price Fetching (CoinGecko as backup)
+  // Multiple API Price Sources
   const fetchAPIPrice = async (): Promise<number> => {
-    try {
-      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd');
-      const data = await response.json();
-      if (data?.binancecoin?.usd) {
-        return data.binancecoin.usd;
+    const apiSources = [
+      // CoinGecko with CORS proxy
+      async () => {
+        const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd'));
+        const data = await response.json();
+        return data?.binancecoin?.usd || 0;
+      },
+      // Binance API (CORS-friendly)
+      async () => {
+        const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT');
+        const data = await response.json();
+        return parseFloat(data?.price || '0');
+      },
+      // CoinCap API (CORS-friendly)
+      async () => {
+        const response = await fetch('https://api.coincap.io/v2/assets/binance-coin');
+        const data = await response.json();
+        return parseFloat(data?.data?.priceUsd || '0');
       }
-      return 0;
-    } catch (error) {
-      console.error('Failed to fetch API price:', error);
-      return 0;
+    ];
+
+    for (const fetchSource of apiSources) {
+      try {
+        const price = await fetchSource();
+        if (price > 0) {
+          return price;
+        }
+      } catch (error) {
+        console.error('API source failed:', error);
+        continue;
+      }
     }
+    
+    return 0;
   };
 
   // Price Update Timer with Multiple Sources

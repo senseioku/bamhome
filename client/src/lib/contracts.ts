@@ -3,7 +3,7 @@ export const BAM_SWAP_ADDRESS = "0x1A7BafBBA6c0A5D9c90913D76B9953F5acEE7b4c";
 
 // BSC Mainnet Configuration
 export const BSC_CHAIN_ID = 56;
-export const BSC_RPC_URL = "https://bsc-dataseed1.binance.org/";
+export const BSC_RPC_URL = "https://rpc.ankr.com/bsc"; // More reliable Ankr endpoint
 
 // Chainlink Price Feed Addresses on BSC Mainnet
 export const CHAINLINK_FEEDS = {
