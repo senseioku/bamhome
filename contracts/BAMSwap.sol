@@ -71,10 +71,11 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     bool public sellBAMForUSDTPaused = true; // PAUSED by default
     bool public sellBAMForBNBPaused = true; // PAUSED by default
     
-    // Wallet purchase tracking for BAM purchases (1 USDT min, 10 USDT max per wallet)
-    mapping(address => uint256) public walletPurchases;
+    // Purchase limits (adjustable by owner)
+    uint256 public exactPurchaseAmount = 1e18; // Exactly 1 USDT per wallet (adjustable)
+    uint256 public maxPurchasePerWallet = 1e18; // Maximum allowed per wallet (adjustable)
     
-    // Wallet purchase tracking for BAM purchases (1 USDT min, 10 USDT max per wallet)
+    // Wallet purchase tracking for BAM purchases
     mapping(address => uint256) public walletPurchases;
 
     // Events
@@ -97,6 +98,8 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     event MinimumSwapEnforced(address indexed user, uint256 amount, string swapType);
     event FeeRecipientUpdated(address oldRecipient, address newRecipient);
     event PaymentRecipientUpdated(address oldRecipient, address newRecipient);
+    event PurchaseLimitsUpdated(uint256 exactAmount, uint256 maxPerWallet);
+    event WalletPurchaseReset(address indexed wallet);
 
     constructor() Ownable(msg.sender) {
         // BSC Mainnet BNB/USD Price Feed
@@ -183,11 +186,12 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function buyBAMWithUSDT(uint256 usdtAmount) external nonReentrant whenNotPaused {
         require(!buyBAMWithUSDTPaused, "Buy BAM with USDT is paused");
-        require(usdtAmount >= MIN_PURCHASE_USDT, "Minimum purchase is 1 USDT");
-        require(walletPurchases[msg.sender] + usdtAmount <= MAX_PURCHASE_USDT, "Maximum 10 USDT per wallet");
+        require(usdtAmount == exactPurchaseAmount, "Must purchase exactly the specified amount");
+        require(walletPurchases[msg.sender] == 0, "Wallet has already made a purchase");
+        require(usdtAmount <= maxPurchasePerWallet, "Amount exceeds maximum per wallet");
         
         // Track wallet purchases
-        walletPurchases[msg.sender] += usdtAmount;
+        walletPurchases[msg.sender] = usdtAmount;
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (usdtAmount * LOW_FEE_RATE) / FEE_DENOMINATOR;
@@ -234,13 +238,14 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         (uint256 bnbPrice, bool isValidPrice) = getBNBPriceWithValidation();
         require(isValidPrice || !emergencyMode, "Price feed unavailable in emergency mode");
         
-        // Check minimum purchase requirement (equivalent to 1 USDT) and maximum wallet limit (10 USDT)
+        // Calculate USD equivalent and enforce exact purchase amount
         uint256 usdValue = (msg.value * bnbPrice) / 1e18;
-        require(usdValue >= MIN_PURCHASE_USDT, "Minimum purchase is 1 USDT equivalent");
-        require(walletPurchases[msg.sender] + usdValue <= MAX_PURCHASE_USDT, "Maximum 10 USDT per wallet");
+        require(usdValue == exactPurchaseAmount, "Must purchase exactly the specified USD amount");
+        require(walletPurchases[msg.sender] == 0, "Wallet has already made a purchase");
+        require(usdValue <= maxPurchasePerWallet, "Amount exceeds maximum per wallet");
         
-        // Track wallet purchases in USDT equivalent
-        walletPurchases[msg.sender] += usdValue;
+        // Track wallet purchases in USD equivalent
+        walletPurchases[msg.sender] = usdValue;
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (msg.value * LOW_FEE_RATE) / FEE_DENOMINATOR;
@@ -664,12 +669,56 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         paymentRecipient = newRecipient;
         emit PaymentRecipientUpdated(oldRecipient, newRecipient);
     }
+    
+    /**
+     * @dev Update purchase limits (owner only)
+     * @param newExactAmount New exact purchase amount required per wallet
+     * @param newMaxPerWallet New maximum purchase amount per wallet
+     */
+    function updatePurchaseLimits(uint256 newExactAmount, uint256 newMaxPerWallet) external onlyOwner {
+        require(newExactAmount > 0, "Exact amount must be greater than 0");
+        require(newMaxPerWallet >= newExactAmount, "Max per wallet must be >= exact amount");
+        require(newMaxPerWallet <= 100e18, "Max per wallet cannot exceed 100 USDT");
+        
+        exactPurchaseAmount = newExactAmount;
+        maxPurchasePerWallet = newMaxPerWallet;
+        emit PurchaseLimitsUpdated(newExactAmount, newMaxPerWallet);
+    }
+    
+    /**
+     * @dev Reset wallet purchase tracking for specific address (owner only)
+     * @param wallet Wallet address to reset
+     */
+    function resetWalletPurchase(address wallet) external onlyOwner {
+        require(wallet != address(0), "Invalid wallet address");
+        walletPurchases[wallet] = 0;
+        emit WalletPurchaseReset(wallet);
+    }
+    
+    /**
+     * @dev Reset multiple wallet purchases at once (owner only)
+     * @param wallets Array of wallet addresses to reset
+     */
+    function resetMultipleWalletPurchases(address[] calldata wallets) external onlyOwner {
+        for (uint256 i = 0; i < wallets.length; i++) {
+            require(wallets[i] != address(0), "Invalid wallet address");
+            walletPurchases[wallets[i]] = 0;
+            emit WalletPurchaseReset(wallets[i]);
+        }
+    }
 
     /**
      * @dev Get current recipients
      */
     function getRecipients() external view returns (address fee, address payment) {
         return (feeRecipient, paymentRecipient);
+    }
+    
+    /**
+     * @dev Get current purchase limits
+     */
+    function getPurchaseLimits() external view returns (uint256 exactAmount, uint256 maxPerWallet) {
+        return (exactPurchaseAmount, maxPurchasePerWallet);
     }
 
     /**

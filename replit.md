@@ -99,7 +99,11 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Updated default pause states: Only BAM purchases (USDT→BAM, BNB→BAM) enabled by default
 ✓ All other functions (swaps, selling) paused by default as requested
 ✓ Added USDT→USDB swap to enabled functions (now allows: USDT→BAM, BNB→BAM, USDT→USDB)
-✓ Contract fully ready for deployment with all requested features implemented
+✓ Implemented exact 1 USDT purchase limit per wallet with owner-adjustable controls
+✓ Added wallet purchase tracking with one-time purchase enforcement
+✓ Created owner functions for purchase limit management and wallet reset capabilities
+✓ Applied exact amount enforcement to both USDT and BNB purchase methods
+✓ Contract fully ready for deployment with strict purchase limits and flexible management controls
 
 ## User Preferences
 
