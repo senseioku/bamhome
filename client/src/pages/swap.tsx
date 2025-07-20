@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowUpDown, Settings, RefreshCw, AlertCircle, CheckCircle, TrendingUp, TrendingDown, Activity, ChevronDown, Info, Zap, BarChart3, Search, Star, Clock } from 'lucide-react';
+import { ArrowUpDown, Settings, RefreshCw, AlertCircle, CheckCircle, TrendingUp, TrendingDown, Activity, Info, Zap, BarChart3, Search, Star, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,8 +11,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { web3Utils, ContractEncoder } from '@/lib/web3';
 import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI } from '@/lib/contracts';
-import { Home, ArrowLeft, Menu, X } from 'lucide-react';
+import { Home, ArrowLeft, Menu, X, Wallet, Copy, LogOut, ChevronDown } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface TokenInfo {
   symbol: string;
@@ -223,6 +224,31 @@ const SwapPage = () => {
 
     checkWalletConnection();
   }, []);
+
+  // Disconnect wallet
+  const disconnectWallet = () => {
+    setWalletAddress('');
+    setBalances({});
+    console.log('🔌 Wallet disconnected');
+  };
+
+  // Copy address to clipboard
+  const copyAddress = async () => {
+    if (walletAddress) {
+      try {
+        await navigator.clipboard.writeText(walletAddress);
+        console.log('📋 Address copied to clipboard');
+      } catch (error) {
+        console.error('Failed to copy address:', error);
+      }
+    }
+  };
+
+  // Format wallet address for display
+  const formatAddress = (address: string) => {
+    if (!address) return '';
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   // Helper function to get token price in USD
   const getTokenUSDPrice = (tokenSymbol: string): number => {
@@ -711,6 +737,52 @@ const SwapPage = () => {
               <a href="/#projects" className="text-gray-300 hover:text-primary transition-colors">Projects</a>
               <div className="w-px h-6 bg-gray-600"></div>
               <span className="text-primary font-medium">Swap</span>
+              
+              {/* Wallet Connection Status */}
+              {walletAddress ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="bg-green-500/10 border-green-500/30 hover:bg-green-500/20 text-green-400">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <Wallet className="w-4 h-4" />
+                        <span className="text-sm">Connected</span>
+                        <ChevronDown className="w-3 h-3" />
+                      </div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64 bg-gray-800 border-gray-700">
+                    <div className="px-3 py-2 border-b border-gray-700">
+                      <div className="text-sm font-medium text-yellow-400 mb-1">WALLET INFO</div>
+                      <div className="text-xs text-gray-300 mb-2">Address:</div>
+                      <div className="text-sm text-white font-mono">{formatAddress(walletAddress)}</div>
+                      {balances.BNB && (
+                        <div className="text-xs text-gray-400 mt-1">
+                          Balance: {parseFloat(balances.BNB).toFixed(4)} BNB
+                        </div>
+                      )}
+                    </div>
+                    <DropdownMenuItem onClick={copyAddress} className="text-gray-300 hover:text-white hover:bg-gray-700">
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Address
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={disconnectWallet} className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Disconnect Wallet
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button 
+                  onClick={connectWallet}
+                  disabled={isLoading}
+                  variant="outline" 
+                  className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+                >
+                  <Wallet className="w-4 h-4 mr-2" />
+                  {isLoading ? 'Connecting...' : 'Connect Wallet'}
+                </Button>
+              )}
             </div>
 
             {/* Mobile Navigation */}
@@ -732,6 +804,45 @@ const SwapPage = () => {
                     <a href="/#projects" className="text-gray-300 hover:text-primary transition-colors">Projects</a>
                     <div className="border-t border-gray-600 pt-4">
                       <span className="text-primary font-medium">Current: Swap</span>
+                    </div>
+                    
+                    {/* Mobile Wallet Info */}
+                    <div className="border-t border-gray-600 pt-4">
+                      {walletAddress ? (
+                        <div className="space-y-3">
+                          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                              <span className="text-sm font-medium text-green-400">Connected</span>
+                            </div>
+                            <div className="text-xs text-gray-400 mb-1">Address:</div>
+                            <div className="text-sm text-white font-mono">{formatAddress(walletAddress)}</div>
+                            {balances.BNB && (
+                              <div className="text-xs text-gray-400 mt-1">
+                                Balance: {parseFloat(balances.BNB).toFixed(4)} BNB
+                              </div>
+                            )}
+                          </div>
+                          <Button onClick={copyAddress} variant="outline" className="w-full text-gray-300 border-gray-600">
+                            <Copy className="w-4 h-4 mr-2" />
+                            Copy Address
+                          </Button>
+                          <Button onClick={disconnectWallet} variant="outline" className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10">
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Disconnect
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button 
+                          onClick={connectWallet}
+                          disabled={isLoading}
+                          variant="outline" 
+                          className="w-full border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+                        >
+                          <Wallet className="w-4 h-4 mr-2" />
+                          {isLoading ? 'Connecting...' : 'Connect Wallet'}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </SheetContent>
