@@ -66,6 +66,8 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Removed unnecessary slippage settings, replaced with contract fee tooltips
 ✓ Enhanced mobile UX with proper padding and responsive breakpoints
 ✓ Fixed React Fragment warnings and improved code stability
+✓ Enhanced number formatting to remove decimals for 6+ digit amounts
+✓ Added proper locale formatting with commas for large numbers
 
 ## User Preferences
 

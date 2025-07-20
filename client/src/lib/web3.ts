@@ -162,6 +162,11 @@ export class Web3Utils {
       return (num / 1e3).toFixed(1) + 'K';
     }
     
+    // For numbers with 6+ digits, remove decimals
+    if (num >= 100000) {
+      return Math.floor(num).toLocaleString();
+    }
+    
     // For very small numbers
     if (num < 0.0001) return '< 0.0001';
     
