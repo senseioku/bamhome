@@ -9,12 +9,21 @@ A simple, fast, efficient and secure swap contract for the BAM ecosystem on Bina
 - **BAM Token Purchase**: Fixed price at $0.0000001
 - **Multi-currency Support**: Accept USDT and BNB for BAM purchases
 - **Real-time Quotes**: Get swap quotes before execution
+- **Live Price Feeds**: Automatic BNB price updates via Chainlink oracles
+
+### Price Oracle Features
+- **Chainlink Integration**: Real-time BNB/USD price feeds from Chainlink
+- **Price Validation**: Comprehensive price data validation and freshness checks
+- **Fallback Mechanism**: Automatic fallback to manual price if oracle fails
+- **Price Range Limits**: Configurable min/max price bounds for safety
+- **Emergency Mode**: Manual override for critical situations
 
 ### Security Features
 - **Reentrancy Protection**: Using OpenZeppelin's ReentrancyGuard
 - **Access Control**: Owner-only administrative functions
 - **Emergency Pause**: Pause contract in emergency situations
 - **Safe Transfers**: Using SafeERC20 for all token transfers
+- **Oracle Security**: Multiple validation layers for price feed data
 
 ### Administrative Features
 - **Liquidity Management**: Add/remove liquidity for all tokens
@@ -68,10 +77,7 @@ bamSwap.buyBAMWithBNB{value: bnbAmount}();
 - **Price in Wei**: 100 wei = $0.0000001
 - **Example**: 1 USDT = 10,000,000 BAM tokens
 
-### BNB Conversion
-- Uses internal oracle price (updatable by owner)
-- Default: $600 USD per BNB
-- Converts BNB → USD → BAM tokens
+
 
 ## Gas Optimization
 

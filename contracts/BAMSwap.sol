@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "./interfaces/AggregatorV3Interface.sol";
 
 /**
  * @title BAMSwap
@@ -30,8 +31,16 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     uint256 public constant BAM_PRICE_IN_USD = 100; // $0.0000001 in wei (100 wei = 0.0000001 USD)
     uint256 public constant PRICE_DECIMALS = 18;
     
-    // BNB/USD price oracle (can be updated by owner)
-    uint256 public bnbPriceInUSD = 600 * 1e18; // $600 USD per BNB (18 decimals)
+    // Chainlink BNB/USD price feed on BSC Mainnet
+    AggregatorV3Interface internal bnbPriceFeed;
+    
+    // Price feed settings
+    uint256 public constant PRICE_FEED_DECIMALS = 8; // Chainlink feeds use 8 decimals
+    uint256 public constant MAX_PRICE_AGE = 3600; // 1 hour max price age
+    
+    // Fallback price (can be updated by owner)
+    uint256 public fallbackBnbPrice = 600 * 1e18; // $600 USD per BNB (18 decimals)
+    bool public useFallbackPrice = false;
     
     // Events
     event SwapUSDTToUSDB(address indexed user, uint256 amount);
@@ -39,9 +48,14 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     event BuyBAMWithUSDT(address indexed user, uint256 usdtAmount, uint256 bamAmount);
     event BuyBAMWithBNB(address indexed user, uint256 bnbAmount, uint256 bamAmount);
     event BNBPriceUpdated(uint256 oldPrice, uint256 newPrice);
+    event FallbackPriceToggled(bool enabled);
+    event PriceFeedUpdated(address newFeed);
     event EmergencyWithdraw(address indexed token, uint256 amount);
 
-    constructor() Ownable(msg.sender) {}
+    constructor() Ownable(msg.sender) {
+        // Initialize Chainlink BNB/USD price feed for BSC Mainnet
+        bnbPriceFeed = AggregatorV3Interface(0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE);
+    }
 
     /**
      * @dev Swap USDT to USDB at 1:1 ratio
@@ -135,16 +149,50 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
-     * @dev Calculate BAM tokens from BNB amount
+     * @dev Calculate BAM tokens from BNB amount using live price feed
      * @param bnbAmount Amount of BNB in wei
      * @return BAM tokens to receive (18 decimals)
      */
     function calculateBAMFromBNB(uint256 bnbAmount) public view returns (uint256) {
+        // Get current BNB price
+        uint256 currentBnbPrice = getCurrentBNBPrice();
+        
         // Convert BNB to USD value
-        uint256 usdValue = (bnbAmount * bnbPriceInUSD) / 1e18;
+        uint256 usdValue = (bnbAmount * currentBnbPrice) / 1e18;
         
         // Calculate BAM tokens from USD value
         return calculateBAMFromUSDT(usdValue);
+    }
+
+    /**
+     * @dev Get current BNB price from Chainlink oracle or fallback
+     * @return BNB price in USD (18 decimals)
+     */
+    function getCurrentBNBPrice() public view returns (uint256) {
+        if (useFallbackPrice) {
+            return fallbackBnbPrice;
+        }
+
+        try bnbPriceFeed.latestRoundData() returns (
+            uint80 roundId,
+            int256 price,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        ) {
+            // Check if price is valid and recent
+            require(price > 0, "Invalid price from feed");
+            require(updatedAt > 0, "Price feed not updated");
+            require(block.timestamp - updatedAt <= MAX_PRICE_AGE, "Price feed too old");
+            require(answeredInRound >= roundId, "Stale price data");
+            
+            // Convert from 8 decimals to 18 decimals
+            return uint256(price) * 1e10;
+            
+        } catch {
+            // If price feed fails, use fallback price
+            return fallbackBnbPrice;
+        }
     }
 
     /**
@@ -166,14 +214,33 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
-     * @dev Update BNB price in USD (only owner)
-     * @param newPrice New BNB price in USD (18 decimals)
+     * @dev Update fallback BNB price in USD (only owner)
+     * @param newPrice New fallback BNB price in USD (18 decimals)
      */
-    function updateBNBPrice(uint256 newPrice) external onlyOwner {
+    function updateFallbackBNBPrice(uint256 newPrice) external onlyOwner {
         require(newPrice > 0, "Price must be greater than 0");
-        uint256 oldPrice = bnbPriceInUSD;
-        bnbPriceInUSD = newPrice;
+        uint256 oldPrice = fallbackBnbPrice;
+        fallbackBnbPrice = newPrice;
         emit BNBPriceUpdated(oldPrice, newPrice);
+    }
+
+    /**
+     * @dev Toggle between Chainlink price feed and fallback price (only owner)
+     * @param _useFallback Whether to use fallback price instead of oracle
+     */
+    function toggleFallbackPrice(bool _useFallback) external onlyOwner {
+        useFallbackPrice = _useFallback;
+        emit FallbackPriceToggled(_useFallback);
+    }
+
+    /**
+     * @dev Update Chainlink price feed address (only owner)
+     * @param newFeed New price feed contract address
+     */
+    function updatePriceFeed(address newFeed) external onlyOwner {
+        require(newFeed != address(0), "Invalid feed address");
+        bnbPriceFeed = AggregatorV3Interface(newFeed);
+        emit PriceFeedUpdated(newFeed);
     }
 
     /**
@@ -239,13 +306,57 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
-     * @dev Get current BAM price info
+     * @dev Get current BAM price info and BNB price
      * @return priceInUSD BAM price in USD (wei)
-     * @return bnbPrice Current BNB price in USD
+     * @return bnbPrice Current BNB price in USD (18 decimals)
+     * @return isUsingFallback Whether fallback price is being used
+     * @return priceAge Age of the price data in seconds
      */
-    function getPriceInfo() external view returns (uint256 priceInUSD, uint256 bnbPrice) {
+    function getPriceInfo() external view returns (
+        uint256 priceInUSD, 
+        uint256 bnbPrice, 
+        bool isUsingFallback,
+        uint256 priceAge
+    ) {
         priceInUSD = BAM_PRICE_IN_USD;
-        bnbPrice = bnbPriceInUSD;
+        bnbPrice = getCurrentBNBPrice();
+        isUsingFallback = useFallbackPrice;
+        
+        // Get price age from oracle
+        if (!useFallbackPrice) {
+            try bnbPriceFeed.latestRoundData() returns (
+                uint80,
+                int256,
+                uint256,
+                uint256 updatedAt,
+                uint80
+            ) {
+                priceAge = block.timestamp - updatedAt;
+            } catch {
+                priceAge = type(uint256).max; // Indicate oracle failure
+            }
+        } else {
+            priceAge = 0; // Fallback price is always "current"
+        }
+    }
+
+    /**
+     * @dev Get detailed price feed information
+     * @return feedAddress Address of the current price feed
+     * @return feedDecimals Decimals used by the price feed
+     * @return maxPriceAge Maximum allowed price age
+     * @return fallbackPrice Current fallback price
+     */
+    function getPriceFeedInfo() external view returns (
+        address feedAddress,
+        uint8 feedDecimals,
+        uint256 maxPriceAge,
+        uint256 fallbackPrice
+    ) {
+        feedAddress = address(bnbPriceFeed);
+        feedDecimals = uint8(PRICE_FEED_DECIMALS);
+        maxPriceAge = MAX_PRICE_AGE;
+        fallbackPrice = fallbackBnbPrice;
     }
 
     /**
