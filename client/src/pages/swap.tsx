@@ -963,13 +963,13 @@ const SwapPage = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="p-2 sm:p-3 pt-16 sm:pt-18 sm:flex sm:items-center sm:justify-center sm:min-h-screen xl:pt-0">
+      <div className="p-2 sm:p-3 pt-4 sm:pt-18 sm:flex sm:items-center sm:justify-center sm:min-h-screen xl:pt-0">
         <div className="w-full max-w-sm sm:max-w-lg mx-auto xl:mt-0">
         {/* Header */}
-        <div className="text-center mb-1 xl:mb-3">
-          <p className="text-xs text-gray-400 mb-1 xl:mb-2">Pioneering Community Growth and Wealth</p>
+        <div className="text-center mb-1 sm:mb-2 xl:mb-3">
+          <p className="text-xs text-gray-400 mb-0.5 sm:mb-1 xl:mb-2">Pioneering Community Growth and Wealth</p>
           {priceInfo && (
-            <div className="flex justify-center items-center space-x-2 mb-1 xl:mb-2 text-xs">
+            <div className="flex justify-center items-center space-x-2 mb-0.5 sm:mb-1 xl:mb-2 text-xs">
               <Badge variant="outline" className="text-green-400 border-green-400 px-1.5 py-0.5">
                 <TrendingUp className="w-2 h-2 mr-0.5" />
                 BNB ${priceInfo.bnbPrice.toFixed(2)}
@@ -986,7 +986,7 @@ const SwapPage = () => {
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
           <CardContent className="p-3 sm:p-6">
             {/* Header with Trade Types */}
-            <div className="flex justify-between items-center mb-2 sm:mb-3">
+            <div className="flex justify-between items-center mb-1.5 sm:mb-3">
               <div className="flex items-center space-x-1 sm:space-x-2">
                 <Button variant="default" className="bg-gray-800 text-white border-yellow-500 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8">
                   Swap
@@ -1037,7 +1037,7 @@ const SwapPage = () => {
             </div>
 
             {/* From Token */}
-            <div className="space-y-1 sm:space-y-2 mb-2 sm:mb-3">
+            <div className="space-y-0.5 sm:space-y-2 mb-1.5 sm:mb-3">
               <div className="flex justify-between items-center">
                 <label className="text-xs sm:text-sm font-medium text-gray-300">From</label>
                 {balances[fromToken.symbol] && (
@@ -1070,7 +1070,7 @@ const SwapPage = () => {
             </div>
 
             {/* Swap Button */}
-            <div className="flex justify-center my-1">
+            <div className="flex justify-center my-0.5 sm:my-1">
               <Button
                 variant="ghost"
                 size="sm"
@@ -1082,7 +1082,7 @@ const SwapPage = () => {
             </div>
 
             {/* To Token */}
-            <div className="space-y-1 sm:space-y-2 mb-2 sm:mb-3">
+            <div className="space-y-0.5 sm:space-y-2 mb-1.5 sm:mb-3">
               <label className="text-xs sm:text-sm font-medium text-gray-300">To</label>
               <div className="relative">
                 <Input
@@ -1105,7 +1105,7 @@ const SwapPage = () => {
 
             {/* Enhanced Quote Information */}
             {quote && (
-              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-lg p-2 mb-2 border border-gray-600/50">
+              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-lg p-1.5 sm:p-2 mb-1.5 sm:mb-2 border border-gray-600/50">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-300 font-medium">Trade Details</span>
                   <Info className="w-3 h-3 text-gray-400" />
