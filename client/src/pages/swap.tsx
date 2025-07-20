@@ -128,12 +128,7 @@ const SwapPage = () => {
           lastUpdated: Date.now()
         });
         
-        // Enhanced logging with source identification
-        const sourceIcon = priceSource.includes('Chainlink') ? '🔗' : 
-                          priceSource.includes('CoinGecko') ? '🦎' : 
-                          priceSource.includes('Binance') ? '🟡' : '💰';
-        
-        console.log(`${sourceIcon} BNB/USD: $${bnbPrice.toFixed(2)} (${priceSource})`);
+        // Silent price update - no console logging
       } catch (err) {
         console.error('Price update failed:', err);
         // Preserve last known good price or use fallback
@@ -178,23 +173,17 @@ const SwapPage = () => {
     }
   };
 
-  // Connect Wallet with improved logic
+  // Connect Wallet with minimal logging
   const connectWallet = async () => {
     try {
       setIsLoading(true);
       setError('');
       
-      console.log('🔗 Connecting wallet...');
       const address = await web3Utils.connectWallet();
-      console.log(`✅ Wallet connected: ${address}`);
-      
       setWalletAddress(address);
-      
-      // Update balances immediately after connection
       await updateBalances(address);
       
     } catch (err: any) {
-      console.error('❌ Wallet connection failed:', err);
       setError(err.message || 'Failed to connect wallet');
       setWalletAddress('');
       setBalances({});
@@ -209,16 +198,14 @@ const SwapPage = () => {
       try {
         const provider = await web3Utils.getProvider();
         if (provider) {
-          // Check if already connected
           const accounts = await provider.request({ method: 'eth_accounts' });
           if (accounts && accounts.length > 0) {
-            console.log('🔄 Found existing wallet connection:', accounts[0]);
             setWalletAddress(accounts[0]);
             await updateBalances(accounts[0]);
           }
         }
       } catch (error) {
-        console.log('No existing wallet connection found');
+        // Silent fail - no wallet connection
       }
     };
 
@@ -229,7 +216,6 @@ const SwapPage = () => {
   const disconnectWallet = () => {
     setWalletAddress('');
     setBalances({});
-    console.log('🔌 Wallet disconnected');
   };
 
   // Copy address to clipboard
@@ -237,9 +223,8 @@ const SwapPage = () => {
     if (walletAddress) {
       try {
         await navigator.clipboard.writeText(walletAddress);
-        console.log('📋 Address copied to clipboard');
       } catch (error) {
-        console.error('Failed to copy address:', error);
+        // Silent fail
       }
     }
   };
@@ -248,6 +233,38 @@ const SwapPage = () => {
   const formatAddress = (address: string) => {
     if (!address) return '';
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  // Format numbers for clean display like Uniswap
+  const formatDisplayAmount = (amount: string, symbol: string): string => {
+    const num = parseFloat(amount || '0');
+    if (num === 0) return '0';
+    
+    // BAM tokens need special handling due to high decimal count
+    if (symbol === 'BAM') {
+      if (num >= 1000000) {
+        return `${(num / 1000000).toFixed(2)}M`;
+      } else if (num >= 1000) {
+        return `${(num / 1000).toFixed(2)}K`;
+      } else if (num >= 1) {
+        return num.toFixed(2);
+      } else {
+        return num.toExponential(2);
+      }
+    }
+    
+    // Standard formatting for other tokens
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(2)}M`;
+    } else if (num >= 1000) {
+      return `${(num / 1000).toFixed(2)}K`;
+    } else if (num >= 1) {
+      return num.toFixed(4);
+    } else if (num >= 0.0001) {
+      return num.toFixed(6);
+    } else {
+      return num.toExponential(2);
+    }
   };
 
   // Helper function to get token price in USD
@@ -295,42 +312,31 @@ const SwapPage = () => {
     })}`;
   };
 
-  // Update token balances with better error handling and logging
+  // Update token balances with minimal logging
   const updateBalances = async (address: string) => {
-    if (!address) {
-      console.log('No wallet address provided for balance update');
-      return;
-    }
+    if (!address) return;
 
-    console.log(`🔄 Updating balances for wallet: ${address.slice(0, 6)}...${address.slice(-4)}`);
     const newBalances: Record<string, string> = {};
     
     try {
       // Get BNB balance
-      console.log('📊 Fetching BNB balance...');
       const bnbBalance = await web3Utils.getBalance(address);
       newBalances.BNB = bnbBalance;
-      console.log(`💰 BNB Balance: ${bnbBalance}`);
 
       // Get token balances for each ERC20 token
       for (const [symbol, token] of Object.entries(TOKENS)) {
         if (symbol !== 'BNB' && token.address) {
           try {
-            console.log(`📊 Fetching ${symbol} balance...`);
             const balance = await web3Utils.getBalance(address, token.address);
             newBalances[symbol] = balance;
-            console.log(`💰 ${symbol} Balance: ${balance}`);
           } catch (tokenError) {
-            console.error(`Failed to get ${symbol} balance:`, tokenError);
             newBalances[symbol] = '0';
           }
         }
       }
 
       setBalances(newBalances);
-      console.log('✅ All balances updated successfully:', newBalances);
     } catch (error) {
-      console.error('❌ Failed to update balances:', error);
       // Set default balances to prevent UI issues
       setBalances({
         BNB: '0',
@@ -652,7 +658,7 @@ const SwapPage = () => {
                           <>
                             <div className="text-sm font-medium text-white">
                               {parseFloat(balances[tokenOption.symbol] || '0') > 0 ? 
-                                web3Utils.formatAmount(balances[tokenOption.symbol]) : 
+                                formatDisplayAmount(balances[tokenOption.symbol], tokenOption.symbol) : 
                                 '0'
                               }
                             </div>
@@ -758,7 +764,7 @@ const SwapPage = () => {
                       <div className="text-sm text-white font-mono">{formatAddress(walletAddress)}</div>
                       {balances.BNB && (
                         <div className="text-xs text-gray-400 mt-1">
-                          Balance: {parseFloat(balances.BNB).toFixed(4)} BNB
+                          Balance: {formatDisplayAmount(balances.BNB, 'BNB')} BNB
                         </div>
                       )}
                     </div>
@@ -819,7 +825,7 @@ const SwapPage = () => {
                             <div className="text-sm text-white font-mono">{formatAddress(walletAddress)}</div>
                             {balances.BNB && (
                               <div className="text-xs text-gray-400 mt-1">
-                                Balance: {parseFloat(balances.BNB).toFixed(4)} BNB
+                                Balance: {formatDisplayAmount(balances.BNB, 'BNB')} BNB
                               </div>
                             )}
                           </div>
@@ -935,7 +941,7 @@ const SwapPage = () => {
                     onClick={() => setFromAmount(balances[fromToken.symbol])}
                     className="text-xs text-yellow-400 hover:text-yellow-300"
                   >
-                    Max: {web3Utils.formatAmount(balances[fromToken.symbol])}
+                    Max: {formatDisplayAmount(balances[fromToken.symbol], fromToken.symbol)}
                   </button>
                 )}
               </div>
@@ -1008,7 +1014,7 @@ const SwapPage = () => {
                       Network Fee ({quote.feePercentage}%)
                     </span>
                     <div className="text-right">
-                      <span className="text-white font-medium">{web3Utils.formatAmount(quote.fee)} {fromToken.symbol}</span>
+                      <span className="text-white font-medium">{formatDisplayAmount(quote.fee, fromToken.symbol)} {fromToken.symbol}</span>
                       <div className="text-xs text-gray-500">{calculateUSDValue(quote.fee, fromToken.symbol)}</div>
                     </div>
                   </div>
@@ -1016,7 +1022,7 @@ const SwapPage = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-400">You Receive</span>
                     <div className="text-right">
-                      <span className="text-white font-medium">{web3Utils.formatAmount(quote.outputAmount)} {toToken.symbol}</span>
+                      <span className="text-white font-medium">{formatDisplayAmount(quote.outputAmount, toToken.symbol)} {toToken.symbol}</span>
                       <div className="text-xs text-gray-500">{calculateUSDValue(quote.outputAmount, toToken.symbol)}</div>
                     </div>
                   </div>
@@ -1116,7 +1122,7 @@ const SwapPage = () => {
                   <div className="flex flex-col items-center">
                     <span>Review Swap</span>
                     <div className="text-xs sm:text-sm opacity-80 mt-0.5">
-                      {fromAmount} {fromToken.symbol} → {toAmount} {toToken.symbol}
+                      {formatDisplayAmount(fromAmount, fromToken.symbol)} {fromToken.symbol} → {formatDisplayAmount(toAmount, toToken.symbol)} {toToken.symbol}
                     </div>
                   </div>
                 )}
