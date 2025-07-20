@@ -26,9 +26,11 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     IERC20 public constant USDB = IERC20(0x4050334836d59C1276068e496aB239DC80247675);
     IERC20 public constant BAM = IERC20(0xA779f03b752fa2442e6A23f145b007f2160F9a7D);
 
-    // Price configuration
-    uint256 public constant BAM_PRICE_IN_USD = 100; // $0.0000001 in wei
+    // Price configuration - BAM token price: $0.0000001 USD
+    // This represents 0.0000001 USD = 100 wei (in 18 decimal format)
+    uint256 public constant BAM_PRICE_IN_USD = 100; // 0.0000001 USD in smallest unit
     uint256 public constant PRICE_DECIMALS = 18;
+    uint256 public constant USD_DECIMALS = 18; // Both USDT and USDB use 18 decimals on BSC
     
     // Fee configuration
     uint256 public constant LOW_FEE_RATE = 50; // 0.5% (50 basis points) - for USDT→USDB, USDT→BAM, BNB→BAM
@@ -99,6 +101,9 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         // Calculate USDT payment distribution (90% to recipient)
         uint256 paymentToRecipient = (amount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
         uint256 remainingInContract = amount - paymentToRecipient - fee;
+        
+        // Ensure calculations are correct
+        require(paymentToRecipient + fee + remainingInContract == amount, "Payment distribution error");
         
         require(USDB.balanceOf(address(this)) >= usdbToUser, "Insufficient USDB liquidity");
         
@@ -174,6 +179,9 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         uint256 paymentToRecipient = (usdtAmount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
         uint256 remainingInContract = usdtAmount - paymentToRecipient - fee;
         
+        // Ensure calculations are correct
+        require(paymentToRecipient + fee + remainingInContract == usdtAmount, "Payment distribution error");
+        
         if (fee > 0) {
             USDT.safeTransfer(FEE_RECIPIENT, fee);
             emit FeeCollected(address(USDT), fee, FEE_RECIPIENT);
@@ -211,6 +219,9 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         // Distribute BNB payment: fee to fee recipient, 90% to payment recipient
         uint256 paymentToRecipient = (msg.value * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
         uint256 remainingInContract = msg.value - paymentToRecipient - fee;
+        
+        // Ensure calculations are correct
+        require(paymentToRecipient + fee + remainingInContract == msg.value, "Payment distribution error");
         
         if (fee > 0) {
             payable(FEE_RECIPIENT).transfer(fee);
@@ -339,8 +350,11 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
 
     /**
      * @dev Calculate BAM tokens from USDT amount
+     * BAM price = $0.0000001, so 1 USDT = 10,000,000 BAM tokens
      */
     function calculateBAMFromUSDT(uint256 usdtAmount) public pure returns (uint256) {
+        // usdtAmount is in 18 decimals, BAM_PRICE_IN_USD represents 0.0000001 USD
+        // 1 USDT (1e18) / 0.0000001 USD (100 wei) = 10,000,000 BAM tokens (1e25 wei)
         return (usdtAmount * 1e18) / BAM_PRICE_IN_USD;
     }
 
@@ -348,15 +362,19 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * @dev Calculate BAM tokens from BNB amount with specific price
      */
     function calculateBAMFromBNB(uint256 bnbAmount, uint256 bnbPrice) public pure returns (uint256) {
+        // Convert BNB to USD value: bnbAmount (18 decimals) * bnbPrice (18 decimals) / 1e18
         uint256 usdValue = (bnbAmount * bnbPrice) / 1e18;
+        // Convert USD to BAM tokens
         return calculateBAMFromUSDT(usdValue);
     }
 
     /**
      * @dev Calculate USDT amount from BAM tokens
+     * BAM price = $0.0000001, so 10,000,000 BAM tokens = 1 USDT
      */
     function calculateUSDTFromBAM(uint256 bamAmount) public pure returns (uint256) {
-        return (bamAmount * BAM_PRICE_IN_USD) / (10 ** PRICE_DECIMALS);
+        // bamAmount * BAM_PRICE_IN_USD / 1e18 to get USDT amount in 18 decimals
+        return (bamAmount * BAM_PRICE_IN_USD) / 1e18;
     }
 
     /**
