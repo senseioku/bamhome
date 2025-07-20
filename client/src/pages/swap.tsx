@@ -498,7 +498,8 @@ const SwapPage = () => {
               data: '0x70a08231000000000000000000000000' + BAM_SWAP_ADDRESS.substring(2) // balanceOf(contract)
             }, 'latest']
           });
-          console.log('Contract USDB balance:', parseInt(usdbBalanceCheck, 16));
+          const contractUsdbBalance = parseInt(usdbBalanceCheck, 16);
+          console.log('Contract USDB balance:', contractUsdbBalance / 1e18, 'USDB');
           
           // Check user USDT balance
           const userUsdtBalance = await window.ethereum.request({
@@ -508,7 +509,18 @@ const SwapPage = () => {
               data: '0x70a08231000000000000000000000000' + walletAddress.substring(2) // balanceOf(user)
             }, 'latest']
           });
-          console.log('User USDT balance:', parseInt(userUsdtBalance, 16));
+          const userBalance = parseInt(userUsdtBalance, 16);
+          console.log('User USDT balance:', userBalance / 1e18, 'USDT');
+          
+          // Check if user has enough balance
+          const requiredAmount = parseInt(amountWei, 16);
+          if (userBalance < requiredAmount) {
+            console.error('Insufficient USDT balance!');
+            setError('Insufficient USDT balance for this swap');
+            return;
+          }
+          
+          console.log('✅ All checks passed - proceeding with swap transaction');
           
         } catch (error) {
           console.log('Contract state check failed:', error);

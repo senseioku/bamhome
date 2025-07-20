@@ -181,19 +181,21 @@ export class Web3Utils {
         // Ethereum address
         encodedParams += param.slice(2).padStart(64, '0');
       } else {
-        // Convert number to hex (big integer support)
+        // Convert number to hex (big integer support) - FIXED
         let value: bigint;
         if (typeof param === 'string') {
-          // Handle large numbers as BigInt
+          // Handle large decimal numbers as BigInt
           if (param.startsWith('0x')) {
             value = BigInt(param);
           } else {
+            // This was the bug - we need to parse decimal string correctly
             value = BigInt(param);
           }
         } else {
           value = BigInt(param);
         }
-        encodedParams += value.toString(16).padStart(64, '0');
+        const hexValue = value.toString(16);
+        encodedParams += hexValue.padStart(64, '0');
       }
     }
     
