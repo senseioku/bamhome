@@ -847,13 +847,13 @@ const SwapPage = () => {
     // Filter tokens based on swap rules (exclude BNB↔USDT)
     const getFilteredTokens = () => {
       return availableTokens.filter(tokenOption => {
-        // Exclude BNB↔USDT swaps
-        if (label === 'from' && token.symbol === 'BNB' && tokenOption.symbol === 'USDT') return false;
-        if (label === 'from' && token.symbol === 'USDT' && tokenOption.symbol === 'BNB') return false;
-        if (label === 'to') {
-          const otherToken = label === 'to' ? fromToken : toToken;
-          if (otherToken.symbol === 'BNB' && tokenOption.symbol === 'USDT') return false;
-          if (otherToken.symbol === 'USDT' && tokenOption.symbol === 'BNB') return false;
+        // Only exclude direct BNB↔USDT pairs, not BNB as an option entirely
+        const otherToken = label === 'to' ? fromToken : toToken;
+        
+        // Prevent selecting USDT when other token is BNB
+        if ((otherToken.symbol === 'BNB' && tokenOption.symbol === 'USDT') || 
+            (otherToken.symbol === 'USDT' && tokenOption.symbol === 'BNB')) {
+          return false;
         }
         
         // Search filter
