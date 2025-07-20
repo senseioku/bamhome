@@ -467,6 +467,13 @@ const SwapPage = () => {
         const data = web3Utils.encodeFunctionCall('swapUSDTToUSDB(uint256)', [amountWei]);
         console.log('USDT→USDB Function Data:', data);
         console.log('Function selector should be:', web3Utils.keccak256('swapUSDTToUSDB(uint256)'));
+        
+        // ⚠️ CRITICAL ERROR DETECTED ⚠️
+        console.error('⚠️ WRONG CONTRACT ADDRESS! ⚠️');
+        console.error('The contract at', BAM_SWAP_ADDRESS, 'is a BEP20 token contract, not a swap contract!');
+        console.error('We need the actual BAM Swap contract address.');
+        setError('Contract configuration error: Using token contract instead of swap contract');
+        return;
         txHash = await web3Utils.sendTransaction({
           to: BAM_SWAP_ADDRESS,
           data,
