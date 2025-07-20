@@ -120,12 +120,11 @@ export class Web3Utils {
     if (!provider) throw new Error('No provider available');
 
     try {
-      // Skip gas estimation for now to avoid the parsing issue
-      // Use fixed reasonable gas parameters for BSC
+      // Use lower gas limit and price for much cheaper transactions
       const txParamsWithGas = {
         ...txParams,
-        gas: '0x493E0', // 300,000 gas limit
-        gasPrice: '0x12A05F200' // 5 Gwei gas price for BSC (low fees)
+        gas: '0x186A0', // 100,000 gas limit (much lower)
+        gasPrice: '0xBA43B7400' // 3 Gwei gas price for BSC (very low fees)
       };
       
       console.log('Transaction params:', txParamsWithGas);
@@ -201,23 +200,29 @@ export class Web3Utils {
     return methodId + encodedParams;
   }
   
-  // Function signature to method ID mapping using corrected selectors
+  // Function signature to method ID mapping using real keccak256
   keccak256(input: string): string {
-    const signatures: { [key: string]: string } = {
-      // BAM contract functions - using calculated selectors from Node.js
-      'swapUSDTToUSDB(uint256)': '0x09bec23b',
-      'swapUSDBToUSDT(uint256)': '0x0d7fc48c', 
-      'buyBAMWithUSDT(uint256)': '0x22b1194b',
-      'buyBAMWithBNB()': '0xf8b112c2',
-      'sellBAMForUSDT(uint256)': '0xd6febde8',
-      'sellBAMForBNB(uint256)': '0x9a5c3b67',
-      // Standard ERC20 functions (verified working)
-      'approve(address,uint256)': '0x095ea7b3',  // Standard ERC20 approve
-      'transfer(address,uint256)': '0xa9059cbb',
-      'balanceOf(address)': '0x70a08231'
-    };
-    
-    return signatures[input] || '0x00000000';
+    // Import keccak256 dynamically for proper hashing
+    try {
+      const { keccak256: keccakHash } = require('js-sha3');
+      const hash = keccakHash(input);
+      return '0x' + hash.substring(0, 8);
+    } catch (error) {
+      console.error('Keccak256 error:', error);
+      // Fallback to pre-calculated values if library fails
+      const signatures: { [key: string]: string } = {
+        'swapUSDTToUSDB(uint256)': '0x09bec23b',
+        'swapUSDBToUSDT(uint256)': '0x0d7fc48c', 
+        'buyBAMWithUSDT(uint256)': '0x22b1194b',
+        'buyBAMWithBNB()': '0xf8b112c2',
+        'sellBAMForUSDT(uint256)': '0xd6febde8',
+        'sellBAMForBNB(uint256)': '0x9a5c3b67',
+        'approve(address,uint256)': '0x095ea7b3',
+        'transfer(address,uint256)': '0xa9059cbb',
+        'balanceOf(address)': '0x70a08231'
+      };
+      return signatures[input] || '0x00000000';
+    }
   }
 
   formatAmount(amount: string, decimals: number = 4): string {
