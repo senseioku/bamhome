@@ -1330,6 +1330,14 @@ const SwapPage = () => {
               >
                 💰 Insufficient {fromToken.symbol} balance
               </Button>
+            ) : (fromToken.symbol === 'BAM' && (toToken.symbol === 'USDT' || toToken.symbol === 'BNB') && 
+                 contractStatus && (contractStatus.functionPaused.bamToUsdt || contractStatus.functionPaused.bamToBnb)) ? (
+              <Button
+                disabled
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-red-600 text-red-200 rounded-lg cursor-not-allowed"
+              >
+                🚫 Not Yet Allowed - BAM Selling Disabled
+              </Button>
             ) : (
               <Button
                 onClick={executeSwap}
@@ -1494,14 +1502,15 @@ const SwapPage = () => {
                   </Alert>
                 )}
 
-                {/* BAM Selling Paused */}
+                {/* BAM Selling Not Yet Allowed */}
                 {fromToken.symbol === 'BAM' && 
+                  (toToken.symbol === 'USDT' || toToken.symbol === 'BNB') && 
                   (contractStatus.functionPaused.bamToUsdt || contractStatus.functionPaused.bamToBnb) && (
-                  <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
+                  <Alert className="border-red-500/50 bg-red-500/20 backdrop-blur-sm">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertDescription className="text-orange-200 text-sm">
-                      <div className="font-medium">⏸️ BAM Selling Paused</div>
-                      <div className="text-xs mt-1">BAM sales are temporarily disabled. Try purchasing instead.</div>
+                    <AlertDescription className="text-red-200 text-sm">
+                      <div className="font-medium">🚫 Not Yet Allowed!</div>
+                      <div className="text-xs mt-1">BAM selling is currently disabled. Only BAM purchases are available.</div>
                     </AlertDescription>
                   </Alert>
                 )}
