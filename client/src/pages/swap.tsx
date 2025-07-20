@@ -650,10 +650,22 @@ const SwapPage = () => {
       }
 
       setTxHash(txHash);
-      setTxStatus('success');
+      setTxStatus('pending');
       
-      // Update balances after successful transaction
-      setTimeout(() => updateBalances(walletAddress), 3000);
+      // Wait for blockchain confirmation
+      console.log('⏳ Waiting for blockchain confirmation...');
+      try {
+        await waitForTransactionConfirmation(txHash);
+        setTxStatus('success');
+        console.log('✅ Transaction confirmed on blockchain');
+        
+        // Update balances after confirmed transaction
+        setTimeout(() => updateBalances(walletAddress), 2000);
+      } catch (confirmError) {
+        console.error('Transaction confirmation failed:', confirmError);
+        setTxStatus('error');
+        setError('Transaction failed to confirm on blockchain');
+      }
       
     } catch (error: any) {
       console.error('=== SWAP TRANSACTION FAILED ===');
@@ -684,14 +696,54 @@ const SwapPage = () => {
     }
   };
 
+  // Wait for transaction confirmation
+  const waitForTransactionConfirmation = async (txHash: string): Promise<void> => {
+    const maxRetries = 60; // Wait up to 5 minutes (60 * 5 seconds)
+    let retries = 0;
+    
+    while (retries < maxRetries) {
+      try {
+        const receipt = await (window as any).ethereum.request({
+          method: 'eth_getTransactionReceipt',
+          params: [txHash]
+        });
+        
+        if (receipt) {
+          if (receipt.status === '0x1') {
+            // Transaction successful
+            return;
+          } else {
+            // Transaction failed
+            throw new Error('Transaction failed on blockchain');
+          }
+        }
+        
+        // Wait 5 seconds before next check
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        retries++;
+      } catch (error) {
+        console.error('Error checking transaction status:', error);
+        retries++;
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    }
+    
+    throw new Error('Transaction confirmation timeout');
+  };
+
   // Approve token spending
   const approveToken = async (tokenAddress: string, amount: string) => {
     const data = web3Utils.encodeFunctionCall('approve(address,uint256)', [BAM_SWAP_ADDRESS, amount]);
-    await web3Utils.sendTransaction({
+    const approveTxHash = await web3Utils.sendTransaction({
       to: tokenAddress,
       data,
       from: walletAddress
     });
+    
+    // Wait for approval confirmation before proceeding
+    console.log('⏳ Waiting for token approval confirmation...');
+    await waitForTransactionConfirmation(approveTxHash);
+    console.log('✅ Token approval confirmed');
   };
 
   // Enhanced Token Selector with filtering and search like Uniswap
@@ -1371,7 +1423,22 @@ const SwapPage = () => {
                   <Alert className="border-yellow-500 bg-yellow-500/10">
                     <AlertCircle className="h-4 w-4 text-yellow-500" />
                     <AlertDescription className="text-yellow-300">
-                      Transaction pending... Please wait.
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Waiting for blockchain confirmation...</span>
+                      </div>
+                      {txHash && (
+                        <div className="mt-1">
+                          <a
+                            href={`https://bscscan.com/tx/${txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs underline hover:text-yellow-200"
+                          >
+                            View on BSCScan
+                          </a>
+                        </div>
+                      )}
                     </AlertDescription>
                   </Alert>
                 )}
