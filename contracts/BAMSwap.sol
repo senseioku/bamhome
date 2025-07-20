@@ -338,7 +338,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         try bnbPriceFeed.latestRoundData() returns (
             uint80 roundId,
             int256 answer,
-            uint256 startedAt,
+            uint256 /* startedAt */,
             uint256 updatedAt,
             uint80 answeredInRound
         ) {
