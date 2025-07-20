@@ -1,4 +1,5 @@
 const { ethers } = require("hardhat");
+const hre = require("hardhat");
 
 async function main() {
   console.log("Deploying BAM Swap Contract...");
