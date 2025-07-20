@@ -79,11 +79,12 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Created comprehensive Chainlink API endpoints with health monitoring
 ✓ Successfully resolved browser CORS limitations by using server-side Web3 provider
 ✓ Achieved institutional-grade price feeds with real-time BNB/USD data from BSC Chainlink oracle
-✓ CRITICAL BUG DISCOVERED: calculateBAMFromUSDT function has catastrophic multiplication error
-✓ Root cause identified: Function calculates 10 quadrillion BAM for 1 USDT instead of 10,000 BAM
-✓ Contract calculation: (usdtAmount * 1e18) / bamPriceInUSD = wrong by factor of 1e12
-✓ Fixed calculation: (usdtAmount * 1e18) / (bamPriceInUSD * 1e12) = correct 10,000 BAM per USDT
-✓ Transaction failure confirmed: "Insufficient BAM liquidity" due to requesting impossible amounts
+✓ CRITICAL BUG DISCOVERED: bamPriceInUSD constant set to wrong value (100 instead of 1e11)
+✓ Root cause identified: bamPriceInUSD = 100 makes contract calculate 10 quadrillion BAM per USDT
+✓ User clarified: 0.0000001 USDT = 1 BAM, so 1 USDT = 10,000,000 BAM tokens
+✓ Fixed bamPriceInUSD: Changed from 100 to 1e11 to give correct 10M BAM per USDT
+✓ Updated minimum purchase: Increased from 1 USDT to 5 USDT as requested
+✓ Verified fix: 1 USDT now correctly calculates 10M BAM (within 1M BAM contract supply - needs more liquidity)
 
 ## User Preferences
 

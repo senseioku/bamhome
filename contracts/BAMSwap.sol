@@ -26,14 +26,16 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     IERC20 public constant USDB = IERC20(0x4050334836d59C1276068e496aB239DC80247675);
     IERC20 public constant BAM = IERC20(0xA779f03b752fa2442e6A23f145b007f2160F9a7D);
 
-    // Price configuration - BAM token price: $0.0000001 USD
-    // This represents 0.0000001 USD = 100 wei (in 18 decimal format)
-    uint256 public bamPriceInUSD = 100; // 0.0000001 USD in smallest unit (updatable by owner)
+    // Price configuration - BAM token price: 0.0000001 USDT = 1 BAM
+    // If 1 USDT = 10M BAM, then bamPriceInUSD should be 1e11 to make the math work
+    // Formula: (usdtAmount * 1e18) / bamPriceInUSD = BAM amount
+    // For 1 USDT: (1e18 * 1e18) / 1e11 = 1e25 = 10M BAM (in wei with 18 decimals)
+    uint256 public bamPriceInUSD = 1e11; // Updated to give 10M BAM per USDT (updatable by owner)
     uint256 public constant PRICE_DECIMALS = 18;
     uint256 public constant USD_DECIMALS = 18; // Both USDT and USDB use 18 decimals on BSC
-    uint256 public constant MIN_BAM_PRICE = 50; // Minimum BAM price: $0.00000005
-    uint256 public constant MAX_BAM_PRICE = 1000; // Maximum BAM price: $0.000001
-    uint256 public constant MIN_PURCHASE_USDT = 1e18; // Minimum purchase: 1 USDT
+    uint256 public constant MIN_BAM_PRICE = 1e10; // Minimum BAM price (more BAM per USDT)
+    uint256 public constant MAX_BAM_PRICE = 1e12; // Maximum BAM price (less BAM per USDT)
+    uint256 public constant MIN_PURCHASE_USDT = 5e18; // Minimum purchase: 5 USDT
     uint256 public constant MIN_SWAP_AMOUNT = 1e18; // Minimum swap: 1 USDT/USDB
     
     // Fee configuration
@@ -172,7 +174,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function buyBAMWithUSDT(uint256 usdtAmount) external nonReentrant whenNotPaused {
         require(!buyBAMWithUSDTPaused, "Buy BAM with USDT is paused");
-        require(usdtAmount >= MIN_PURCHASE_USDT, "Minimum purchase is 1 USDT");
+        require(usdtAmount >= MIN_PURCHASE_USDT, "Minimum purchase is 5 USDT");
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (usdtAmount * LOW_FEE_RATE) / FEE_DENOMINATOR;
@@ -219,9 +221,9 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         (uint256 bnbPrice, bool isValidPrice) = getBNBPriceWithValidation();
         require(isValidPrice || !emergencyMode, "Price feed unavailable in emergency mode");
         
-        // Check minimum purchase requirement (equivalent to 1 USDT)
+        // Check minimum purchase requirement (equivalent to 5 USDT)
         uint256 usdValue = (msg.value * bnbPrice) / 1e18;
-        require(usdValue >= MIN_PURCHASE_USDT, "Minimum purchase is 1 USDT equivalent");
+        require(usdValue >= MIN_PURCHASE_USDT, "Minimum purchase is 5 USDT equivalent");
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (msg.value * LOW_FEE_RATE) / FEE_DENOMINATOR;
@@ -368,11 +370,10 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * BAM price = $0.0000001, so 1 USDT = 10,000,000 BAM tokens
      */
     function calculateBAMFromUSDT(uint256 usdtAmount) public view returns (uint256) {
-        // FIXED: Correct BAM calculation for $0.0000001 per BAM
-        // If BAM costs $0.0000001, then 1 USDT ($1.00) buys 10,000,000 BAM tokens
-        // bamPriceInUSD = 100 represents 0.0000001 USD in our system
-        // Formula: usdtAmount * (1e18 / bamPriceInUSD) = BAM tokens in wei
-        return (usdtAmount * 1e18) / (bamPriceInUSD * 1e12);
+        // BAM price: 0.0000001 USDT = 1 BAM, so 1 USDT = 10,000,000 BAM
+        // bamPriceInUSD = 100 wei represents 0.0000001 USD
+        // Original calculation was correct: (usdtAmount * 1e18) / bamPriceInUSD
+        return (usdtAmount * 1e18) / bamPriceInUSD;
     }
 
     /**
@@ -381,8 +382,8 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     function calculateBAMFromBNB(uint256 bnbAmount, uint256 bnbPrice) public view returns (uint256) {
         // Convert BNB to USD value: bnbAmount (18 decimals) * bnbPrice (18 decimals) / 1e18
         uint256 usdValue = (bnbAmount * bnbPrice) / 1e18;
-        // Convert USD to BAM tokens using current BAM price - FIXED
-        return (usdValue * 1e18) / (bamPriceInUSD * 1e12);
+        // Convert USD to BAM tokens using current BAM price
+        return (usdValue * 1e18) / bamPriceInUSD;
     }
 
     /**
