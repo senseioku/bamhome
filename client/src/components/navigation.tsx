@@ -77,6 +77,16 @@ export default function Navigation() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="glass-card border-border">
                   <DropdownMenuItem>
+                    <button
+                      onClick={() => scrollToSection("ecosystem")}
+                      className="flex items-center w-full text-left"
+                    >
+                      <span className="mr-2">🔄</span>
+                      BAM Swap
+                      <span className="ml-auto text-xs bg-primary/20 text-primary px-2 py-1 rounded">Ready</span>
+                    </button>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
                     <a
                       href="https://apex.bam-ecosystem.com"
                       target="_blank"
@@ -124,6 +134,12 @@ export default function Navigation() {
                   ))}
                   <div className="border-t border-border pt-4">
                     <div className="text-sm text-muted-foreground mb-2">Platforms</div>
+                    <button
+                      onClick={() => scrollToSection("ecosystem")}
+                      className="block py-2 text-foreground hover:text-primary w-full text-left"
+                    >
+                      🔄 BAM Swap <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded ml-2">Ready</span>
+                    </button>
                     <a
                       href="https://apex.bam-ecosystem.com"
                       target="_blank"
