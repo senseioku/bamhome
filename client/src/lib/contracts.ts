@@ -108,6 +108,12 @@ export const ERC20_ABI = [
   }
 ] as const;
 
+// Import token icons
+import usdtIcon from '@assets/usdtToken_1753039099297.png';
+import usdbIcon from '@assets/USBDtoken_1753039099297.png';
+import bamIcon from '@assets/bamToken_1753039099296.png';
+import bnbIcon from '@assets/bnbCoin_1753039099295.png';
+
 // Token Information
 export const TOKENS = {
   USDT: {
@@ -115,28 +121,28 @@ export const TOKENS = {
     name: "Tether USD",
     decimals: 18,
     address: TOKEN_ADDRESSES.USDT,
-    icon: "💵"
+    icon: usdtIcon
   },
   USDB: {
     symbol: "USDB",
     name: "USD Base",
     decimals: 18,
     address: TOKEN_ADDRESSES.USDB,
-    icon: "🏦"
+    icon: usdbIcon
   },
   BAM: {
     symbol: "BAM",
     name: "Build And Multiply",
     decimals: 18,
     address: TOKEN_ADDRESSES.BAM,
-    icon: "🚀"
+    icon: bamIcon
   },
   BNB: {
     symbol: "BNB",
     name: "BNB",
     decimals: 18,
     address: TOKEN_ADDRESSES.BNB,
-    icon: "⚡"
+    icon: bnbIcon
   }
 } as const;
 

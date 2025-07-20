@@ -877,7 +877,11 @@ const SwapPage = () => {
         <DialogTrigger asChild>
           <Button variant="ghost" className="p-1.5 sm:p-2 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-700/50">
             <div className="flex items-center space-x-1.5 sm:space-x-2">
-              <div className="text-base sm:text-lg">{token.icon}</div>
+              {typeof token.icon === 'string' && token.icon.startsWith('http') || typeof token.icon !== 'string' ? (
+                <img src={typeof token.icon === 'string' ? token.icon : token.icon} alt={token.symbol} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full" />
+              ) : (
+                <div className="text-base sm:text-lg">{token.icon}</div>
+              )}
               <span className="font-semibold text-white text-sm sm:text-base">{token.symbol}</span>
               <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
             </div>
@@ -918,7 +922,11 @@ const SwapPage = () => {
                       setSearchQuery('');
                     }}
                   >
-                    <div className="text-xl mb-1">{tokenOption.icon}</div>
+                    {typeof tokenOption.icon === 'string' && tokenOption.icon.startsWith('http') || typeof tokenOption.icon !== 'string' ? (
+                      <img src={typeof tokenOption.icon === 'string' ? tokenOption.icon : tokenOption.icon} alt={tokenOption.symbol} className="w-8 h-8 rounded-full mb-1" />
+                    ) : (
+                      <div className="text-xl mb-1">{tokenOption.icon}</div>
+                    )}
                     <span className="text-xs font-medium text-white">{tokenOption.symbol}</span>
                   </Button>
                 ))}
@@ -960,7 +968,11 @@ const SwapPage = () => {
                     }}
                   >
                     <div className="flex items-center space-x-3 w-full">
-                      <div className="text-2xl">{tokenOption.icon}</div>
+                      {typeof tokenOption.icon === 'string' && tokenOption.icon.startsWith('http') || typeof tokenOption.icon !== 'string' ? (
+                        <img src={typeof tokenOption.icon === 'string' ? tokenOption.icon : tokenOption.icon} alt={tokenOption.symbol} className="w-8 h-8 rounded-full" />
+                      ) : (
+                        <div className="text-2xl">{tokenOption.icon}</div>
+                      )}
                       <div className="flex-1 text-left">
                         <div className="flex items-center space-x-2">
                           <span className="font-semibold text-white">{tokenOption.symbol}</span>
