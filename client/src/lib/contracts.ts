@@ -125,7 +125,7 @@ export const TOKENS = {
   },
   USDB: {
     symbol: "USDB",
-    name: "USD Base",
+    name: "USDB Token",
     decimals: 18,
     address: TOKEN_ADDRESSES.USDB,
     icon: usdbIcon
