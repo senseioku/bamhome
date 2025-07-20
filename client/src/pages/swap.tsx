@@ -963,8 +963,8 @@ const SwapPage = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="p-2 sm:p-3 pt-16 sm:pt-18 xl:pt-0 xl:flex xl:items-center xl:justify-center xl:min-h-screen">
-        <div className="max-w-md mx-auto xl:mt-0">
+      <div className="p-2 sm:p-3 pt-16 sm:pt-18 sm:flex sm:items-center sm:justify-center sm:min-h-screen xl:pt-0">
+        <div className="w-full max-w-sm sm:max-w-lg mx-auto xl:mt-0">
         {/* Header */}
         <div className="text-center mb-1 xl:mb-3">
           <p className="text-xs text-gray-400 mb-1 xl:mb-2">Pioneering Community Growth and Wealth</p>
@@ -984,20 +984,20 @@ const SwapPage = () => {
 
         {/* Main Swap Card */}
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
-          <CardContent className="p-2 sm:p-3">
+          <CardContent className="p-3 sm:p-6">
             {/* Header with Trade Types */}
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center space-x-1">
-                <Button variant="default" className="bg-gray-800 text-white border-yellow-500 text-xs px-2 py-1 h-7">
+            <div className="flex justify-between items-center mb-2 sm:mb-3">
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                <Button variant="default" className="bg-gray-800 text-white border-yellow-500 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8">
                   Swap
                 </Button>
-                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-xs px-2 py-1 h-7">
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8">
                   Limit
                 </Button>
-                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-xs px-2 py-1 h-7 hidden sm:block">
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8 hidden sm:block">
                   Buy
                 </Button>
-                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-xs px-2 py-1 h-7 hidden sm:block">
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8 hidden sm:block">
                   Sell
                 </Button>
               </div>
@@ -1037,13 +1037,13 @@ const SwapPage = () => {
             </div>
 
             {/* From Token */}
-            <div className="space-y-1 mb-2">
+            <div className="space-y-1 sm:space-y-2 mb-2 sm:mb-3">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-medium text-gray-300">From</label>
+                <label className="text-xs sm:text-sm font-medium text-gray-300">From</label>
                 {balances[fromToken.symbol] && (
                   <button
                     onClick={() => setFromAmount(balances[fromToken.symbol])}
-                    className="text-xs text-yellow-400 hover:text-yellow-300"
+                    className="text-xs sm:text-sm text-yellow-400 hover:text-yellow-300"
                   >
                     Max: {formatDisplayAmount(balances[fromToken.symbol], fromToken.symbol)}
                   </button>
@@ -1055,7 +1055,7 @@ const SwapPage = () => {
                   value={fromAmount}
                   onChange={(e) => setFromAmount(e.target.value)}
                   placeholder="0"
-                  className="text-xl sm:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-12 pr-24 sm:pr-28 focus:ring-0 focus:border-none"
+                  className="text-xl sm:text-3xl font-bold bg-transparent border-none text-white h-10 sm:h-16 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
                   step="any"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
@@ -1063,7 +1063,7 @@ const SwapPage = () => {
                 </div>
               </div>
               {fromAmount && parseFloat(fromAmount) > 0 && (
-                <div className="text-xs text-gray-400 px-1">
+                <div className="text-xs sm:text-sm text-gray-400 px-1">
                   {calculateUSDValue(fromAmount, fromToken.symbol)}
                 </div>
               )}
@@ -1082,22 +1082,22 @@ const SwapPage = () => {
             </div>
 
             {/* To Token */}
-            <div className="space-y-1 mb-2">
-              <label className="text-xs font-medium text-gray-300">To</label>
+            <div className="space-y-1 sm:space-y-2 mb-2 sm:mb-3">
+              <label className="text-xs sm:text-sm font-medium text-gray-300">To</label>
               <div className="relative">
                 <Input
                   type="number"
                   value={toAmount}
                   readOnly
                   placeholder="0"
-                  className="text-xl sm:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-12 pr-24 sm:pr-28 focus:ring-0 focus:border-none"
+                  className="text-xl sm:text-3xl font-bold bg-transparent border-none text-white h-10 sm:h-16 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                   <TokenSelector token={toToken} onSelect={setToToken} label="to" />
                 </div>
               </div>
               {toAmount && parseFloat(toAmount) > 0 && (
-                <div className="text-xs text-gray-400 px-1">
+                <div className="text-xs sm:text-sm text-gray-400 px-1">
                   {calculateUSDValue(toAmount, toToken.symbol)}
                 </div>
               )}
