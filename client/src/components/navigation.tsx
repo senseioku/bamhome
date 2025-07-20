@@ -150,12 +150,12 @@ export default function Navigation() {
                   ))}
                   <div className="border-t border-border pt-4">
                     <div className="text-sm text-muted-foreground mb-2">Platforms</div>
-                    <button
-                      onClick={() => scrollToSection("ecosystem")}
+                    <a
+                      href="/swap"
                       className="block py-2 text-foreground hover:text-primary w-full text-left"
                     >
                       🔄 BAM Swap <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded ml-2">Ready</span>
-                    </button>
+                    </a>
                     <button
                       onClick={() => scrollToSection("projects")}
                       className="block py-2 text-foreground hover:text-primary w-full text-left"
