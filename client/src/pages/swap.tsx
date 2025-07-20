@@ -833,8 +833,11 @@ const SwapPage = () => {
                   alt="BAM Token" 
                   className="h-8 w-8 rounded-full"
                 />
-                <div>
+                <div className="flex items-center space-x-2">
                   <span className="text-xl font-bold gradient-text">BAM Swap</span>
+                  <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                    Soon
+                  </span>
                 </div>
               </div>
             </div>
