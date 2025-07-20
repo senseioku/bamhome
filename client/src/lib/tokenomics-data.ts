@@ -33,10 +33,10 @@ export const tokenomicsData: TokenomicsData[] = [
     amount: 10000000000,
     color: "hsl(38, 85%, 50%)", // darker amber
     vestingSchedule: {
-      tgeUnlock: 50, // 50% at TGE
+      tgeUnlock: 25, // 25% at TGE
       vestingPeriod: 6, // remaining over 6 months
       cliffPeriod: 0, // no cliff
-      description: "50% unlocked at TGE, remaining vested over 6 months"
+      description: "25% unlocked at TGE, remaining vested over 6 months"
     }
   },
   {
@@ -62,7 +62,7 @@ export const tokenomicsData: TokenomicsData[] = [
       tgeUnlock: 0, // 0% at TGE
       vestingPeriod: 48, // 48 months
       cliffPeriod: 0, // no cliff
-      description: "Vesting Period: 48 months Unlocked at TGE: 0%"
+      description: "Vesting Period: 48 months, Unlocked at TGE: 0%"
     }
   },
   {

@@ -32,6 +32,8 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Updated tokenomics allocation: Public Sale 25%, Presale 10%, Advisors 15%, Ecosystem 20%, Treasury 10%, Community 10%, CEX 10%
 ✓ Implemented new vesting schedules with proper TGE unlock percentages and cliff periods
 ✓ Updated community allocation metric to 45% reflecting combined public, presale, community and CEX allocations
+✓ Refined presale TGE unlock: Changed from 50% to 25% with remaining 75% vested over 6 months
+✓ Confirmed all allocation percentages and token amounts (100B total supply)
 ✓ Corrected deflationary mechanism description - removed "built-in burn" to match actual ERC20 contract
 ✓ Token contract analysis: Standard ERC20 with no automatic burn or fee mechanisms
 ✓ Added presale allocation (10%) with 50% TGE unlock and 6-month vesting schedule
