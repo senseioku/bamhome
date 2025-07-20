@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { web3Utils, ContractEncoder } from '@/lib/web3';
-import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI, CHAINLINK_FEEDS, CHAINLINK_ABI } from '@/lib/contracts';
+import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI } from '@/lib/contracts';
 
 interface TokenInfo {
   symbol: string;
@@ -58,114 +58,65 @@ const SwapPage = () => {
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
 
-  // Direct Chainlink Price Fetching with fallback RPC
-  const fetchChainlinkPrice = async (feedAddress: string): Promise<number> => {
-    const rpcEndpoints = [
-      'https://rpc.ankr.com/bsc',
-      'https://bsc-dataseed.bnbchain.org',
-      'https://bsc-dataseed-public.bnbchain.org'
-    ];
-
-    for (const rpcUrl of rpcEndpoints) {
-      try {
-        const response = await fetch(rpcUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            method: 'eth_call',
-            params: [{
-              to: feedAddress,
-              data: '0x50d25bcd' // latestRoundData() function selector
-            }, 'latest'],
-            id: 1
-          })
-        });
-
-        const result = await response.json();
-        if (result?.result && result.result !== '0x') {
-          // Decode the ABI encoded result
-          const hexResult = result.result.slice(2); // Remove 0x
-          if (hexResult.length >= 128) { // Ensure we have enough data
-            // Extract the price (2nd return value, 32 bytes each)
-            const priceHex = hexResult.slice(64, 128);
-            const price = parseInt(priceHex, 16) / 1e8; // Chainlink has 8 decimals
-            if (price > 0) {
-              return price;
-            }
-          }
-        }
-      } catch (error) {
-        console.error(`Chainlink call failed for ${rpcUrl}:`, error);
-        continue;
-      }
-    }
-    
-    return 0;
-  };
-
-  // Multiple API Price Sources
-  const fetchAPIPrice = async (): Promise<number> => {
+  // Simplified price fetching - API sources only to avoid CORS issues
+  const fetchReliablePrice = async (): Promise<{ price: number; source: string }> => {
     const apiSources = [
-      // CoinGecko with CORS proxy
-      async () => {
-        const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd'));
-        const data = await response.json();
-        return data?.binancecoin?.usd || 0;
+      // Binance API (most reliable, direct exchange data)
+      {
+        name: 'Binance API',
+        fetch: async () => {
+          const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT');
+          const data = await response.json();
+          return parseFloat(data?.price || '0');
+        }
       },
-      // Binance API (CORS-friendly)
-      async () => {
-        const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT');
-        const data = await response.json();
-        return parseFloat(data?.price || '0');
+      // CoinCap API (reliable alternative)
+      {
+        name: 'CoinCap API', 
+        fetch: async () => {
+          const response = await fetch('https://api.coincap.io/v2/assets/binance-coin');
+          const data = await response.json();
+          return parseFloat(data?.data?.priceUsd || '0');
+        }
       },
-      // CoinCap API (CORS-friendly)
-      async () => {
-        const response = await fetch('https://api.coincap.io/v2/assets/binance-coin');
-        const data = await response.json();
-        return parseFloat(data?.data?.priceUsd || '0');
+      // CoinGecko via CORS proxy (backup)
+      {
+        name: 'CoinGecko API',
+        fetch: async () => {
+          const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd'));
+          const data = await response.json();
+          return data?.binancecoin?.usd || 0;
+        }
       }
     ];
 
-    for (const fetchSource of apiSources) {
+    for (const source of apiSources) {
       try {
-        const price = await fetchSource();
+        const price = await source.fetch();
         if (price > 0) {
-          return price;
+          return { price, source: source.name };
         }
       } catch (error) {
-        console.error('API source failed:', error);
+        console.error(`${source.name} failed:`, error);
         continue;
       }
     }
     
-    return 0;
+    return { price: 692, source: 'Fallback' }; // Static fallback
   };
 
-  // Price Update Timer with Multiple Sources
+
+
+  // Price Update Timer - Reliable API sources only
   useEffect(() => {
     const updatePrices = async () => {
       try {
-        // Try Chainlink first
-        let bnbPrice = await fetchChainlinkPrice(CHAINLINK_FEEDS.BNB_USD);
-        let priceSource = 'Chainlink';
-        
-        // If Chainlink fails, try API
-        if (bnbPrice <= 0) {
-          bnbPrice = await fetchAPIPrice();
-          priceSource = 'CoinGecko API';
-        }
-        
-        // If both fail, use reasonable fallback
-        if (bnbPrice <= 0) {
-          bnbPrice = 692;
-          priceSource = 'Fallback';
-        }
+        const { price: bnbPrice, source: priceSource } = await fetchReliablePrice();
         
         setPriceInfo({
           bnbPrice,
           bamPrice: 0.0000001, // Fixed BAM price
-          isValidPrice: bnbPrice > 0 && priceSource !== 'Fallback',
+          isValidPrice: priceSource !== 'Fallback',
           lastUpdated: Date.now()
         });
         
