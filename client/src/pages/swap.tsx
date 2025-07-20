@@ -1173,14 +1173,11 @@ const SwapPage = () => {
               <Alert className="border-yellow-500/30 bg-yellow-500/10 mb-3">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-yellow-200 text-sm">
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <div className="font-medium">⚠️ BAM Purchase Limits:</div>
-                    <ul className="text-xs space-y-1 ml-4 list-disc">
-                      <li>Exactly 1 USDT (or equivalent BNB) per wallet</li>
-                      <li>One-time purchase only - no repeat buys allowed</li>
-                      <li>Receives 10,000,000 BAM tokens per purchase</li>
-                      <li>Check wallet purchase status before buying</li>
-                    </ul>
+                    <div className="text-xs">
+                      • Exactly 1 USDT per wallet • One-time purchase only
+                    </div>
                   </div>
                 </AlertDescription>
               </Alert>
