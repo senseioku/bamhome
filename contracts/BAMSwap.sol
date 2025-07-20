@@ -63,8 +63,8 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     bool public useFallbackPrice = false;
     bool public emergencyMode = false;
     
-    // Individual pause controls for each swap function (default: only BAM purchases enabled)
-    bool public swapUSDTToUSDBPaused = true; // PAUSED by default
+    // Individual pause controls for each swap function (default: BAM purchases and USDT→USDB enabled)
+    bool public swapUSDTToUSDBPaused = false; // ENABLED - USDT to USDB swaps allowed
     bool public swapUSDBToUSDTPaused = true; // PAUSED by default
     bool public buyBAMWithUSDTPaused = false; // ENABLED - BAM purchases allowed
     bool public buyBAMWithBNBPaused = false; // ENABLED - BAM purchases allowed  
