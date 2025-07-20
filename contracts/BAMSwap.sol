@@ -401,14 +401,26 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
-     * @dev Calculate swap amounts after fees
+     * @dev Calculate swap amounts after fees for USDT→USDB (0.5%)
      */
-    function calculateSwapAmounts(uint256 amount) 
+    function calculateUSDTToUSDBSwapAmounts(uint256 amount) 
         external 
         pure 
         returns (uint256 fee, uint256 amountAfterFee) 
     {
-        fee = (amount * SWAP_FEE_RATE) / FEE_DENOMINATOR;
+        fee = (amount * LOW_FEE_RATE) / FEE_DENOMINATOR;
+        amountAfterFee = amount - fee;
+    }
+    
+    /**
+     * @dev Calculate swap amounts after fees for USDB→USDT (1.5%)
+     */
+    function calculateUSDBToUSDTSwapAmounts(uint256 amount) 
+        external 
+        pure 
+        returns (uint256 fee, uint256 amountAfterFee) 
+    {
+        fee = (amount * HIGH_FEE_RATE) / FEE_DENOMINATOR;
         amountAfterFee = amount - fee;
     }
 
