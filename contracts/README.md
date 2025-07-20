@@ -12,9 +12,11 @@ A simple, fast, efficient and secure swap contract for the BAM ecosystem on Bina
 - **Live Price Feeds**: Automatic BNB price updates via Chainlink oracles
 
 ### Fee Structure
-- **Swap Fee**: 0.5% on all USDB ↔ USDT swaps
-- **Fee Distribution**: All swap fees go to designated fee recipient
-- **Payment Distribution**: 90% of BAM purchase payments to recipient, 10% remains in contract
+- **Low Fee (0.5%)**: USDT→USDB, USDT→BAM, BNB→BAM
+- **High Fee (1.5%)**: USDB→USDT, BAM→USDT, BAM→BNB
+- **Fee Distribution**: All fees go to designated fee recipient
+- **Payment Distribution**: Only USDT/BNB payments: 90% to recipient, 10% remains in contract
+- **Token Retention**: BAM/USDB payments stay in contract (no distribution)
 - **Transparent Fees**: All fees and distributions logged via events
 
 ### Price Oracle Features
@@ -66,9 +68,38 @@ USDT.approve(bamSwapAddress, usdtAmount);
 // Get quote first (optional) - includes payment distribution info
 (uint256 bamAmount, , , , , , uint256 paymentToRecipient, ) = bamSwap.getQuotes(usdtAmount, 0);
 
-// Execute purchase (90% payment goes to recipient, 10% stays in contract)
+// Execute purchase (0.5% fee, 90% payment to recipient, 10% stays in contract)
 bamSwap.buyBAMWithUSDT(usdtAmount);
 ```
+
+## Fee Structure Examples
+
+### USDT → USDB Swap ($10,000 USDT)
+- **User Input**: 10,000 USDT
+- **Fee (0.5%)**: 50 USDT → Fee Recipient (`0x65b504...00b`)
+- **Payment (90%)**: 9,000 USDT → Payment Recipient (`0xEbF9c1...F71`)
+- **Contract Keeps**: 950 USDT
+- **User Receives**: 10,000 USDB
+
+### USDB → USDT Swap (10,000 USDB)
+- **User Input**: 10,000 USDB
+- **Fee (1.5%)**: 150 USDB → Fee Recipient (`0x65b504...00b`)
+- **USDB Payment**: Stays in contract (no distribution)
+- **User Receives**: 9,850 USDT
+
+### BAM Purchase with USDT ($1,000 USDT)
+- **User Input**: 1,000 USDT
+- **Fee (0.5%)**: 5 USDT → Fee Recipient (`0x65b504...00b`)
+- **Payment (90%)**: 900 USDT → Payment Recipient (`0xEbF9c1...F71`)
+- **Contract Keeps**: 95 USDT
+- **User Receives**: 10,000,000,000 BAM tokens
+
+### BAM Sale for USDT (10,000,000,000 BAM)
+- **User Input**: 10,000,000,000 BAM tokens
+- **BAM Payment**: Stays in contract (no distribution)
+- **USDT Equivalent**: 1,000 USDT
+- **Fee (1.5%)**: 15 USDT → Fee Recipient (`0x65b504...00b`)
+- **User Receives**: 985 USDT
 
 ### Buy BAM with BNB
 ```solidity
@@ -119,6 +150,8 @@ event SwapUSDTToUSDB(address indexed user, uint256 amount, uint256 fee);
 event SwapUSDBToUSDT(address indexed user, uint256 amount, uint256 fee);
 event BuyBAMWithUSDT(address indexed user, uint256 usdtAmount, uint256 bamAmount, uint256 paymentToRecipient, uint256 remainingInContract);
 event BuyBAMWithBNB(address indexed user, uint256 bnbAmount, uint256 bamAmount, uint256 bnbPrice, uint256 paymentToRecipient, uint256 remainingInContract);
+event SellBAMForUSDT(address indexed user, uint256 bamAmount, uint256 usdtAmount, uint256 fee);
+event SellBAMForBNB(address indexed user, uint256 bamAmount, uint256 bnbAmount, uint256 bnbPrice, uint256 fee);
 event FeeCollected(address indexed token, uint256 amount, address recipient);
 event PaymentDistributed(address indexed token, uint256 totalAmount, uint256 toRecipient, uint256 remaining);
 event PriceSourceChanged(bool isUsingFallback, uint256 price);
@@ -132,9 +165,11 @@ event EmergencyWithdraw(address indexed token, uint256 amount);
 
 ### User Functions
 - `swapUSDTToUSDB(uint256 amount)`: Swap USDT to USDB 1:1 with 0.5% fee
-- `swapUSDBToUSDT(uint256 amount)`: Swap USDB to USDT 1:1 with 0.5% fee
-- `buyBAMWithUSDT(uint256 usdtAmount)`: Buy BAM tokens with USDT (90% payment to recipient)
-- `buyBAMWithBNB()`: Buy BAM tokens with BNB (90% payment to recipient)
+- `swapUSDBToUSDT(uint256 amount)`: Swap USDB to USDT 1:1 with 1.5% fee
+- `buyBAMWithUSDT(uint256 usdtAmount)`: Buy BAM with USDT (0.5% fee, 90% payment to recipient)
+- `buyBAMWithBNB()`: Buy BAM with BNB (0.5% fee, 90% payment to recipient)
+- `sellBAMForUSDT(uint256 bamAmount)`: Sell BAM for USDT (1.5% fee, BAM stays in contract)
+- `sellBAMForBNB(uint256 bamAmount)`: Sell BAM for BNB (1.5% fee, BAM stays in contract)
 - `getQuotes(uint256, uint256)`: Get comprehensive quotes including fees and distributions
 - `calculateSwapAmounts(uint256)`: Calculate swap fees and amounts after fees
 - `calculatePaymentDistribution(uint256)`: Calculate payment distribution breakdown

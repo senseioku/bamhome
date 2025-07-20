@@ -36,6 +36,12 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Token contract analysis: Standard ERC20 with no automatic burn or fee mechanisms
 ✓ Added presale allocation (10%) with 50% TGE unlock and 6-month vesting schedule
 ✓ Updated public sale to 25% with 100% TGE unlock (no vesting period)
+✓ Implemented complete fee structure with differential rates: 0.5% (USDT→USDB/BAM, BNB→BAM) vs 1.5% (USDB→USDT, BAM→USDT/BNB)
+✓ Added proper payment distribution: 90% of USDT/BNB to recipient, fees to fee recipient, remainder stays in contract
+✓ Added BAM selling functions (sellBAMForUSDT, sellBAMForBNB) with 1.5% fees
+✓ Implemented token retention logic: BAM/USDB payments stay in contract, only USDT/BNB distributed
+✓ Enhanced contract with reverse calculation functions for selling BAM tokens
+✓ Updated all events and documentation to reflect complete fee structure
 
 ## User Preferences
 
