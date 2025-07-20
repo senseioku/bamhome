@@ -1,2 +1,2 @@
-Build timestamp: 2025-07-19T03:32:15Z
-TOKENOMICS ACCURACY: Updated deflationary mechanism to match actual contract (no built-in burn)
+Build timestamp: 2025-07-19T06:16:30Z
+TOKENOMICS UPDATE: New allocation - Public Sale 25%, Presale 10%, Advisors 15%, Ecosystem 20%, Treasury 10%, Community 10%, CEX 10%

@@ -14,11 +14,24 @@ export interface TokenomicsData {
 
 export const tokenomicsData: TokenomicsData[] = [
   {
-    name: "Public Sale (Liquidity)",
-    value: 35,
-    percentage: 35,
-    amount: 35000000000,
+    name: "Public Sale",
+    value: 25,
+    percentage: 25,
+    amount: 25000000000,
     color: "hsl(45, 90%, 55%)", // primary golden
+    vestingSchedule: {
+      tgeUnlock: 100, // 100% at TGE
+      vestingPeriod: 0, // no vesting
+      cliffPeriod: 0, // no cliff
+      description: "Vesting Period: None, Unlocked at TGE: 100%"
+    }
+  },
+  {
+    name: "Presale",
+    value: 10,
+    percentage: 10,
+    amount: 10000000000,
+    color: "hsl(38, 85%, 50%)", // darker amber
     vestingSchedule: {
       tgeUnlock: 50, // 50% at TGE
       vestingPeriod: 6, // remaining over 6 months
@@ -31,7 +44,7 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 20,
     percentage: 20,
     amount: 20000000000,
-    color: "hsl(38, 85%, 50%)", // darker amber
+    color: "hsl(35, 80%, 45%)", // bronze-gold
     vestingSchedule: {
       tgeUnlock: 20, // 20% at TGE
       vestingPeriod: 40, // remaining over 40 months
@@ -49,7 +62,7 @@ export const tokenomicsData: TokenomicsData[] = [
       tgeUnlock: 0, // 0% at TGE
       vestingPeriod: 48, // 48 months
       cliffPeriod: 0, // no cliff
-      description: "Vesting Period: 48 months, Unlocked at TGE: 0%"
+      description: "Vesting Period: 48 months Unlocked at TGE: 0%"
     }
   },
   {
@@ -57,7 +70,7 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 10,
     percentage: 10,
     amount: 10000000000,
-    color: "hsl(35, 80%, 45%)", // bronze-gold
+    color: "hsl(42, 95%, 60%)", // light gold
     vestingSchedule: {
       tgeUnlock: 0, // 0% at TGE
       vestingPeriod: 36, // 36 months vesting
@@ -70,7 +83,7 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 10,
     percentage: 10,
     amount: 10000000000,
-    color: "hsl(48, 85%, 58%)", // warm gold
+    color: "hsl(48, 88%, 52%)", // medium gold
     vestingSchedule: {
       tgeUnlock: 100, // 100% at TGE
       vestingPeriod: 0, // no vesting
@@ -83,7 +96,7 @@ export const tokenomicsData: TokenomicsData[] = [
     value: 10,
     percentage: 10,
     amount: 10000000000,
-    color: "hsl(55, 95%, 70%)", // light champagne gold
+    color: "hsl(40, 82%, 48%)", // darker gold
     vestingSchedule: {
       tgeUnlock: 100, // 100% at TGE
       vestingPeriod: 0, // no vesting
@@ -96,7 +109,8 @@ export const tokenomicsData: TokenomicsData[] = [
 export const totalSupply = 100000000000; // 100 billion BAM tokens
 
 export const vestingHighlights = [
-  "Fair Launch with 35% public sale allocation and 50% TGE unlock",
+  "Fair Launch with 25% public sale allocation fully unlocked at TGE",
+  "Presale allocation with 50% TGE unlock and 6-month vesting for remaining",
   "Long-term aligned advisor vesting over 48 months with 0% TGE unlock",
   "Treasury funds secured with 6-month cliff and 36-month vesting",
   "Immediate liquidity for community incentives and CEX listings (100% TGE)",

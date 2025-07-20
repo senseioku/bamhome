@@ -29,11 +29,13 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ FINAL FIX: Completely resolved white background by adding dark classes to HTML and body elements
 ✓ Updated all hardcoded color classes in projects section to use golden theme variants
 ✓ Confirmed site loads with proper dark background and golden BAM branding from start
-✓ Updated tokenomics allocation: Public Sale 35%, Ecosystem 20%, Advisors 15%, Treasury 10%, Community 10%, CEX 10%
+✓ Updated tokenomics allocation: Public Sale 25%, Presale 10%, Advisors 15%, Ecosystem 20%, Treasury 10%, Community 10%, CEX 10%
 ✓ Implemented new vesting schedules with proper TGE unlock percentages and cliff periods
-✓ Updated community allocation metric to 45% reflecting combined public and community allocations
+✓ Updated community allocation metric to 45% reflecting combined public, presale, community and CEX allocations
 ✓ Corrected deflationary mechanism description - removed "built-in burn" to match actual ERC20 contract
 ✓ Token contract analysis: Standard ERC20 with no automatic burn or fee mechanisms
+✓ Added presale allocation (10%) with 50% TGE unlock and 6-month vesting schedule
+✓ Updated public sale to 25% with 100% TGE unlock (no vesting period)
 
 ## User Preferences
 
