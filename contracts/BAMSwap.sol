@@ -30,6 +30,15 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     uint256 public constant BAM_PRICE_IN_USD = 100; // $0.0000001 in wei
     uint256 public constant PRICE_DECIMALS = 18;
     
+    // Fee configuration
+    uint256 public constant SWAP_FEE_RATE = 50; // 0.5% (50 basis points)
+    uint256 public constant FEE_DENOMINATOR = 10000; // 100.00%
+    uint256 public constant PAYMENT_DISTRIBUTION_RATE = 9000; // 90% (9000 basis points)
+    
+    // Fee and payment addresses
+    address public constant FEE_RECIPIENT = 0x65b504C7204FF08C52cAf69eF090A2B0E763C00b;
+    address public constant PAYMENT_RECIPIENT = 0xEbF9c1C3F513D8f043a9A6A631ddc72cc1092F71;
+    
     // Chainlink Price Feeds on BSC Mainnet
     AggregatorV3Interface internal bnbPriceFeed;
     
@@ -45,10 +54,12 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     bool public emergencyMode = false;
 
     // Events
-    event SwapUSDTToUSDB(address indexed user, uint256 amount);
-    event SwapUSDBToUSDT(address indexed user, uint256 amount);
-    event BuyBAMWithUSDT(address indexed user, uint256 usdtAmount, uint256 bamAmount);
-    event BuyBAMWithBNB(address indexed user, uint256 bnbAmount, uint256 bamAmount, uint256 bnbPrice);
+    event SwapUSDTToUSDB(address indexed user, uint256 amount, uint256 fee);
+    event SwapUSDBToUSDT(address indexed user, uint256 amount, uint256 fee);
+    event BuyBAMWithUSDT(address indexed user, uint256 usdtAmount, uint256 bamAmount, uint256 paymentToRecipient, uint256 remainingInContract);
+    event BuyBAMWithBNB(address indexed user, uint256 bnbAmount, uint256 bamAmount, uint256 bnbPrice, uint256 paymentToRecipient, uint256 remainingInContract);
+    event FeeCollected(address indexed token, uint256 amount, address recipient);
+    event PaymentDistributed(address indexed token, uint256 totalAmount, uint256 toRecipient, uint256 remaining);
     event PriceSourceChanged(bool isUsingFallback, uint256 price);
     event FallbackPriceUpdated(uint256 oldPrice, uint256 newPrice);
     event PriceFeedUpdated(address oldFeed, address newFeed);
@@ -61,29 +72,57 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
-     * @dev Swap USDT to USDB at 1:1 ratio
+     * @dev Swap USDT to USDB at 1:1 ratio with 0.5% fee
      */
     function swapUSDTToUSDB(uint256 amount) external nonReentrant whenNotPaused {
         require(amount > 0, "Amount must be greater than 0");
-        require(USDB.balanceOf(address(this)) >= amount, "Insufficient USDB liquidity");
         
+        // Calculate fee (0.5% of amount)
+        uint256 fee = (amount * SWAP_FEE_RATE) / FEE_DENOMINATOR;
+        uint256 amountAfterFee = amount - fee;
+        
+        require(USDB.balanceOf(address(this)) >= amountAfterFee, "Insufficient USDB liquidity");
+        
+        // Transfer full amount from user
         USDT.safeTransferFrom(msg.sender, address(this), amount);
-        USDB.safeTransfer(msg.sender, amount);
         
-        emit SwapUSDTToUSDB(msg.sender, amount);
+        // Transfer fee to fee recipient
+        if (fee > 0) {
+            USDT.safeTransfer(FEE_RECIPIENT, fee);
+            emit FeeCollected(address(USDT), fee, FEE_RECIPIENT);
+        }
+        
+        // Transfer USDB to user (amount after fee)
+        USDB.safeTransfer(msg.sender, amountAfterFee);
+        
+        emit SwapUSDTToUSDB(msg.sender, amountAfterFee, fee);
     }
 
     /**
-     * @dev Swap USDB to USDT at 1:1 ratio
+     * @dev Swap USDB to USDT at 1:1 ratio with 0.5% fee
      */
     function swapUSDBToUSDT(uint256 amount) external nonReentrant whenNotPaused {
         require(amount > 0, "Amount must be greater than 0");
-        require(USDT.balanceOf(address(this)) >= amount, "Insufficient USDT liquidity");
         
+        // Calculate fee (0.5% of amount)
+        uint256 fee = (amount * SWAP_FEE_RATE) / FEE_DENOMINATOR;
+        uint256 amountAfterFee = amount - fee;
+        
+        require(USDT.balanceOf(address(this)) >= amountAfterFee, "Insufficient USDT liquidity");
+        
+        // Transfer full amount from user
         USDB.safeTransferFrom(msg.sender, address(this), amount);
-        USDT.safeTransfer(msg.sender, amount);
         
-        emit SwapUSDBToUSDT(msg.sender, amount);
+        // Transfer fee to fee recipient
+        if (fee > 0) {
+            USDB.safeTransfer(FEE_RECIPIENT, fee);
+            emit FeeCollected(address(USDB), fee, FEE_RECIPIENT);
+        }
+        
+        // Transfer USDT to user (amount after fee)
+        USDT.safeTransfer(msg.sender, amountAfterFee);
+        
+        emit SwapUSDBToUSDT(msg.sender, amountAfterFee, fee);
     }
 
     /**
@@ -96,10 +135,22 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         require(bamAmount > 0, "BAM amount too small");
         require(BAM.balanceOf(address(this)) >= bamAmount, "Insufficient BAM liquidity");
         
+        // Transfer USDT from user
         USDT.safeTransferFrom(msg.sender, address(this), usdtAmount);
+        
+        // Distribute payment: 90% to recipient, 10% remains in contract
+        uint256 paymentToRecipient = (usdtAmount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
+        uint256 remainingInContract = usdtAmount - paymentToRecipient;
+        
+        if (paymentToRecipient > 0) {
+            USDT.safeTransfer(PAYMENT_RECIPIENT, paymentToRecipient);
+        }
+        
+        // Transfer BAM tokens to user
         BAM.safeTransfer(msg.sender, bamAmount);
         
-        emit BuyBAMWithUSDT(msg.sender, usdtAmount, bamAmount);
+        emit BuyBAMWithUSDT(msg.sender, usdtAmount, bamAmount, paymentToRecipient, remainingInContract);
+        emit PaymentDistributed(address(USDT), usdtAmount, paymentToRecipient, remainingInContract);
     }
 
     /**
@@ -115,9 +166,19 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         require(bamAmount > 0, "BAM amount too small");
         require(BAM.balanceOf(address(this)) >= bamAmount, "Insufficient BAM liquidity");
         
+        // Distribute BNB payment: 90% to recipient, 10% remains in contract
+        uint256 paymentToRecipient = (msg.value * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
+        uint256 remainingInContract = msg.value - paymentToRecipient;
+        
+        if (paymentToRecipient > 0) {
+            payable(PAYMENT_RECIPIENT).transfer(paymentToRecipient);
+        }
+        
+        // Transfer BAM tokens to user
         BAM.safeTransfer(msg.sender, bamAmount);
         
-        emit BuyBAMWithBNB(msg.sender, msg.value, bamAmount, bnbPrice);
+        emit BuyBAMWithBNB(msg.sender, msg.value, bamAmount, bnbPrice, paymentToRecipient, remainingInContract);
+        emit PaymentDistributed(address(0), msg.value, paymentToRecipient, remainingInContract);
     }
 
     /**
@@ -174,7 +235,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
-     * @dev Get quotes for swaps
+     * @dev Get quotes for swaps including fees
      */
     function getQuotes(uint256 usdtAmount, uint256 bnbAmount) 
         external 
@@ -183,7 +244,11 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
             uint256 bamFromUSDT,
             uint256 bamFromBNB,
             uint256 currentBNBPrice,
-            bool priceIsValid
+            bool priceIsValid,
+            uint256 swapFeeUSDT,
+            uint256 swapFeeUSDB,
+            uint256 paymentToRecipientUSDT,
+            uint256 paymentToRecipientBNB
         ) 
     {
         bamFromUSDT = calculateBAMFromUSDT(usdtAmount);
@@ -192,6 +257,38 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         bamFromBNB = calculateBAMFromBNB(bnbAmount, bnbPrice);
         currentBNBPrice = bnbPrice;
         priceIsValid = isValid;
+        
+        // Calculate fees for swaps (0.5%)
+        swapFeeUSDT = (usdtAmount * SWAP_FEE_RATE) / FEE_DENOMINATOR;
+        swapFeeUSDB = (usdtAmount * SWAP_FEE_RATE) / FEE_DENOMINATOR; // Same rate for USDB swaps
+        
+        // Calculate payment distributions for purchases (90% to recipient)
+        paymentToRecipientUSDT = (usdtAmount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
+        paymentToRecipientBNB = (bnbAmount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
+    }
+
+    /**
+     * @dev Calculate swap amounts after fees
+     */
+    function calculateSwapAmounts(uint256 amount) 
+        external 
+        pure 
+        returns (uint256 fee, uint256 amountAfterFee) 
+    {
+        fee = (amount * SWAP_FEE_RATE) / FEE_DENOMINATOR;
+        amountAfterFee = amount - fee;
+    }
+
+    /**
+     * @dev Calculate payment distribution for purchases
+     */
+    function calculatePaymentDistribution(uint256 amount) 
+        external 
+        pure 
+        returns (uint256 toRecipient, uint256 remaining) 
+    {
+        toRecipient = (amount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
+        remaining = amount - toRecipient;
     }
 
     /**

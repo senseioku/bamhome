@@ -5,11 +5,17 @@ A simple, fast, efficient and secure swap contract for the BAM ecosystem on Bina
 ## Features
 
 ### Core Functionality
-- **USDB ↔ USDT Swaps**: 1:1 ratio with no fees
+- **USDB ↔ USDT Swaps**: 1:1 ratio with 0.5% swap fee
 - **BAM Token Purchase**: Fixed price at $0.0000001
 - **Multi-currency Support**: Accept USDT and BNB for BAM purchases
-- **Real-time Quotes**: Get swap quotes before execution
+- **Real-time Quotes**: Get swap quotes including fees before execution
 - **Live Price Feeds**: Automatic BNB price updates via Chainlink oracles
+
+### Fee Structure
+- **Swap Fee**: 0.5% on all USDB ↔ USDT swaps
+- **Fee Distribution**: All swap fees go to designated fee recipient
+- **Payment Distribution**: 90% of BAM purchase payments to recipient, 10% remains in contract
+- **Transparent Fees**: All fees and distributions logged via events
 
 ### Price Oracle Features
 - **Chainlink Integration**: Real-time BNB/USD price feeds from Chainlink
@@ -45,7 +51,10 @@ BAM:  0xA779f03b752fa2442e6A23f145b007f2160F9a7D
 // Approve USDT spending first
 USDT.approve(bamSwapAddress, amount);
 
-// Execute swap
+// Get quote with fee calculation (optional)
+(uint256 fee, uint256 amountAfterFee) = bamSwap.calculateSwapAmounts(amount);
+
+// Execute swap (0.5% fee goes to fee recipient)
 bamSwap.swapUSDTToUSDB(amount);
 ```
 
@@ -54,10 +63,10 @@ bamSwap.swapUSDTToUSDB(amount);
 // Approve USDT spending
 USDT.approve(bamSwapAddress, usdtAmount);
 
-// Get quote first (optional)
-uint256 bamAmount = bamSwap.getUSDTToBAMQuote(usdtAmount);
+// Get quote first (optional) - includes payment distribution info
+(uint256 bamAmount, , , , , , uint256 paymentToRecipient, ) = bamSwap.getQuotes(usdtAmount, 0);
 
-// Execute purchase
+// Execute purchase (90% payment goes to recipient, 10% stays in contract)
 bamSwap.buyBAMWithUSDT(usdtAmount);
 ```
 
@@ -106,10 +115,12 @@ The contract is optimized for minimal gas usage:
 ## Events
 
 ```solidity
-event SwapUSDTToUSDB(address indexed user, uint256 amount);
-event SwapUSDBToUSDT(address indexed user, uint256 amount);
-event BuyBAMWithUSDT(address indexed user, uint256 usdtAmount, uint256 bamAmount);
-event BuyBAMWithBNB(address indexed user, uint256 bnbAmount, uint256 bamAmount, uint256 bnbPrice);
+event SwapUSDTToUSDB(address indexed user, uint256 amount, uint256 fee);
+event SwapUSDBToUSDT(address indexed user, uint256 amount, uint256 fee);
+event BuyBAMWithUSDT(address indexed user, uint256 usdtAmount, uint256 bamAmount, uint256 paymentToRecipient, uint256 remainingInContract);
+event BuyBAMWithBNB(address indexed user, uint256 bnbAmount, uint256 bamAmount, uint256 bnbPrice, uint256 paymentToRecipient, uint256 remainingInContract);
+event FeeCollected(address indexed token, uint256 amount, address recipient);
+event PaymentDistributed(address indexed token, uint256 totalAmount, uint256 toRecipient, uint256 remaining);
 event PriceSourceChanged(bool isUsingFallback, uint256 price);
 event FallbackPriceUpdated(uint256 oldPrice, uint256 newPrice);
 event PriceFeedUpdated(address oldFeed, address newFeed);
@@ -120,11 +131,13 @@ event EmergencyWithdraw(address indexed token, uint256 amount);
 ## Functions Overview
 
 ### User Functions
-- `swapUSDTToUSDB(uint256 amount)`: Swap USDT to USDB 1:1
-- `swapUSDBToUSDT(uint256 amount)`: Swap USDB to USDT 1:1
-- `buyBAMWithUSDT(uint256 usdtAmount)`: Buy BAM tokens with USDT
-- `buyBAMWithBNB()`: Buy BAM tokens with BNB (payable)
-- `getQuotes(uint256, uint256)`: Get quotes for USDT and BNB amounts
+- `swapUSDTToUSDB(uint256 amount)`: Swap USDT to USDB 1:1 with 0.5% fee
+- `swapUSDBToUSDT(uint256 amount)`: Swap USDB to USDT 1:1 with 0.5% fee
+- `buyBAMWithUSDT(uint256 usdtAmount)`: Buy BAM tokens with USDT (90% payment to recipient)
+- `buyBAMWithBNB()`: Buy BAM tokens with BNB (90% payment to recipient)
+- `getQuotes(uint256, uint256)`: Get comprehensive quotes including fees and distributions
+- `calculateSwapAmounts(uint256)`: Calculate swap fees and amounts after fees
+- `calculatePaymentDistribution(uint256)`: Calculate payment distribution breakdown
 
 ### View Functions
 - `getBNBPriceWithValidation()`: Get BNB price with validity check
