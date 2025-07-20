@@ -2,17 +2,20 @@
 
 ## Prerequisites for BSCScan Verification
 
-### 1. Get BSCScan API Key
+### 1. Setup Environment Variables
+Create `.env` file in contracts directory:
+```bash
+# Copy from example
+cp .env.example .env
+
+# Edit with your credentials
+PRIVATE_KEY=your_private_key_without_0x_prefix
+BSCSCAN_API_KEY=your_bscscan_api_key_here
+```
+
+Get BSCScan API Key:
 - Visit: https://bscscan.com/apis
 - Create account and generate API key
-- Add to `hardhat.config.js`:
-```javascript
-etherscan: {
-  apiKey: {
-    bsc: "YOUR_BSCSCAN_API_KEY"
-  }
-}
-```
 
 ### 2. Deployment Command
 ```bash

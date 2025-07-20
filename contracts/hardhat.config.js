@@ -1,40 +1,43 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    version: "0.8.20",
+    version: process.env.COMPILER_VERSION || "0.8.20",
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200
+        runs: parseInt(process.env.OPTIMIZER_RUNS || "200")
       }
     }
   },
   networks: {
     hardhat: {
       forking: {
-        url: "https://bsc-dataseed1.binance.org/",
+        url: process.env.BSC_MAINNET_URL || "https://bsc-dataseed1.binance.org/",
         enabled: false
       }
     },
     bsc: {
-      url: "https://bsc-dataseed1.binance.org/",
+      url: process.env.BSC_MAINNET_URL || "https://bsc-dataseed1.binance.org/",
       chainId: 56,
-      gasPrice: 20000000000,
-      accounts: [] // Add your private keys here for deployment
+      gasPrice: parseInt(process.env.GAS_PRICE || "5000000000"), // 5 gwei default
+      gas: parseInt(process.env.GAS_LIMIT || "5000000"),
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
     },
     bscTestnet: {
-      url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+      url: process.env.BSC_TESTNET_URL || "https://data-seed-prebsc-1-s1.binance.org:8545/",
       chainId: 97,
-      gasPrice: 20000000000,
-      accounts: [] // Add your private keys here for testing
+      gasPrice: parseInt(process.env.GAS_PRICE || "10000000000"), // 10 gwei for testnet
+      gas: parseInt(process.env.GAS_LIMIT || "5000000"),
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
     }
   },
   etherscan: {
     apiKey: {
-      bsc: "YOUR_BSCSCAN_API_KEY", // Add your BSCScan API key
-      bscTestnet: "YOUR_BSCSCAN_API_KEY"
+      bsc: process.env.BSCSCAN_API_KEY || "",
+      bscTestnet: process.env.BSCSCAN_API_KEY || ""
     }
   },
   gasReporter: {
