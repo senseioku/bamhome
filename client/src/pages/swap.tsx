@@ -204,15 +204,13 @@ const SwapPage: React.FC = () => {
       }
 
       const fee = parseFloat(amount) * (feePercentage / 100);
-      const minimumReceived = parseFloat(outputAmount) * (1 - slippage / 100);
-
       setQuote({
         inputAmount: amount,
         outputAmount: outputAmount,
         fee: fee.toString(),
         feePercentage,
-        priceImpact: 0.1, // Minimal price impact for our fixed-price swaps
-        minimumReceived: minimumReceived.toString(),
+        priceImpact: 0, // No price impact for fixed-price swaps
+        minimumReceived: outputAmount, // Same as output for fixed swaps
         route
       });
 
@@ -349,15 +347,15 @@ const SwapPage: React.FC = () => {
     return (
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button variant="ghost" className="p-2 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-700/50">
-            <div className="flex items-center space-x-2">
-              <div className="text-lg">{token.icon}</div>
-              <span className="font-semibold text-white">{token.symbol}</span>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+          <Button variant="ghost" className="p-1.5 sm:p-2 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-700/50">
+            <div className="flex items-center space-x-1.5 sm:space-x-2">
+              <div className="text-base sm:text-lg">{token.icon}</div>
+              <span className="font-semibold text-white text-sm sm:text-base">{token.symbol}</span>
+              <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
             </div>
           </Button>
         </DialogTrigger>
-        <DialogContent className="bg-gray-900 border-gray-700 max-w-lg">
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-lg mx-4 sm:mx-auto">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center space-x-2">
               <span>Select a token</span>
@@ -495,19 +493,19 @@ const SwapPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
-      <div className="max-w-lg mx-auto pt-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-2 sm:p-4">
+      <div className="max-w-md sm:max-w-lg mx-auto pt-4 sm:pt-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">BAM Swap</h1>
-          <p className="text-gray-400">Professional DeFi Trading Interface</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">BAM Swap</h1>
+          <p className="text-sm sm:text-base text-gray-400">Professional DeFi Trading Interface</p>
           {priceInfo && (
-            <div className="flex justify-center items-center space-x-4 mt-4 text-sm">
-              <Badge variant="outline" className="text-green-400 border-green-400">
+            <div className="flex justify-center items-center space-x-2 sm:space-x-4 mt-4 text-xs sm:text-sm">
+              <Badge variant="outline" className="text-green-400 border-green-400 px-2 py-1">
                 <TrendingUp className="w-3 h-3 mr-1" />
                 BNB ${priceInfo.bnbPrice.toFixed(2)}
               </Badge>
-              <Badge variant="outline" className="text-yellow-400 border-yellow-400">
+              <Badge variant="outline" className="text-yellow-400 border-yellow-400 px-2 py-1">
                 <Activity className="w-3 h-3 mr-1" />
                 BAM $0.0000001
               </Badge>
@@ -517,20 +515,20 @@ const SwapPage: React.FC = () => {
 
         {/* Main Swap Card */}
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             {/* Header with Trade Types */}
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center space-x-4">
-                <Button variant="default" className="bg-gray-800 text-white border-yellow-500">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <Button variant="default" className="bg-gray-800 text-white border-yellow-500 text-sm sm:text-base px-3 sm:px-4">
                   Swap
                 </Button>
-                <Button variant="ghost" className="text-gray-500 hover:text-gray-400">
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-sm sm:text-base">
                   Limit
                 </Button>
-                <Button variant="ghost" className="text-gray-500 hover:text-gray-400">
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-sm sm:text-base hidden sm:block">
                   Buy
                 </Button>
-                <Button variant="ghost" className="text-gray-500 hover:text-gray-400">
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-sm sm:text-base hidden sm:block">
                   Sell
                 </Button>
               </div>
@@ -550,57 +548,22 @@ const SwapPage: React.FC = () => {
                     <TooltipContent>Refresh Price</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                <Dialog open={showSettings} onOpenChange={setShowSettings}>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                      <Settings className="w-4 h-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-gray-900 border-gray-700">
-                    <DialogHeader>
-                      <DialogTitle className="text-white">Transaction Settings</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-300">Slippage Tolerance</label>
-                        <div className="flex items-center space-x-2 mt-2">
-                          {[0.1, 0.5, 1.0, 3.0].map((value) => (
-                            <Button
-                              key={value}
-                              variant={slippage === value ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setSlippage(value)}
-                              className="text-xs"
-                            >
-                              {value}%
-                            </Button>
-                          ))}
-                          <Input
-                            type="number"
-                            value={slippage}
-                            onChange={(e) => setSlippage(parseFloat(e.target.value) || 0.5)}
-                            className="w-20 text-center text-xs bg-gray-800 border-gray-600"
-                            step="0.1"
-                            min="0.1"
-                            max="50"
-                          />
-                        </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                        <Info className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-gray-800 border-gray-600 text-white max-w-xs">
+                      <div className="space-y-2 text-xs">
+                        <div>Fixed fees: 0.5% (USDT→USDB/BAM, BNB→BAM)</div>
+                        <div>Higher fees: 1.5% (USDB→USDT, BAM→USDT/BNB)</div>
+                        <div>Minimum: 1 USDT per transaction</div>
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-300">Transaction Deadline</label>
-                        <div className="flex items-center space-x-2 mt-2">
-                          <Input
-                            type="number"
-                            defaultValue="20"
-                            className="bg-gray-800 border-gray-600 text-white"
-                            placeholder="20"
-                          />
-                          <span className="text-gray-400 text-sm">minutes</span>
-                        </div>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </div>
 
@@ -623,10 +586,10 @@ const SwapPage: React.FC = () => {
                   value={fromAmount}
                   onChange={(e) => setFromAmount(e.target.value)}
                   placeholder="0"
-                  className="text-3xl font-bold bg-transparent border-none text-white h-16 pr-32 focus:ring-0 focus:border-none"
+                  className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-transparent border-none text-white h-14 sm:h-16 lg:h-20 pr-28 sm:pr-32 focus:ring-0 focus:border-none"
                   step="any"
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2">
                   <TokenSelector token={fromToken} onSelect={setFromToken} label="from" />
                 </div>
               </div>
@@ -653,9 +616,9 @@ const SwapPage: React.FC = () => {
                   value={toAmount}
                   readOnly
                   placeholder="0"
-                  className="text-3xl font-bold bg-transparent border-none text-white h-16 pr-32 focus:ring-0 focus:border-none"
+                  className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-transparent border-none text-white h-14 sm:h-16 lg:h-20 pr-28 sm:pr-32 focus:ring-0 focus:border-none"
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2">
                   <TokenSelector token={toToken} onSelect={setToToken} label="to" />
                 </div>
               </div>
@@ -679,10 +642,10 @@ const SwapPage: React.FC = () => {
                   </div>
                   
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-400">Minimum Received</span>
+                    <span className="text-sm text-gray-400">You Receive</span>
                     <div className="text-right">
-                      <span className="text-white font-medium">{web3Utils.formatAmount(quote.minimumReceived)} {toToken.symbol}</span>
-                      <div className="text-xs text-gray-500">After {slippage}% slippage</div>
+                      <span className="text-white font-medium">{web3Utils.formatAmount(quote.outputAmount)} {toToken.symbol}</span>
+                      <div className="text-xs text-gray-500">After fees</div>
                     </div>
                   </div>
                   
@@ -691,7 +654,7 @@ const SwapPage: React.FC = () => {
                       <BarChart3 className="w-3 h-3 mr-1" />
                       Price Impact
                     </span>
-                    <span className="text-green-400 font-medium">&lt; {quote.priceImpact}%</span>
+                    <span className="text-green-400 font-medium">~0%</span>
                   </div>
                   
                   <Separator className="bg-gray-600/50" />
@@ -700,7 +663,7 @@ const SwapPage: React.FC = () => {
                     <span className="text-sm text-gray-400">Route</span>
                     <div className="flex items-center space-x-1">
                       {quote.route.map((token, index) => (
-                        <React.Fragment key={token}>
+                        <React.Fragment key={`${token}-${index}`}>
                           <span className="text-white text-sm font-medium">{token}</span>
                           {index < quote.route.length - 1 && (
                             <ArrowUpDown className="w-3 h-3 text-gray-500 rotate-90" />
@@ -727,11 +690,11 @@ const SwapPage: React.FC = () => {
               <Button
                 onClick={connectWallet}
                 disabled={isLoading}
-                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl shadow-lg transition-all duration-200"
+                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl shadow-lg transition-all duration-200"
               >
                 {isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Connecting...</span>
                   </div>
                 ) : (
@@ -741,21 +704,21 @@ const SwapPage: React.FC = () => {
             ) : !quote || !fromAmount || parseFloat(fromAmount) <= 0 ? (
               <Button
                 disabled
-                className="w-full h-14 text-lg font-bold bg-gray-700 text-gray-400 rounded-xl cursor-not-allowed"
+                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gray-700 text-gray-400 rounded-xl cursor-not-allowed"
               >
                 Enter an amount
               </Button>
             ) : parseFloat(fromAmount) < 1 ? (
               <Button
                 disabled
-                className="w-full h-14 text-lg font-bold bg-gray-700 text-gray-400 rounded-xl cursor-not-allowed"
+                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gray-700 text-gray-400 rounded-xl cursor-not-allowed"
               >
                 Minimum: 1 {fromToken.symbol}
               </Button>
             ) : balances[fromToken.symbol] && parseFloat(fromAmount) > parseFloat(balances[fromToken.symbol]) ? (
               <Button
                 disabled
-                className="w-full h-14 text-lg font-bold bg-red-700 text-red-200 rounded-xl cursor-not-allowed"
+                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-red-700 text-red-200 rounded-xl cursor-not-allowed"
               >
                 Insufficient {fromToken.symbol} balance
               </Button>
@@ -763,17 +726,17 @@ const SwapPage: React.FC = () => {
               <Button
                 onClick={executeSwap}
                 disabled={isLoading}
-                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl shadow-lg transition-all duration-200"
+                className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl shadow-lg transition-all duration-200"
               >
                 {isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Processing...</span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
                     <span>Review Swap</span>
-                    <div className="text-sm opacity-80">
+                    <div className="text-xs sm:text-sm opacity-80 mt-0.5">
                       {fromAmount} {fromToken.symbol} → {toAmount} {toToken.symbol}
                     </div>
                   </div>
@@ -834,7 +797,7 @@ const SwapPage: React.FC = () => {
         </Card>
 
         {/* Additional Info */}
-        <div className="mt-6 text-center text-sm text-gray-400">
+        <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-400 space-y-1">
           <p>🔒 Powered by BAM Smart Contracts on BSC</p>
           <p>💎 Professional-grade DeFi with minimal fees</p>
         </div>
