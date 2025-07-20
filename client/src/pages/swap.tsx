@@ -859,19 +859,19 @@ const SwapPage = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="p-2 sm:p-4 pt-20 sm:pt-22">
+      <div className="p-2 sm:p-3 pt-18 sm:pt-20">
         <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="text-center mb-3 sm:mb-4">
-          <p className="text-xs sm:text-sm text-gray-400 mb-3">Pioneering Community Growth and Wealth</p>
+        <div className="text-center mb-2">
+          <p className="text-xs text-gray-400 mb-2">Pioneering Community Growth and Wealth</p>
           {priceInfo && (
-            <div className="flex justify-center items-center space-x-2 mb-3 text-xs">
-              <Badge variant="outline" className="text-green-400 border-green-400 px-2 py-1">
-                <TrendingUp className="w-3 h-3 mr-1" />
+            <div className="flex justify-center items-center space-x-2 mb-2 text-xs">
+              <Badge variant="outline" className="text-green-400 border-green-400 px-1.5 py-0.5">
+                <TrendingUp className="w-2 h-2 mr-0.5" />
                 BNB ${priceInfo.bnbPrice.toFixed(2)}
               </Badge>
-              <Badge variant="outline" className="text-yellow-400 border-yellow-400 px-2 py-1">
-                <Activity className="w-3 h-3 mr-1" />
+              <Badge variant="outline" className="text-yellow-400 border-yellow-400 px-1.5 py-0.5">
+                <Activity className="w-2 h-2 mr-0.5" />
                 BAM $0.0000001
               </Badge>
             </div>
@@ -880,24 +880,24 @@ const SwapPage = () => {
 
         {/* Main Swap Card */}
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
-          <CardContent className="p-3 sm:p-4">
+          <CardContent className="p-2 sm:p-3">
             {/* Header with Trade Types */}
-            <div className="flex justify-between items-center mb-3 sm:mb-4">
-              <div className="flex items-center space-x-2 sm:space-x-4">
-                <Button variant="default" className="bg-gray-800 text-white border-yellow-500 text-sm sm:text-base px-3 sm:px-4">
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center space-x-1">
+                <Button variant="default" className="bg-gray-800 text-white border-yellow-500 text-xs px-2 py-1 h-7">
                   Swap
                 </Button>
-                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-sm sm:text-base">
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-xs px-2 py-1 h-7">
                   Limit
                 </Button>
-                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-sm sm:text-base hidden sm:block">
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-xs px-2 py-1 h-7 hidden sm:block">
                   Buy
                 </Button>
-                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-sm sm:text-base hidden sm:block">
+                <Button variant="ghost" className="text-gray-500 hover:text-gray-400 text-xs px-2 py-1 h-7 hidden sm:block">
                   Sell
                 </Button>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -905,9 +905,9 @@ const SwapPage = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => priceInfo && calculateQuote(fromAmount, fromToken, toToken)}
-                        className="text-gray-400 hover:text-white"
+                        className="text-gray-400 hover:text-white p-1 h-6 w-6"
                       >
-                        <RefreshCw className="w-4 h-4" />
+                        <RefreshCw className="w-3 h-3" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Refresh Price</TooltipContent>
@@ -916,12 +916,12 @@ const SwapPage = () => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                        <Info className="w-4 h-4" />
+                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white p-1 h-6 w-6">
+                        <Info className="w-3 h-3" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent className="bg-gray-800 border-gray-600 text-white max-w-xs">
-                      <div className="space-y-2 text-xs">
+                      <div className="space-y-1 text-xs">
                         <div>Fixed fees: 0.5% (USDT→USDB/BAM, BNB→BAM)</div>
                         <div>Higher fees: 1.5% (USDB→USDT, BAM→USDT/BNB)</div>
                         <div>Minimum: 1 USDT per transaction</div>
@@ -1001,57 +1001,51 @@ const SwapPage = () => {
 
             {/* Enhanced Quote Information */}
             {quote && (
-              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-lg p-3 mb-4 border border-gray-600/50">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-300 font-medium">Trade Details</span>
-                  <Info className="w-4 h-4 text-gray-400" />
+              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-lg p-2 mb-3 border border-gray-600/50">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-300 font-medium">Trade Details</span>
+                  <Info className="w-3 h-3 text-gray-400" />
                 </div>
                 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-400 flex items-center">
-                      <Zap className="w-3 h-3 mr-1" />
+                      <Zap className="w-2 h-2 mr-1" />
                       Network Fee ({quote.feePercentage}%)
                     </span>
-                    <div className="text-right">
-                      <span className="text-sm text-white font-medium">{formatDisplayAmount(quote.fee, fromToken.symbol)} {fromToken.symbol}</span>
-                      <div className="text-xs text-gray-500">{calculateUSDValue(quote.fee, fromToken.symbol)}</div>
-                    </div>
+                    <span className="text-xs text-white font-medium">{formatDisplayAmount(quote.fee, fromToken.symbol)} {fromToken.symbol}</span>
                   </div>
                   
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-400">You Receive</span>
-                    <div className="text-right">
-                      <span className="text-sm text-white font-medium">{formatDisplayAmount(quote.outputAmount, toToken.symbol)} {toToken.symbol}</span>
-                      <div className="text-xs text-gray-500">{calculateUSDValue(quote.outputAmount, toToken.symbol)}</div>
-                    </div>
+                    <span className="text-xs text-white font-medium">{formatDisplayAmount(quote.outputAmount, toToken.symbol)} {toToken.symbol}</span>
                   </div>
                   
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-400 flex items-center">
-                      <BarChart3 className="w-3 h-3 mr-1" />
+                      <BarChart3 className="w-2 h-2 mr-1" />
                       Price Impact
                     </span>
-                    <span className="text-sm text-green-400 font-medium">~0%</span>
+                    <span className="text-xs text-green-400 font-medium">~0%</span>
                   </div>
                   
-                  <Separator className="bg-gray-600/50" />
-                  
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-400">Route</span>
-                    <div className="flex items-center space-x-1">
-                      {quote.route.map((token, index) => [
-                        <span key={`token-${index}`} className="text-white text-xs font-medium">{token}</span>,
-                        index < quote.route.length - 1 && (
-                          <ArrowUpDown key={`arrow-${index}`} className="w-3 h-3 text-gray-500 rotate-90" />
-                        )
-                      ]).flat().filter(Boolean)}
+                  <div className="border-t border-gray-600/50 pt-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-400">Route</span>
+                      <div className="flex items-center space-x-1">
+                        {quote.route.map((token, index) => [
+                          <span key={`token-${index}`} className="text-white text-xs">{token}</span>,
+                          index < quote.route.length - 1 && (
+                            <ArrowUpDown key={`arrow-${index}`} className="w-2 h-2 text-gray-500 rotate-90" />
+                          )
+                        ]).flat().filter(Boolean)}
+                      </div>
                     </div>
                   </div>
                   
                   {fromToken.symbol === 'USDT' && toToken.symbol === 'BAM' && (
-                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-2 mt-2">
-                      <div className="text-yellow-400 text-xs font-medium mb-1">Fixed Price Swap</div>
+                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded p-1.5 mt-1">
+                      <div className="text-yellow-400 text-xs font-medium">Fixed Price Swap</div>
                       <div className="text-yellow-300 text-xs">
                         1 USDT = 10,000,000 BAM (Rate: $0.0000001)
                       </div>
@@ -1059,8 +1053,8 @@ const SwapPage = () => {
                   )}
                   
                   {(fromToken.symbol === 'BAM' && (toToken.symbol === 'USDT' || toToken.symbol === 'BNB')) && (
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-2 mt-2">
-                      <div className="text-blue-400 text-xs font-medium mb-1">BAM Sale</div>
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded p-1.5 mt-1">
+                      <div className="text-blue-400 text-xs font-medium">BAM Sale</div>
                       <div className="text-blue-300 text-xs">
                         Higher fees apply (1.5%) for selling BAM tokens
                       </div>
