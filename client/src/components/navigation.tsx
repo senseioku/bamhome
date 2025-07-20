@@ -69,6 +69,12 @@ export default function Navigation() {
                   {item.label}
                 </button>
               ))}
+              <a 
+                href="/swap" 
+                className="text-foreground hover:text-primary transition-colors duration-200 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-4 py-2 rounded-lg font-semibold"
+              >
+                Launch Swap
+              </a>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="text-foreground hover:text-primary">
@@ -77,14 +83,14 @@ export default function Navigation() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="glass-card border-border">
                   <DropdownMenuItem>
-                    <button
-                      onClick={() => scrollToSection("ecosystem")}
+                    <a
+                      href="/swap"
                       className="flex items-center w-full text-left"
                     >
                       <span className="mr-2">🔄</span>
                       BAM Swap
                       <span className="ml-auto text-xs bg-primary/20 text-primary px-2 py-1 rounded">Ready</span>
-                    </button>
+                    </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <button
