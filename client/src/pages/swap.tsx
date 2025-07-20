@@ -1112,9 +1112,9 @@ const SwapPage = () => {
 
 
 
-      {/* Main Content */}
-      <div className="p-2 sm:p-3 pt-8 sm:pt-18 flex items-center justify-center min-h-screen xl:pt-0">
-        <div className="w-full max-w-sm sm:max-w-lg mx-auto mt-4 sm:mt-0">
+      {/* Main Content - Properly sized and centered for desktop */}
+      <div className="p-2 sm:p-4 pt-20 sm:pt-24 flex items-center justify-center min-h-screen">
+        <div className="w-full max-w-sm sm:max-w-md lg:max-w-sm xl:max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-1 sm:mb-2 xl:mb-3">
           <p className="text-xs text-gray-400 mb-0.5 sm:mb-1 xl:mb-2">Pioneering Community Growth and Wealth</p>
@@ -1132,9 +1132,9 @@ const SwapPage = () => {
           )}
         </div>
 
-        {/* Main Swap Card */}
+        {/* Main Swap Card - Compact desktop sizing */}
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
-          <CardContent className="p-3 sm:p-6">
+          <CardContent className="p-4 sm:p-5 lg:p-4 xl:p-5">
             {/* Header with Trade Types */}
             <div className="flex justify-between items-center mb-1.5 sm:mb-3">
               <div className="flex items-center space-x-1 sm:space-x-2">
@@ -1210,7 +1210,7 @@ const SwapPage = () => {
                   value={fromAmount}
                   onChange={(e) => setFromAmount(e.target.value)}
                   placeholder="0"
-                  className="text-xl sm:text-3xl font-bold bg-transparent border-none text-white h-10 sm:h-16 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
+                  className="text-xl sm:text-2xl lg:text-xl xl:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-14 lg:h-12 xl:h-14 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
                   step="any"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
@@ -1263,7 +1263,7 @@ const SwapPage = () => {
                   value={toAmount}
                   readOnly
                   placeholder="0"
-                  className="text-xl sm:text-3xl font-bold bg-transparent border-none text-white h-10 sm:h-16 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
+                  className="text-xl sm:text-2xl lg:text-xl xl:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-14 lg:h-12 xl:h-14 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                   <TokenSelector token={toToken} onSelect={setToToken} label="to" />
@@ -1411,7 +1411,7 @@ const SwapPage = () => {
               <Button
                 onClick={executeSwap}
                 disabled={isLoading}
-                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-lg shadow-lg transition-all duration-200"
+                className="w-full h-10 sm:h-12 lg:h-11 xl:h-12 text-sm sm:text-base lg:text-sm xl:text-base font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-lg shadow-lg transition-all duration-200"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
