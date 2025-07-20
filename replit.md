@@ -104,6 +104,9 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Created owner functions for purchase limit management and wallet reset capabilities
 ✓ Applied exact amount enforcement to both USDT and BNB purchase methods
 ✓ Contract fully ready for deployment with strict purchase limits and flexible management controls
+✓ NEW CONTRACT DEPLOYED: 0x2D2F3bD3D6C5a1cCE37211F4385D92F6F1DF0F86
+✓ Updated frontend configuration to use new contract address
+✓ All purchase limit features and security measures now live on BSC mainnet
 
 ## User Preferences
 
