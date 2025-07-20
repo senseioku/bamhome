@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { web3Utils, ContractEncoder } from '@/lib/web3';
-import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI } from '@/lib/contracts';
+import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI, CHAINLINK_FEEDS, CHAINLINK_ABI } from '@/lib/contracts';
 
 interface TokenInfo {
   symbol: string;
@@ -58,21 +58,80 @@ const SwapPage = () => {
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
 
-  // Price Update Timer
+  // Direct Chainlink Price Fetching
+  const fetchChainlinkPrice = async (feedAddress: string): Promise<number> => {
+    try {
+      const data = ContractEncoder.encodeFunctionCall('latestRoundData()');
+      const result = await web3Utils.callContract(feedAddress, data);
+      
+      if (result && result !== '0x') {
+        // Decode the result: roundId, answer, startedAt, updatedAt, answeredInRound
+        const decoded = ContractEncoder.decodeResult(result, 'tuple');
+        if (decoded && decoded.length >= 2) {
+          // Chainlink prices have 8 decimals
+          const price = parseInt(decoded[1]) / 1e8;
+          return price;
+        }
+      }
+      return 0;
+    } catch (error) {
+      console.error('Failed to fetch Chainlink price:', error);
+      return 0;
+    }
+  };
+
+  // Alternative API Price Fetching (CoinGecko as backup)
+  const fetchAPIPrice = async (): Promise<number> => {
+    try {
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd');
+      const data = await response.json();
+      if (data?.binancecoin?.usd) {
+        return data.binancecoin.usd;
+      }
+      return 0;
+    } catch (error) {
+      console.error('Failed to fetch API price:', error);
+      return 0;
+    }
+  };
+
+  // Price Update Timer with Multiple Sources
   useEffect(() => {
     const updatePrices = async () => {
       try {
-        const contractInfo = await getContractInfo();
-        if (contractInfo) {
-          setPriceInfo({
-            bnbPrice: parseFloat(web3Utils.fromWei(contractInfo[4])),
-            bamPrice: 0.0000001, // Fixed BAM price
-            isValidPrice: contractInfo[6],
-            lastUpdated: Date.now()
-          });
+        // Try Chainlink first
+        let bnbPrice = await fetchChainlinkPrice(CHAINLINK_FEEDS.BNB_USD);
+        let priceSource = 'Chainlink';
+        
+        // If Chainlink fails, try API
+        if (bnbPrice <= 0) {
+          bnbPrice = await fetchAPIPrice();
+          priceSource = 'CoinGecko API';
         }
+        
+        // If both fail, use reasonable fallback
+        if (bnbPrice <= 0) {
+          bnbPrice = 692;
+          priceSource = 'Fallback';
+        }
+        
+        setPriceInfo({
+          bnbPrice,
+          bamPrice: 0.0000001, // Fixed BAM price
+          isValidPrice: bnbPrice > 0 && priceSource !== 'Fallback',
+          lastUpdated: Date.now()
+        });
+        
+        console.log(`💰 BNB/USD: $${bnbPrice.toFixed(2)} (${priceSource})`);
       } catch (err) {
         console.error('Failed to update prices:', err);
+        // Final fallback
+        setPriceInfo({
+          bnbPrice: 692,
+          bamPrice: 0.0000001,
+          isValidPrice: false,
+          lastUpdated: Date.now()
+        });
       }
     };
 
@@ -139,7 +198,7 @@ const SwapPage = () => {
     // Fallback prices when contract data unavailable
     switch (tokenSymbol) {
       case 'BNB':
-        return 692; // Approximate BNB price
+        return priceInfo?.bnbPrice || 692; // Use fetched price or fallback
       case 'BAM':
         return 0.0000001; // BAM price from contract
       case 'USDT':

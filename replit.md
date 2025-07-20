@@ -71,6 +71,9 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Added real USD equivalent pricing for all swaps like Uniswap
 ✓ Implemented USD value displays under input amounts and in quote details
 ✓ Real-time USD calculations using live token prices (BNB, BAM, USDT/USDB)
+✓ Integrated Chainlink price feeds for accurate BNB/USD pricing on BSC mainnet
+✓ Added CoinGecko API fallback for reliable price data when Chainlink unavailable
+✓ Multi-source price fetching with automatic failover (Chainlink → API → Fallback)
 
 ## User Preferences
 

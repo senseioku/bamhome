@@ -5,6 +5,12 @@ export const BAM_SWAP_ADDRESS = "0x1A7BafBBA6c0A5D9c90913D76B9953F5acEE7b4c";
 export const BSC_CHAIN_ID = 56;
 export const BSC_RPC_URL = "https://bsc-dataseed1.binance.org/";
 
+// Chainlink Price Feed Addresses on BSC Mainnet
+export const CHAINLINK_FEEDS = {
+  BNB_USD: "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE", // BNB/USD price feed
+  USDT_USD: "0xB97Ad0E74fa7d920791E90258A6E2085088b4320", // USDT/USD price feed
+} as const;
+
 // Token Addresses on BSC Mainnet
 export const TOKEN_ADDRESSES = {
   USDT: "0x55d398326f99059fF775485246999027B3197955",
@@ -12,6 +18,37 @@ export const TOKEN_ADDRESSES = {
   BAM: "0xA779f03b752fa2442e6A23f145b007f2160F9a7D",
   BNB: "0x0000000000000000000000000000000000000000", // Native BNB
 } as const;
+
+// Chainlink Aggregator V3 Interface ABI
+export const CHAINLINK_ABI = [
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{"internalType": "uint8", "name": "", "type": "uint8"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "description",
+    "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "latestRoundData",
+    "outputs": [
+      {"internalType": "uint80", "name": "roundId", "type": "uint80"},
+      {"internalType": "int256", "name": "answer", "type": "int256"},
+      {"internalType": "uint256", "name": "startedAt", "type": "uint256"},
+      {"internalType": "uint256", "name": "updatedAt", "type": "uint256"},
+      {"internalType": "uint80", "name": "answeredInRound", "type": "uint80"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+] as const;
 
 // BAM Swap Contract ABI (Essential functions)
 export const BAM_SWAP_ABI = [
