@@ -675,17 +675,34 @@ const SwapPage = () => {
       let errorMessage = 'Transaction failed';
       if (error && error.message) {
         errorMessage = error.message;
+        
+        // Check for gas-related errors
+        if (error.message.includes('out of gas') || error.message.includes('gas required exceeds allowance')) {
+          errorMessage = 'Transaction failed due to insufficient gas. Please try again.';
+        }
         // Check for specific contract errors
-        if (error.message.includes('execution reverted')) {
+        else if (error.message.includes('execution reverted')) {
           if (error.message.includes('insufficient')) {
             errorMessage = 'Insufficient balance or liquidity';
           } else if (error.message.includes('paused')) {
             errorMessage = 'Contract function is paused';
           } else if (error.message.includes('allowance')) {
             errorMessage = 'Token approval required';
+          } else if (error.message.includes('Already purchased')) {
+            errorMessage = 'You have already purchased BAM tokens with this wallet';
+          } else if (error.message.includes('Exact amount required')) {
+            errorMessage = 'BAM purchases require exactly 1 USDT';
           } else {
             errorMessage = 'Contract execution failed - check requirements';
           }
+        }
+        // Check for user rejection
+        else if (error.message.includes('User rejected') || error.code === 4001) {
+          errorMessage = 'Transaction cancelled by user';
+        }
+        // Check for network errors
+        else if (error.message.includes('network') || error.message.includes('connection')) {
+          errorMessage = 'Network error - please check your connection and try again';
         }
       }
       

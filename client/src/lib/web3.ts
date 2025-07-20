@@ -115,19 +115,48 @@ export class Web3Utils {
     }
   }
 
+  async estimateGas(txParams: any): Promise<string> {
+    const provider = await this.getProvider();
+    if (!provider) throw new Error('No provider available');
+
+    try {
+      const gasEstimate = await provider.request({
+        method: 'eth_estimateGas',
+        params: [txParams],
+      });
+      // Add 20% buffer to the estimate
+      const gasLimit = Math.floor(parseInt(gasEstimate, 16) * 1.2);
+      return `0x${gasLimit.toString(16)}`;
+    } catch (error) {
+      console.error('Gas estimation failed, using default:', error);
+      // Fallback gas limits based on transaction type
+      if (txParams.data && txParams.data.startsWith('0xa9059cbb')) {
+        return '0x186A0'; // 100,000 for token transfers
+      } else if (txParams.value && txParams.value !== '0x0') {
+        return '0x5208'; // 21,000 for BNB transfers
+      } else {
+        return '0x4C4B40'; // 500,000 for complex contract calls
+      }
+    }
+  }
+
   async sendTransaction(txParams: any): Promise<string> {
     const provider = await this.getProvider();
     if (!provider) throw new Error('No provider available');
 
     try {
-      // Use minimal gas settings for BSC network
+      // Estimate gas dynamically
+      const gasLimit = await this.estimateGas(txParams);
+      
+      // Use proper gas settings for BSC network
       const txParamsWithGas = {
         ...txParams,
-        gas: '0xC350', // 50,000 gas limit (minimal)
-        gasPrice: '0x77359400' // 2 Gwei gas price (minimal for BSC)
+        gas: gasLimit,
+        gasPrice: '0x12A05F200' // 5 Gwei gas price (standard for BSC)
       };
       
-      console.log('Transaction params:', txParamsWithGas);
+      console.log('Transaction params with estimated gas:', txParamsWithGas);
+      console.log('Gas limit:', parseInt(gasLimit, 16));
       
       const txHash = await provider.request({
         method: 'eth_sendTransaction',
