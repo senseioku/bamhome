@@ -35,7 +35,8 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     uint256 public constant USD_DECIMALS = 18; // Both USDT and USDB use 18 decimals on BSC
     uint256 public constant MIN_BAM_PRICE = 1e10; // Minimum BAM price (more BAM per USDT)
     uint256 public constant MAX_BAM_PRICE = 1e12; // Maximum BAM price (less BAM per USDT)
-    uint256 public constant MIN_PURCHASE_USDT = 5e18; // Minimum purchase: 5 USDT
+    uint256 public constant MIN_PURCHASE_USDT = 1e18; // Minimum purchase: 1 USDT
+    uint256 public constant MAX_PURCHASE_USDT = 10e18; // Maximum purchase: 10 USDT per wallet
     uint256 public constant MIN_SWAP_AMOUNT = 1e18; // Minimum swap: 1 USDT/USDB
     
     // Fee configuration
@@ -69,6 +70,12 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     bool public buyBAMWithBNBPaused = false;
     bool public sellBAMForUSDTPaused = false;
     bool public sellBAMForBNBPaused = false;
+    
+    // Wallet purchase tracking for BAM purchases (1 USDT min, 10 USDT max per wallet)
+    mapping(address => uint256) public walletPurchases;
+    
+    // Wallet purchase tracking for BAM purchases (1 USDT min, 10 USDT max per wallet)
+    mapping(address => uint256) public walletPurchases;
 
     // Events
     event SwapUSDTToUSDB(address indexed user, uint256 amount, uint256 fee);
@@ -174,7 +181,11 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function buyBAMWithUSDT(uint256 usdtAmount) external nonReentrant whenNotPaused {
         require(!buyBAMWithUSDTPaused, "Buy BAM with USDT is paused");
-        require(usdtAmount >= MIN_PURCHASE_USDT, "Minimum purchase is 5 USDT");
+        require(usdtAmount >= MIN_PURCHASE_USDT, "Minimum purchase is 1 USDT");
+        require(walletPurchases[msg.sender] + usdtAmount <= MAX_PURCHASE_USDT, "Maximum 10 USDT per wallet");
+        
+        // Track wallet purchases
+        walletPurchases[msg.sender] += usdtAmount;
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (usdtAmount * LOW_FEE_RATE) / FEE_DENOMINATOR;
@@ -221,9 +232,13 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         (uint256 bnbPrice, bool isValidPrice) = getBNBPriceWithValidation();
         require(isValidPrice || !emergencyMode, "Price feed unavailable in emergency mode");
         
-        // Check minimum purchase requirement (equivalent to 5 USDT)
+        // Check minimum purchase requirement (equivalent to 1 USDT) and maximum wallet limit (10 USDT)
         uint256 usdValue = (msg.value * bnbPrice) / 1e18;
-        require(usdValue >= MIN_PURCHASE_USDT, "Minimum purchase is 5 USDT equivalent");
+        require(usdValue >= MIN_PURCHASE_USDT, "Minimum purchase is 1 USDT equivalent");
+        require(walletPurchases[msg.sender] + usdValue <= MAX_PURCHASE_USDT, "Maximum 10 USDT per wallet");
+        
+        // Track wallet purchases in USDT equivalent
+        walletPurchases[msg.sender] += usdValue;
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (msg.value * LOW_FEE_RATE) / FEE_DENOMINATOR;

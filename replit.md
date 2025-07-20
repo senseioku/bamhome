@@ -83,11 +83,12 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Root cause identified: bamPriceInUSD = 100 makes contract calculate 10 quadrillion BAM per USDT
 ✓ User clarified: 0.0000001 USDT = 1 BAM, so 1 USDT = 10,000,000 BAM tokens
 ✓ Fixed bamPriceInUSD: Changed from 100 to 1e11 to give correct 10M BAM per USDT
-✓ Updated minimum purchase: Increased from 1 USDT to 5 USDT as requested  
+✓ Updated purchase limits: 1 USDT minimum, 10 USDT maximum per wallet as requested
 ✓ Verified fix: 1 USDT = 10,000,000 BAM (mathematically correct)
+✓ Added wallet purchase tracking with per-wallet 10 USDT limit enforcement
 ✓ Current contract liquidity verified: 60,000 USDB, 100 USDT, 1,000,000,000 BAM, 0.11 BNB
-✓ Contract capacity: Can handle 20 orders of 5 USDT each (1B BAM ÷ 50M BAM per order)
-✓ Total purchase capacity: 100 USDT worth of BAM purchases before liquidity exhaustion
+✓ Contract capacity: Can handle 10 unique wallets maxing out (10 USDT each) = 100 USDT total
+✓ Alternative: 100 individual wallets buying 1 USDT each = 100 USDT total capacity
 
 ## User Preferences
 
