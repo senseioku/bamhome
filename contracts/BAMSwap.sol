@@ -33,6 +33,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     uint256 public constant USD_DECIMALS = 18; // Both USDT and USDB use 18 decimals on BSC
     uint256 public constant MIN_BAM_PRICE = 50; // Minimum BAM price: $0.00000005
     uint256 public constant MAX_BAM_PRICE = 1000; // Maximum BAM price: $0.000001
+    uint256 public constant MIN_PURCHASE_USDT = 1e18; // Minimum purchase: 1 USDT
     
     // Fee configuration
     uint256 public constant LOW_FEE_RATE = 50; // 0.5% (50 basis points) - for USDT→USDB, USDT→BAM, BNB→BAM
@@ -82,6 +83,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     event SwapFunctionPaused(string functionName, bool paused);
     event EmergencyWithdraw(address indexed token, uint256 amount);
     event BAMPriceUpdated(uint256 oldPrice, uint256 newPrice);
+    event MinimumPurchaseEnforced(address indexed user, uint256 amount, string purchaseType);
 
     constructor() Ownable(msg.sender) {
         // BSC Mainnet BNB/USD Price Feed
@@ -166,7 +168,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function buyBAMWithUSDT(uint256 usdtAmount) external nonReentrant whenNotPaused {
         require(!buyBAMWithUSDTPaused, "Buy BAM with USDT is paused");
-        require(usdtAmount > 0, "Amount must be greater than 0");
+        require(usdtAmount >= MIN_PURCHASE_USDT, "Minimum purchase is 1 USDT");
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (usdtAmount * LOW_FEE_RATE) / FEE_DENOMINATOR;
@@ -199,6 +201,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         
         emit BuyBAMWithUSDT(msg.sender, usdtAmount, bamAmount, paymentToRecipient, remainingInContract);
         emit PaymentDistributed(address(USDT), usdtAmount, paymentToRecipient, remainingInContract);
+        emit MinimumPurchaseEnforced(msg.sender, usdtAmount, "USDT");
     }
 
     /**
@@ -211,6 +214,10 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         
         (uint256 bnbPrice, bool isValidPrice) = getBNBPriceWithValidation();
         require(isValidPrice || !emergencyMode, "Price feed unavailable in emergency mode");
+        
+        // Check minimum purchase requirement (equivalent to 1 USDT)
+        uint256 usdValue = (msg.value * bnbPrice) / 1e18;
+        require(usdValue >= MIN_PURCHASE_USDT, "Minimum purchase is 1 USDT equivalent");
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (msg.value * LOW_FEE_RATE) / FEE_DENOMINATOR;
@@ -240,6 +247,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         
         emit BuyBAMWithBNB(msg.sender, msg.value, bamAmount, bnbPrice, paymentToRecipient, remainingInContract);
         emit PaymentDistributed(address(0), msg.value, paymentToRecipient, remainingInContract);
+        emit MinimumPurchaseEnforced(msg.sender, usdValue, "BNB");
     }
 
     /**
@@ -597,6 +605,13 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function getBAMPrice() external view returns (uint256) {
         return bamPriceInUSD;
+    }
+    
+    /**
+     * @dev Get minimum purchase amount
+     */
+    function getMinimumPurchase() external pure returns (uint256) {
+        return MIN_PURCHASE_USDT;
     }
 
     /**
