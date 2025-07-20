@@ -251,16 +251,28 @@ const SwapPage = () => {
 
     try {
       setIsCheckingPurchaseHistory(true);
+      console.log(`🔍 Checking purchase history for wallet: ${address}`);
+      
       const web3 = new Web3(window.ethereum);
       const contract = new web3.eth.Contract(COMPLETE_BAM_SWAP_ABI, BAM_SWAP_ADDRESS);
       
-      // Check if wallet has purchased BAM by calling the contract view function
-      const hasPurchased = await contract.methods.hasPurchased(address).call();
-      setHasAlreadyPurchased(hasPurchased);
+      // Check if wallet has purchased BAM by calling walletPurchases mapping
+      console.log(`📞 Calling contract.methods.walletPurchases(${address}).call()`);
+      const purchaseAmount = await contract.methods.walletPurchases(address).call();
+      console.log(`✅ Contract response - Purchase amount:`, purchaseAmount);
       
-      console.log(`Purchase history for ${address}:`, hasPurchased ? 'Already purchased' : 'No previous purchase');
+      // If purchase amount > 0, wallet has already purchased
+      const hasPurchased = purchaseAmount && purchaseAmount > 0;
+      setHasAlreadyPurchased(Boolean(hasPurchased));
+      
+      console.log(`🔍 Purchase history result for ${address}:`, hasPurchased ? '🚫 Already purchased' : '✅ No previous purchase');
     } catch (error) {
-      console.error('Error checking purchase history:', error);
+      console.error('❌ Error checking purchase history:', error);
+      console.log('📋 Error details:', {
+        message: error.message,
+        code: error.code,
+        data: error.data
+      });
       // Default to allowing purchase if check fails
       setHasAlreadyPurchased(false);
     } finally {
