@@ -39,7 +39,7 @@ interface PriceInfo {
   lastUpdated: number;
 }
 
-const SwapPage: React.FC = () => {
+const SwapPage = () => {
   // State Management
   const [fromToken, setFromToken] = useState<TokenInfo>(TOKENS.USDT);
   const [toToken, setToToken] = useState<TokenInfo>(TOKENS.BAM);
@@ -662,14 +662,12 @@ const SwapPage: React.FC = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-400">Route</span>
                     <div className="flex items-center space-x-1">
-                      {quote.route.map((token, index) => (
-                        <React.Fragment key={`${token}-${index}`}>
-                          <span className="text-white text-sm font-medium">{token}</span>
-                          {index < quote.route.length - 1 && (
-                            <ArrowUpDown className="w-3 h-3 text-gray-500 rotate-90" />
-                          )}
-                        </React.Fragment>
-                      ))}
+                      {quote.route.map((token, index) => [
+                        <span key={`token-${index}`} className="text-white text-sm font-medium">{token}</span>,
+                        index < quote.route.length - 1 && (
+                          <ArrowUpDown key={`arrow-${index}`} className="w-3 h-3 text-gray-500 rotate-90" />
+                        )
+                      ]).flat().filter(Boolean)}
                     </div>
                   </div>
                   
@@ -677,7 +675,16 @@ const SwapPage: React.FC = () => {
                     <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mt-3">
                       <div className="text-yellow-400 text-sm font-medium mb-1">Fixed Price Swap</div>
                       <div className="text-yellow-300 text-xs">
-                        1 USDT = 10,000,000 BAM (Fixed Rate: $0.0000001)
+                        1 USDT = 10,000,000 BAM (Rate: $0.0000001)
+                      </div>
+                    </div>
+                  )}
+                  
+                  {(fromToken.symbol === 'BAM' && (toToken.symbol === 'USDT' || toToken.symbol === 'BNB')) && (
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-3">
+                      <div className="text-blue-400 text-sm font-medium mb-1">BAM Sale</div>
+                      <div className="text-blue-300 text-xs">
+                        Higher fees apply (1.5%) for selling BAM tokens
                       </div>
                     </div>
                   )}

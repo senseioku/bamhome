@@ -147,7 +147,29 @@ export class Web3Utils {
   formatAmount(amount: string, decimals: number = 4): string {
     const num = parseFloat(amount);
     if (num === 0) return '0';
+    
+    // For very large numbers (like BAM tokens), use readable formatting
+    if (num >= 1e12) {
+      return (num / 1e12).toFixed(1) + 'T';
+    }
+    if (num >= 1e9) {
+      return (num / 1e9).toFixed(1) + 'B';
+    }
+    if (num >= 1e6) {
+      return (num / 1e6).toFixed(1) + 'M';
+    }
+    if (num >= 1e3) {
+      return (num / 1e3).toFixed(1) + 'K';
+    }
+    
+    // For very small numbers
     if (num < 0.0001) return '< 0.0001';
+    
+    // For regular numbers
+    if (num >= 1) {
+      return num.toFixed(Math.min(decimals, 2));
+    }
+    
     return num.toFixed(decimals);
   }
 
