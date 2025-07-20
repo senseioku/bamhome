@@ -11,6 +11,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { web3Utils, ContractEncoder } from '@/lib/web3';
 import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI } from '@/lib/contracts';
+import { Home, ArrowLeft, Menu, X } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 interface TokenInfo {
   symbol: string;
@@ -595,8 +597,71 @@ const SwapPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-2 sm:p-4">
-      <div className="max-w-md sm:max-w-lg mx-auto pt-4 sm:pt-8">
+    <TooltipProvider>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        {/* Navigation Header */}
+        <nav className="fixed top-0 w-full z-50 glass-card backdrop-blur-xl border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo and Back to Home */}
+            <div className="flex items-center gap-4">
+              <a href="/" className="flex items-center gap-2 text-gray-300 hover:text-primary transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+                <span className="hidden sm:inline">Back to Home</span>
+              </a>
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/assets/bamToken_1752877645023.png" 
+                  alt="BAM Token" 
+                  className="h-8 w-8 rounded-full"
+                />
+                <div>
+                  <span className="text-xl font-bold gradient-text">BAM Swap</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Navigation Links */}
+            <div className="hidden md:flex items-center space-x-6">
+              <a href="/#home" className="text-gray-300 hover:text-primary transition-colors">Home</a>
+              <a href="/#ecosystem" className="text-gray-300 hover:text-primary transition-colors">Ecosystem</a>
+              <a href="/#tokenomics" className="text-gray-300 hover:text-primary transition-colors">Tokenomics</a>
+              <a href="/#projects" className="text-gray-300 hover:text-primary transition-colors">Projects</a>
+              <div className="w-px h-6 bg-gray-600"></div>
+              <span className="text-primary font-medium">Swap</span>
+            </div>
+
+            {/* Mobile Navigation */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6 text-gray-300" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="glass-card border-border">
+                  <div className="flex flex-col space-y-4 mt-8">
+                    <a href="/" className="flex items-center gap-2 text-gray-300 hover:text-primary transition-colors">
+                      <Home className="w-4 h-4" />
+                      Home
+                    </a>
+                    <a href="/#ecosystem" className="text-gray-300 hover:text-primary transition-colors">Ecosystem</a>
+                    <a href="/#tokenomics" className="text-gray-300 hover:text-primary transition-colors">Tokenomics</a>
+                    <a href="/#projects" className="text-gray-300 hover:text-primary transition-colors">Projects</a>
+                    <div className="border-t border-gray-600 pt-4">
+                      <span className="text-primary font-medium">Current: Swap</span>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="p-2 sm:p-4 pt-20">
+        <div className="max-w-md sm:max-w-lg mx-auto pt-4 sm:pt-8">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">BAM Swap</h1>
@@ -923,8 +988,10 @@ const SwapPage = () => {
           <p>🔒 Powered by BAM Smart Contracts on BSC</p>
           <p>💎 Professional-grade DeFi with minimal fees</p>
         </div>
+        </div>
       </div>
     </div>
+    </TooltipProvider>
   );
 };
 
