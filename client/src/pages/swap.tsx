@@ -57,9 +57,19 @@ const SwapPage = () => {
   const [error, setError] = useState<string>('');
   const [slippage, setSlippage] = useState(0.5);
   const [showSettings, setShowSettings] = useState(false);
+  const [showLimitsModal, setShowLimitsModal] = useState(false);
 
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
+
+  // Enhanced validation states for better UX
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isValidAmount, setIsValidAmount] = useState(false);
+  const [contractStatus, setContractStatus] = useState<{
+    isPaused: boolean;
+    functionPaused: { [key: string]: boolean };
+    lastChecked: number;
+  } | null>(null);
 
   // Chainlink-first price fetching with backend API
   const fetchReliablePrice = async (): Promise<{ price: number; source: string }> => {
@@ -149,6 +159,61 @@ const SwapPage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Check contract pause status for specific functions
+  const checkContractStatus = async () => {
+    if (!walletAddress) return;
+
+    try {
+      const ethereum = (window as any).ethereum;
+      if (!ethereum) return;
+
+      // Check main contract pause
+      const pausedResult = await ethereum.request({
+        method: 'eth_call',
+        params: [{
+          to: BAM_SWAP_ADDRESS,
+          data: '0x5c975abb' // paused() function selector
+        }, 'latest']
+      });
+      
+      // Check individual function pause states
+      const functions = {
+        usdtToUsdb: '0x9fc8f73a', // swapUSDTToUSDBPaused()
+        usdbToUsdt: '0x1234abcd', // swapUSDBToUSDTPaused() (placeholder)
+        usdtToBam: '0x5678cdef', // buyBAMWithUSDTPaused() (placeholder)
+        bnbToBam: '0x9abc1234', // buyBAMWithBNBPaused() (placeholder)
+        bamToUsdt: '0x4567890a', // sellBAMForUSDTPaused() (placeholder)
+        bamToBnb: '0xbcdef123' // sellBAMForBNBPaused() (placeholder)
+      };
+
+      const functionPaused: { [key: string]: boolean } = {};
+      
+      for (const [funcName, selector] of Object.entries(functions)) {
+        try {
+          const result = await ethereum.request({
+            method: 'eth_call',
+            params: [{
+              to: BAM_SWAP_ADDRESS,
+              data: selector
+            }, 'latest']
+          });
+          functionPaused[funcName] = parseInt(result, 16) === 1;
+        } catch (error) {
+          // If function doesn't exist, assume it's not paused
+          functionPaused[funcName] = false;
+        }
+      }
+
+      setContractStatus({
+        isPaused: parseInt(pausedResult, 16) === 1,
+        functionPaused,
+        lastChecked: Date.now()
+      });
+    } catch (error) {
+      console.error('Failed to check contract status:', error);
+    }
+  };
+
   // Get contract information with fallback data
   const getContractInfo = async () => {
     try {
@@ -211,6 +276,17 @@ const SwapPage = () => {
 
     checkWalletConnection();
   }, []);
+
+  // Check contract status when wallet connects and periodically
+  useEffect(() => {
+    if (walletAddress) {
+      checkContractStatus();
+      
+      // Check every 2 minutes for pause status updates
+      const interval = setInterval(checkContractStatus, 120000);
+      return () => clearInterval(interval);
+    }
+  }, [walletAddress]);
 
   // Disconnect wallet
   const disconnectWallet = () => {
@@ -471,7 +547,7 @@ const SwapPage = () => {
         // Check contract state before attempting swap
         try {
           // Test if contract is paused
-          const pausedCheck = await window.ethereum.request({
+          const pausedCheck = await (window as any).ethereum.request({
             method: 'eth_call',
             params: [{
               to: BAM_SWAP_ADDRESS,
@@ -481,7 +557,7 @@ const SwapPage = () => {
           console.log('Contract paused status:', pausedCheck);
           
           // Test specific function pause status
-          const usdtToUsdbPausedCheck = await window.ethereum.request({
+          const usdtToUsdbPausedCheck = await (window as any).ethereum.request({
             method: 'eth_call', 
             params: [{
               to: BAM_SWAP_ADDRESS,
@@ -491,7 +567,7 @@ const SwapPage = () => {
           console.log('USDT→USDB swap paused:', usdtToUsdbPausedCheck);
           
           // Check if contract has sufficient USDB balance
-          const usdbBalanceCheck = await window.ethereum.request({
+          const usdbBalanceCheck = await (window as any).ethereum.request({
             method: 'eth_call',
             params: [{
               to: TOKEN_ADDRESSES.USDB,
@@ -502,7 +578,7 @@ const SwapPage = () => {
           console.log('Contract USDB balance:', contractUsdbBalance / 1e18, 'USDB');
           
           // Check user USDT balance
-          const userUsdtBalance = await window.ethereum.request({
+          const userUsdtBalance = await (window as any).ethereum.request({
             method: 'eth_call',
             params: [{
               to: TOKEN_ADDRESSES.USDT,
@@ -631,7 +707,7 @@ const SwapPage = () => {
         if (label === 'from' && token.symbol === 'BNB' && tokenOption.symbol === 'USDT') return false;
         if (label === 'from' && token.symbol === 'USDT' && tokenOption.symbol === 'BNB') return false;
         if (label === 'to') {
-          const otherToken = label === 'from' ? toToken : fromToken;
+          const otherToken = label === 'to' ? fromToken : toToken;
           if (otherToken.symbol === 'BNB' && tokenOption.symbol === 'USDT') return false;
           if (otherToken.symbol === 'USDT' && tokenOption.symbol === 'BNB') return false;
         }
@@ -965,6 +1041,87 @@ const SwapPage = () => {
         </div>
       </nav>
 
+      {/* Contract Status Warnings - Outside Main Interface */}
+      {contractStatus && (
+        <div className="fixed top-20 left-4 right-4 z-50 space-y-2 pointer-events-none">
+          {/* Main Contract Paused */}
+          {contractStatus.isPaused && (
+            <Alert className="border-red-500/50 bg-red-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-red-200 text-sm">
+                <div className="font-medium">🚫 Contract Temporarily Paused</div>
+                <div className="text-xs mt-1">All swap functions are currently disabled. Please try again later.</div>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Specific Function Paused Warnings */}
+          {!contractStatus.isPaused && (
+            <>
+              {/* USDT to BAM paused */}
+              {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
+                (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && 
+                contractStatus.functionPaused.usdtToBam && (
+                <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-orange-200 text-sm">
+                    <div className="font-medium">⏸️ BAM Purchases Paused</div>
+                    <div className="text-xs mt-1">BAM token purchases are temporarily disabled.</div>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* USDT to USDB paused */}
+              {fromToken.symbol === 'USDT' && toToken.symbol === 'USDB' && 
+                contractStatus.functionPaused.usdtToUsdb && (
+                <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-orange-200 text-sm">
+                    <div className="font-medium">⏸️ USDT→USDB Swaps Paused</div>
+                    <div className="text-xs mt-1">This swap direction is temporarily disabled.</div>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* USDB to USDT paused */}
+              {fromToken.symbol === 'USDB' && toToken.symbol === 'USDT' && 
+                contractStatus.functionPaused.usdbToUsdt && (
+                <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-orange-200 text-sm">
+                    <div className="font-medium">⏸️ USDB→USDT Swaps Paused</div>
+                    <div className="text-xs mt-1">This swap direction is temporarily disabled.</div>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* BAM selling paused */}
+              {fromToken.symbol === 'BAM' && 
+                (contractStatus.functionPaused.bamToUsdt || contractStatus.functionPaused.bamToBnb) && (
+                <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-orange-200 text-sm">
+                    <div className="font-medium">⏸️ BAM Selling Paused</div>
+                    <div className="text-xs mt-1">BAM token sales are temporarily disabled.</div>
+                  </AlertDescription>
+                </Alert>
+              )}
+            </>
+          )}
+
+          {/* Connection Status */}
+          {!walletAddress && (
+            <Alert className="border-blue-500/50 bg-blue-500/20 backdrop-blur-sm pointer-events-auto max-w-md mx-auto">
+              <Info className="h-4 w-4" />
+              <AlertDescription className="text-blue-200 text-sm">
+                <div className="font-medium">💡 Connect Wallet</div>
+                <div className="text-xs mt-1">Connect your wallet to check current swap availability.</div>
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="p-2 sm:p-3 pt-8 sm:pt-18 flex items-center justify-center min-h-screen xl:pt-0">
         <div className="w-full max-w-sm sm:max-w-lg mx-auto mt-4 sm:mt-0">
@@ -1023,15 +1180,20 @@ const SwapPage = () => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white p-1 h-6 w-6">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setShowLimitsModal(true)}
+                        className="text-gray-400 hover:text-white p-1 h-6 w-6"
+                      >
                         <Info className="w-3 h-3" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent className="bg-gray-800 border-gray-600 text-white max-w-xs">
                       <div className="space-y-1 text-xs">
+                        <div>Click for detailed swap limits and requirements</div>
                         <div>Fixed fees: 0.5% (USDT→USDB/BAM, BNB→BAM)</div>
                         <div>Higher fees: 1.5% (USDB→USDT, BAM→USDT/BNB)</div>
-                        <div>Minimum: 1 USDT per transaction</div>
                       </div>
                     </TooltipContent>
                   </Tooltip>
@@ -1083,6 +1245,107 @@ const SwapPage = () => {
                 <ArrowUpDown className="w-3 h-3" />
               </Button>
             </div>
+
+            {/* Purchase Limit Warning for BAM */}
+            {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
+              (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && (
+              <Alert className="border-yellow-500/30 bg-yellow-500/10 mb-3">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-yellow-200 text-sm">
+                  <div className="space-y-2">
+                    <div className="font-medium">⚠️ BAM Purchase Limits:</div>
+                    <ul className="text-xs space-y-1 ml-4 list-disc">
+                      <li>Exactly 1 USDT (or equivalent BNB) per wallet</li>
+                      <li>One-time purchase only - no repeat buys allowed</li>
+                      <li>Receives 10,000,000 BAM tokens per purchase</li>
+                      <li>Check wallet purchase status before buying</li>
+                    </ul>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Input Validation Warnings */}
+            {fromAmount && (
+              <>
+                {parseFloat(fromAmount) < 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && (
+                  <Alert className="border-red-500/30 bg-red-500/10 mb-3">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-red-200 text-sm">
+                      ❌ Minimum swap amount: 1 {fromToken.symbol}
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
+                {/* Enhanced BAM Purchase Validation */}
+                {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && parseFloat(fromAmount) !== 1) && (
+                  <Alert className="border-orange-500/30 bg-orange-500/10 mb-3">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-orange-200 text-sm">
+                      <div className="space-y-1">
+                        <div className="font-medium">🎯 BAM Purchase Validation:</div>
+                        <div>Required: Exactly 1 USDT</div>
+                        <div>Current: {fromAmount} USDT</div>
+                        <div className="text-xs text-orange-300">
+                          {parseFloat(fromAmount) > 1 ? 
+                            `Reduce amount by ${(parseFloat(fromAmount) - 1).toFixed(6)} USDT` :
+                            `Add ${(1 - parseFloat(fromAmount)).toFixed(6)} USDT`
+                          }
+                        </div>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* BNB to BAM Purchase Validation */}
+                {((fromToken.symbol === 'BNB' && toToken.symbol === 'BAM') && priceInfo) && (
+                  <Alert className="border-blue-500/30 bg-blue-500/10 mb-3">
+                    <Info className="h-4 w-4" />
+                    <AlertDescription className="text-blue-200 text-sm">
+                      <div className="space-y-1">
+                        <div className="font-medium">💡 BNB to BAM Purchase:</div>
+                        <div>BNB Price: ${priceInfo.bnbPrice.toFixed(2)}</div>
+                        <div>Required: ~${(1 / priceInfo.bnbPrice).toFixed(6)} BNB (≈ 1 USDT)</div>
+                        <div className="text-xs text-blue-300">Automatically calculated for 10M BAM tokens</div>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Maximum Limit Warning for Non-BAM Swaps */}
+                {parseFloat(fromAmount) > 1 && 
+                 (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && 
+                 toToken.symbol !== 'BAM' && (
+                  <Alert className="border-red-500/30 bg-red-500/10 mb-3">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-red-200 text-sm">
+                      <div className="space-y-1">
+                        <div className="font-medium">🚫 Per-Wallet Limit Exceeded:</div>
+                        <div>Maximum: 1 {fromToken.symbol} per wallet per transaction</div>
+                        <div>Current: {fromAmount} {fromToken.symbol}</div>
+                        <div className="text-xs text-red-300">Reduce amount to 1 {fromToken.symbol} or less</div>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {balances[fromToken.symbol] && parseFloat(fromAmount) > parseFloat(balances[fromToken.symbol]) && (
+                  <Alert className="border-red-500/30 bg-red-500/10 mb-3">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-red-200 text-sm">
+                      <div className="space-y-1">
+                        <div className="font-medium">💰 Insufficient Balance:</div>
+                        <div>Required: {fromAmount} {fromToken.symbol}</div>
+                        <div>Available: {formatDisplayAmount(balances[fromToken.symbol], fromToken.symbol)} {fromToken.symbol}</div>
+                        <div className="text-xs text-red-300">
+                          Need {(parseFloat(fromAmount) - parseFloat(balances[fromToken.symbol])).toFixed(6)} more {fromToken.symbol}
+                        </div>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </>
+            )}
 
             {/* To Token */}
             <div className="space-y-0.5 sm:space-y-2 mb-1.5 sm:mb-3">
@@ -1171,7 +1434,7 @@ const SwapPage = () => {
               </div>
             )}
 
-            {/* Enhanced Connect/Swap Button */}
+            {/* Enhanced Connect/Swap Button with Improved Validation */}
             {!walletAddress ? (
               <Button
                 onClick={connectWallet}
@@ -1187,26 +1450,47 @@ const SwapPage = () => {
                   'Connect Wallet'
                 )}
               </Button>
-            ) : !quote || !fromAmount || parseFloat(fromAmount) <= 0 ? (
+            ) : !fromAmount || parseFloat(fromAmount) <= 0 ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gray-700 text-gray-400 rounded-lg cursor-not-allowed"
               >
                 Enter an amount
               </Button>
-            ) : parseFloat(fromAmount) < 1 ? (
+            ) : parseFloat(fromAmount) < 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') ? (
+              <Button
+                disabled
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-red-700 text-red-200 rounded-lg cursor-not-allowed"
+              >
+                ❌ Minimum: 1 {fromToken.symbol}
+              </Button>
+            ) : ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && parseFloat(fromAmount) !== 1) ? (
+              <Button
+                disabled
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
+              >
+                ⚠️ BAM requires exactly 1 USDT
+              </Button>
+            ) : ((fromToken.symbol === 'BNB' && toToken.symbol === 'BAM') && !priceInfo) ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gray-700 text-gray-400 rounded-lg cursor-not-allowed"
               >
-                Minimum: 1 {fromToken.symbol}
+                Loading price data...
+              </Button>
+            ) : parseFloat(fromAmount) > 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && toToken.symbol !== 'BAM' ? (
+              <Button
+                disabled
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
+              >
+                ⚠️ Maximum: 1 {fromToken.symbol} per wallet
               </Button>
             ) : balances[fromToken.symbol] && parseFloat(fromAmount) > parseFloat(balances[fromToken.symbol]) ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-red-700 text-red-200 rounded-lg cursor-not-allowed"
               >
-                Insufficient {fromToken.symbol} balance
+                💰 Insufficient {fromToken.symbol} balance
               </Button>
             ) : (
               <Button
@@ -1221,9 +1505,13 @@ const SwapPage = () => {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
-                    <span>Review Swap</span>
+                    <span>
+                      {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
+                        (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) ? 
+                        'Buy BAM Tokens' : 'Review Swap'}
+                    </span>
                     <div className="text-xs opacity-80 mt-0.5">
-                      {formatDisplayAmount(fromAmount, fromToken.symbol)} {fromToken.symbol} → {formatDisplayAmount(toAmount, toToken.symbol)} {toToken.symbol}
+                      {formatDisplayAmount(fromAmount, fromToken.symbol)} {fromToken.symbol} → {formatDisplayAmount(toAmount || '0', toToken.symbol)} {toToken.symbol}
                     </div>
                   </div>
                 )}
@@ -1289,6 +1577,154 @@ const SwapPage = () => {
         </div>
         </div>
       </div>
+
+      {/* Comprehensive Limits & Requirements Modal */}
+      <Dialog open={showLimitsModal} onOpenChange={setShowLimitsModal}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center space-x-2">
+              <Info className="w-5 h-5 text-yellow-400" />
+              <span>BAM Swap - Limits & Requirements</span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* BAM Purchase Limits */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+              <h3 className="text-yellow-400 font-semibold mb-3 flex items-center">
+                <AlertCircle className="w-4 h-4 mr-2" />
+                BAM Token Purchase Limits (CRITICAL)
+              </h3>
+              <div className="space-y-2 text-sm text-yellow-200">
+                <div className="flex items-start space-x-2">
+                  <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div><span className="font-medium">Exact Amount:</span> Must be exactly 1 USDT (or equivalent BNB)</div>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div><span className="font-medium">One-Time Purchase:</span> Only one purchase per wallet address allowed</div>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div><span className="font-medium">Fixed Reward:</span> Receive exactly 10,000,000 BAM tokens</div>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div><span className="font-medium">No Repeats:</span> Cannot buy BAM again with same wallet</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contract Status */}
+            {contractStatus && (
+              <div className="bg-gray-800/50 border border-gray-600 rounded-lg p-4">
+                <h3 className="text-gray-300 font-semibold mb-3 flex items-center">
+                  <Activity className="w-4 h-4 mr-2" />
+                  Current Contract Status
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Main Contract:</span>
+                    <span className={contractStatus.isPaused ? "text-red-400" : "text-green-400"}>
+                      {contractStatus.isPaused ? "Paused" : "Active"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">BAM Purchases:</span>
+                    <span className={contractStatus.functionPaused.usdtToBam ? "text-red-400" : "text-green-400"}>
+                      {contractStatus.functionPaused.usdtToBam ? "Paused" : "Active"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">USDT↔USDB Swaps:</span>
+                    <span className={contractStatus.functionPaused.usdtToUsdb ? "text-red-400" : "text-green-400"}>
+                      {contractStatus.functionPaused.usdtToUsdb ? "Paused" : "Active"}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-2">
+                    Last checked: {new Date(contractStatus.lastChecked).toLocaleTimeString()}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Fee Structure */}
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+              <h3 className="text-green-400 font-semibold mb-3 flex items-center">
+                <Zap className="w-4 h-4 mr-2" />
+                Fee Structure
+              </h3>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <div className="text-green-300 font-medium mb-1">Low Fees (0.5%):</div>
+                  <div className="text-green-200 ml-4 space-y-1">
+                    <div>• USDT → USDB</div>
+                    <div>• USDT → BAM</div>
+                    <div>• BNB → BAM</div>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-red-300 font-medium mb-1">Higher Fees (1.5%):</div>
+                  <div className="text-red-200 ml-4 space-y-1">
+                    <div>• USDB → USDT</div>
+                    <div>• BAM → USDT</div>
+                    <div>• BAM → BNB</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Current Market Data */}
+            {priceInfo && (
+              <div className="bg-gray-800/50 border border-gray-600 rounded-lg p-4">
+                <h3 className="text-gray-300 font-semibold mb-3 flex items-center">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Current Market Data
+                </h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <div className="text-gray-400">BNB Price</div>
+                    <div className="text-green-400 font-medium">${priceInfo.bnbPrice.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400">BAM Price</div>
+                    <div className="text-yellow-400 font-medium">$0.0000001</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400">BNB for 1 USDT</div>
+                    <div className="text-blue-400 font-medium">~{(1 / priceInfo.bnbPrice).toFixed(6)} BNB</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400">BAM per USDT</div>
+                    <div className="text-purple-400 font-medium">10,000,000</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowLimitsModal(false)}
+                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              >
+                Close
+              </Button>
+              <Button 
+                onClick={() => {
+                  setFromAmount('1');
+                  setFromToken(TOKENS.USDT);
+                  setToToken(TOKENS.BAM);
+                  setShowLimitsModal(false);
+                }}
+                className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
+              >
+                Set Up BAM Purchase
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
     </TooltipProvider>
   );
