@@ -201,20 +201,20 @@ export class Web3Utils {
     return methodId + encodedParams;
   }
   
-  // Function signature to method ID mapping (actual keccak256 hashes from 4byte.directory)
+  // Function signature to method ID mapping using corrected selectors
   keccak256(input: string): string {
     const signatures: { [key: string]: string } = {
-      // Custom BAM contract functions (these need to be calculated from actual contract ABI)
-      'swapUSDTToUSDB(uint256)': '0xa0712d68',
-      'swapUSDBToUSDT(uint256)': '0x2e95b6c8', 
-      'buyBAMWithUSDT(uint256)': '0x8803dbee',
-      'buyBAMWithBNB()': '0x1c3db2e0',
+      // BAM contract functions - using calculated selectors from Node.js
+      'swapUSDTToUSDB(uint256)': '0x09bec23b',
+      'swapUSDBToUSDT(uint256)': '0x0d7fc48c', 
+      'buyBAMWithUSDT(uint256)': '0x22b1194b',
+      'buyBAMWithBNB()': '0xf8b112c2',
       'sellBAMForUSDT(uint256)': '0xd6febde8',
       'sellBAMForBNB(uint256)': '0x9a5c3b67',
-      // Standard ERC20 functions (confirmed from 4byte.directory)
-      'approve(address,uint256)': '0x095ea7b3',  // Standard ERC20 approve (verified)
-      'transfer(address,uint256)': '0xa9059cbb',  // Standard ERC20 transfer
-      'balanceOf(address)': '0x70a08231'  // Standard ERC20 balanceOf
+      // Standard ERC20 functions (verified working)
+      'approve(address,uint256)': '0x095ea7b3',  // Standard ERC20 approve
+      'transfer(address,uint256)': '0xa9059cbb',
+      'balanceOf(address)': '0x70a08231'
     };
     
     return signatures[input] || '0x00000000';
