@@ -52,6 +52,7 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Implemented dynamic BAM price updates with owner-only controls and safety limits
 ✓ Enhanced contract with BAM price management functions and comprehensive validation
 ✓ Fixed all calculation functions to use updatable BAM price instead of constants
+✓ Added minimum purchase requirements: 1 USDT for BAM purchases and 1 USDT for USDB→USDT swaps
 
 ## User Preferences
 

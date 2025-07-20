@@ -34,6 +34,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     uint256 public constant MIN_BAM_PRICE = 50; // Minimum BAM price: $0.00000005
     uint256 public constant MAX_BAM_PRICE = 1000; // Maximum BAM price: $0.000001
     uint256 public constant MIN_PURCHASE_USDT = 1e18; // Minimum purchase: 1 USDT
+    uint256 public constant MIN_SWAP_AMOUNT = 1e18; // Minimum swap: 1 USDT/USDB
     
     // Fee configuration
     uint256 public constant LOW_FEE_RATE = 50; // 0.5% (50 basis points) - for USDT→USDB, USDT→BAM, BNB→BAM
@@ -84,6 +85,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     event EmergencyWithdraw(address indexed token, uint256 amount);
     event BAMPriceUpdated(uint256 oldPrice, uint256 newPrice);
     event MinimumPurchaseEnforced(address indexed user, uint256 amount, string purchaseType);
+    event MinimumSwapEnforced(address indexed user, uint256 amount, string swapType);
 
     constructor() Ownable(msg.sender) {
         // BSC Mainnet BNB/USD Price Feed
@@ -96,7 +98,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function swapUSDTToUSDB(uint256 amount) external nonReentrant whenNotPaused {
         require(!swapUSDTToUSDBPaused, "USDT to USDB swap is paused");
-        require(amount > 0, "Amount must be greater than 0");
+        require(amount >= MIN_SWAP_AMOUNT, "Minimum swap is 1 USDT");
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (amount * LOW_FEE_RATE) / FEE_DENOMINATOR;
@@ -130,6 +132,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         
         emit SwapUSDTToUSDB(msg.sender, usdbToUser, fee);
         emit PaymentDistributed(address(USDT), amount, paymentToRecipient, remainingInContract);
+        emit MinimumSwapEnforced(msg.sender, amount, "USDT_TO_USDB");
     }
 
     /**
@@ -138,7 +141,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function swapUSDBToUSDT(uint256 amount) external nonReentrant whenNotPaused {
         require(!swapUSDBToUSDTPaused, "USDB to USDT swap is paused");
-        require(amount > 0, "Amount must be greater than 0");
+        require(amount >= MIN_SWAP_AMOUNT, "Minimum swap is 1 USDB");
         
         // Calculate fee (1.5% of amount)
         uint256 fee = (amount * HIGH_FEE_RATE) / FEE_DENOMINATOR;
@@ -160,6 +163,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         USDT.safeTransfer(msg.sender, amountAfterFee);
         
         emit SwapUSDBToUSDT(msg.sender, amountAfterFee, fee);
+        emit MinimumSwapEnforced(msg.sender, amount, "USDB_TO_USDT");
     }
 
     /**
@@ -612,6 +616,13 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function getMinimumPurchase() external pure returns (uint256) {
         return MIN_PURCHASE_USDT;
+    }
+    
+    /**
+     * @dev Get minimum swap amount
+     */
+    function getMinimumSwap() external pure returns (uint256) {
+        return MIN_SWAP_AMOUNT;
     }
 
     /**
