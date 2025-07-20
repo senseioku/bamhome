@@ -177,20 +177,52 @@ const SwapPage = () => {
     }
   };
 
-  // Connect Wallet
+  // Connect Wallet with improved logic
   const connectWallet = async () => {
     try {
       setIsLoading(true);
-      const address = await web3Utils.connectWallet();
-      setWalletAddress(address);
-      await updateBalances(address);
       setError('');
+      
+      console.log('🔗 Connecting wallet...');
+      const address = await web3Utils.connectWallet();
+      console.log(`✅ Wallet connected: ${address}`);
+      
+      setWalletAddress(address);
+      
+      // Update balances immediately after connection
+      await updateBalances(address);
+      
     } catch (err: any) {
+      console.error('❌ Wallet connection failed:', err);
       setError(err.message || 'Failed to connect wallet');
+      setWalletAddress('');
+      setBalances({});
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Check for existing wallet connection on page load
+  useEffect(() => {
+    const checkWalletConnection = async () => {
+      try {
+        const provider = await web3Utils.getProvider();
+        if (provider) {
+          // Check if already connected
+          const accounts = await provider.request({ method: 'eth_accounts' });
+          if (accounts && accounts.length > 0) {
+            console.log('🔄 Found existing wallet connection:', accounts[0]);
+            setWalletAddress(accounts[0]);
+            await updateBalances(accounts[0]);
+          }
+        }
+      } catch (error) {
+        console.log('No existing wallet connection found');
+      }
+    };
+
+    checkWalletConnection();
+  }, []);
 
   // Helper function to get token price in USD
   const getTokenUSDPrice = (tokenSymbol: string): number => {
@@ -237,26 +269,49 @@ const SwapPage = () => {
     })}`;
   };
 
-  // Update token balances
+  // Update token balances with better error handling and logging
   const updateBalances = async (address: string) => {
+    if (!address) {
+      console.log('No wallet address provided for balance update');
+      return;
+    }
+
+    console.log(`🔄 Updating balances for wallet: ${address.slice(0, 6)}...${address.slice(-4)}`);
     const newBalances: Record<string, string> = {};
     
     try {
       // Get BNB balance
+      console.log('📊 Fetching BNB balance...');
       const bnbBalance = await web3Utils.getBalance(address);
       newBalances.BNB = bnbBalance;
+      console.log(`💰 BNB Balance: ${bnbBalance}`);
 
-      // Get token balances
+      // Get token balances for each ERC20 token
       for (const [symbol, token] of Object.entries(TOKENS)) {
-        if (symbol !== 'BNB') {
-          const balance = await web3Utils.getBalance(address, token.address);
-          newBalances[symbol] = balance;
+        if (symbol !== 'BNB' && token.address) {
+          try {
+            console.log(`📊 Fetching ${symbol} balance...`);
+            const balance = await web3Utils.getBalance(address, token.address);
+            newBalances[symbol] = balance;
+            console.log(`💰 ${symbol} Balance: ${balance}`);
+          } catch (tokenError) {
+            console.error(`Failed to get ${symbol} balance:`, tokenError);
+            newBalances[symbol] = '0';
+          }
         }
       }
 
       setBalances(newBalances);
+      console.log('✅ All balances updated successfully:', newBalances);
     } catch (error) {
-      console.error('Failed to update balances:', error);
+      console.error('❌ Failed to update balances:', error);
+      // Set default balances to prevent UI issues
+      setBalances({
+        BNB: '0',
+        USDT: '0', 
+        USDB: '0',
+        BAM: '0'
+      });
     }
   };
 
@@ -567,20 +622,34 @@ const SwapPage = () => {
                         )}
                       </div>
                       <div className="text-right">
-                        {balances[tokenOption.symbol] && (
+                        {balances[tokenOption.symbol] !== undefined ? (
                           <>
                             <div className="text-sm font-medium text-white">
-                              {web3Utils.formatAmount(balances[tokenOption.symbol])}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {tokenOption.symbol === 'BAM' ? 
-                                `$${(parseFloat(balances[tokenOption.symbol]) * 0.0000001).toFixed(6)}` :
-                                tokenOption.symbol === 'USDT' || tokenOption.symbol === 'USDB' ?
-                                `$${balances[tokenOption.symbol]}` :
-                                `~$${(parseFloat(balances[tokenOption.symbol]) * (priceInfo?.bnbPrice || 600)).toFixed(2)}`
+                              {parseFloat(balances[tokenOption.symbol] || '0') > 0 ? 
+                                web3Utils.formatAmount(balances[tokenOption.symbol]) : 
+                                '0'
                               }
                             </div>
+                            <div className="text-xs text-gray-500">
+                              {parseFloat(balances[tokenOption.symbol] || '0') > 0 ? (
+                                tokenOption.symbol === 'BAM' ? 
+                                  `$${(parseFloat(balances[tokenOption.symbol]) * 0.0000001).toFixed(6)}` :
+                                  tokenOption.symbol === 'USDT' || tokenOption.symbol === 'USDB' ?
+                                  `$${balances[tokenOption.symbol]}` :
+                                  `~$${(parseFloat(balances[tokenOption.symbol]) * (priceInfo?.bnbPrice || 600)).toFixed(2)}`
+                              ) : (
+                                '$0.00'
+                              )}
+                            </div>
                           </>
+                        ) : walletAddress ? (
+                          <div className="text-xs text-gray-500">
+                            Loading...
+                          </div>
+                        ) : (
+                          <div className="text-xs text-gray-500">
+                            Connect wallet
+                          </div>
                         )}
                       </div>
                     </div>
