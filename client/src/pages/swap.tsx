@@ -11,6 +11,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { web3Utils, ContractEncoder } from '@/lib/web3';
 import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI } from '@/lib/contracts';
+import Web3 from 'web3';
+import { COMPLETE_BAM_SWAP_ABI } from '@/lib/complete-bam-swap-abi';
 import { Home, ArrowLeft, Menu, X, Wallet, Copy, LogOut, ChevronDown } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -58,6 +60,8 @@ const SwapPage = () => {
   const [slippage, setSlippage] = useState(0.5);
   const [showSettings, setShowSettings] = useState(false);
   const [showLimitsModal, setShowLimitsModal] = useState(false);
+  const [hasAlreadyPurchased, setHasAlreadyPurchased] = useState<boolean>(false);
+  const [isCheckingPurchaseHistory, setIsCheckingPurchaseHistory] = useState<boolean>(false);
 
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
@@ -238,7 +242,33 @@ const SwapPage = () => {
     }
   };
 
-  // Connect Wallet with minimal logging
+  // Check if wallet has already purchased BAM
+  const checkPurchaseHistory = useCallback(async (address: string) => {
+    if (!window.ethereum || !address) {
+      setHasAlreadyPurchased(false);
+      return;
+    }
+
+    try {
+      setIsCheckingPurchaseHistory(true);
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(COMPLETE_BAM_SWAP_ABI, BAM_SWAP_ADDRESS);
+      
+      // Check if wallet has purchased BAM by calling the contract view function
+      const hasPurchased = await contract.methods.hasPurchased(address).call();
+      setHasAlreadyPurchased(hasPurchased);
+      
+      console.log(`Purchase history for ${address}:`, hasPurchased ? 'Already purchased' : 'No previous purchase');
+    } catch (error) {
+      console.error('Error checking purchase history:', error);
+      // Default to allowing purchase if check fails
+      setHasAlreadyPurchased(false);
+    } finally {
+      setIsCheckingPurchaseHistory(false);
+    }
+  }, []);
+
+  // Connect Wallet with purchase history check
   const connectWallet = async () => {
     try {
       setIsLoading(true);
@@ -247,11 +277,13 @@ const SwapPage = () => {
       const address = await web3Utils.connectWallet();
       setWalletAddress(address);
       await updateBalances(address);
+      await checkPurchaseHistory(address);
       
     } catch (err: any) {
       setError(err.message || 'Failed to connect wallet');
       setWalletAddress('');
       setBalances({});
+      setHasAlreadyPurchased(false);
     } finally {
       setIsLoading(false);
     }
@@ -267,6 +299,7 @@ const SwapPage = () => {
           if (accounts && accounts.length > 0) {
             setWalletAddress(accounts[0]);
             await updateBalances(accounts[0]);
+            await checkPurchaseHistory(accounts[0]);
           }
         }
       } catch (error) {
@@ -292,6 +325,7 @@ const SwapPage = () => {
   const disconnectWallet = () => {
     setWalletAddress('');
     setBalances({});
+    setHasAlreadyPurchased(false);
   };
 
   // Copy address to clipboard
@@ -1239,17 +1273,43 @@ const SwapPage = () => {
             {/* Purchase Limit Warning for BAM */}
             {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
               (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && (
-              <Alert className="border-yellow-500/30 bg-yellow-500/10 mb-3">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="text-yellow-200 text-sm">
-                  <div className="space-y-1">
-                    <div className="font-medium">⚠️ BAM Purchase Limits:</div>
-                    <div className="text-xs">
-                      • Exactly 1 USDT per wallet • One-time purchase only
-                    </div>
-                  </div>
-                </AlertDescription>
-              </Alert>
+              <>
+                {hasAlreadyPurchased ? (
+                  <Alert className="border-red-500/30 bg-red-500/10 mb-3">
+                    <AlertCircle className="h-4 w-4 text-red-400" />
+                    <AlertDescription className="text-red-200 text-sm">
+                      <div className="space-y-1">
+                        <div className="font-medium">🚫 Already Purchased BAM:</div>
+                        <div className="text-xs">
+                          Your wallet has already bought BAM tokens. Only one purchase per wallet is allowed.
+                        </div>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                ) : isCheckingPurchaseHistory ? (
+                  <Alert className="border-blue-500/30 bg-blue-500/10 mb-3">
+                    <AlertCircle className="h-4 w-4 text-blue-400" />
+                    <AlertDescription className="text-blue-200 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Checking purchase history...</span>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Alert className="border-yellow-500/30 bg-yellow-500/10 mb-3">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-yellow-200 text-sm">
+                      <div className="space-y-1">
+                        <div className="font-medium">⚠️ BAM Purchase Limits:</div>
+                        <div className="text-xs">
+                          • Exactly 1 USDT per wallet • One-time purchase only
+                        </div>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </>
             )}
 
 
@@ -1370,6 +1430,13 @@ const SwapPage = () => {
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-red-700 text-red-200 rounded-lg cursor-not-allowed"
               >
                 ❌ Minimum: 1 {fromToken.symbol}
+              </Button>
+            ) : hasAlreadyPurchased && ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) ? (
+              <Button
+                disabled
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-red-600 text-red-200 rounded-lg cursor-not-allowed"
+              >
+                🚫 Already Purchased - One Per Wallet
               </Button>
             ) : ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && parseFloat(fromAmount) !== 1) ? (
               <Button
