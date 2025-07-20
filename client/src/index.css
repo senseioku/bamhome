@@ -131,3 +131,26 @@ body {
   from { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
   to { box-shadow: 0 0 30px rgba(0, 212, 255, 0.6); }
 }
+
+/* Dialog positioning fix for mobile */
+@media (max-width: 640px) {
+  [data-radix-popper-content-wrapper] {
+    transform: none !important;
+  }
+  
+  [role="dialog"] {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    max-height: 75vh !important;
+  }
+  
+  .DialogContent {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+}
