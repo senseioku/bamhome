@@ -468,12 +468,30 @@ const SwapPage = () => {
         console.log('USDT→USDB Function Data:', data);
         console.log('Function selector should be:', web3Utils.keccak256('swapUSDTToUSDB(uint256)'));
         
-        // ⚠️ CRITICAL ERROR DETECTED ⚠️
-        console.error('⚠️ WRONG CONTRACT ADDRESS! ⚠️');
-        console.error('The contract at', BAM_SWAP_ADDRESS, 'is a BEP20 token contract, not a swap contract!');
-        console.error('We need the actual BAM Swap contract address.');
-        setError('Contract configuration error: Using token contract instead of swap contract');
-        return;
+        // Check contract state before attempting swap
+        try {
+          // Test if contract is paused
+          const pausedCheck = await window.ethereum.request({
+            method: 'eth_call',
+            params: [{
+              to: BAM_SWAP_ADDRESS,
+              data: '0x5c975abb' // paused() function selector
+            }, 'latest']
+          });
+          console.log('Contract paused status:', pausedCheck);
+          
+          // Test specific function pause status
+          const usdtToUsdbPausedCheck = await window.ethereum.request({
+            method: 'eth_call', 
+            params: [{
+              to: BAM_SWAP_ADDRESS,
+              data: '0x' + web3Utils.keccak256('swapUSDTToUSDBPaused()').substring(2) // swapUSDTToUSDBPaused()
+            }, 'latest']
+          });
+          console.log('USDT→USDB swap paused:', usdtToUsdbPausedCheck);
+        } catch (error) {
+          console.log('Contract state check failed:', error);
+        }
         txHash = await web3Utils.sendTransaction({
           to: BAM_SWAP_ADDRESS,
           data,
