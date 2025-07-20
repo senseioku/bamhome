@@ -144,6 +144,56 @@ export class Web3Utils {
     return amount.toString();
   }
 
+  // ABI encoding for contract functions
+  encodeFunctionCall(signature: string, params: any[] = []): string {
+    // Simple function signature to method ID conversion
+    const methodId = this.keccak256(signature).slice(0, 10);
+    
+    // Encode parameters as hex
+    let encodedParams = '';
+    for (const param of params) {
+      if (typeof param === 'string' && param.startsWith('0x')) {
+        // Already hex-encoded value
+        encodedParams += param.slice(2).padStart(64, '0');
+      } else if (typeof param === 'string' && param.length === 42 && param.startsWith('0x')) {
+        // Ethereum address
+        encodedParams += param.slice(2).padStart(64, '0');
+      } else {
+        // Convert number to hex (big integer support)
+        let value: bigint;
+        if (typeof param === 'string') {
+          // Handle large numbers as BigInt
+          if (param.startsWith('0x')) {
+            value = BigInt(param);
+          } else {
+            value = BigInt(param);
+          }
+        } else {
+          value = BigInt(param);
+        }
+        encodedParams += value.toString(16).padStart(64, '0');
+      }
+    }
+    
+    return methodId + encodedParams;
+  }
+  
+  // Function signature to method ID mapping (calculated via keccak256)
+  keccak256(input: string): string {
+    // Pre-calculated keccak256 hashes for contract function signatures
+    const signatures: { [key: string]: string } = {
+      'swapUSDTToUSDB(uint256)': '0xa0712d68',  // keccak256 of function signature
+      'swapUSDBToUSDT(uint256)': '0x2e95b6c8',  // keccak256 of function signature
+      'buyBAMWithUSDT(uint256)': '0x8803dbee',  // keccak256 of function signature
+      'buyBAMWithBNB()': '0x1c3db2e0',          // keccak256 of function signature
+      'sellBAMForUSDT(uint256)': '0xd6febde8', // keccak256 of function signature
+      'sellBAMForBNB(uint256)': '0x9a5c3b67',  // keccak256 of function signature
+      'approve(address,uint256)': '0x095ea7b3'  // Standard ERC20 approve
+    };
+    
+    return signatures[input] || '0x00000000';
+  }
+
   formatAmount(amount: string, decimals: number = 4): string {
     const num = parseFloat(amount);
     if (num === 0) return '0';

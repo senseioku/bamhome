@@ -458,7 +458,7 @@ const SwapPage = () => {
         // First approve USDT
         await approveToken(TOKEN_ADDRESSES.USDT, amountWei);
         // Then execute swap
-        const data = ContractEncoder.encodeFunctionCall('swapUSDTToUSDB(uint256)', [amountWei]);
+        const data = web3Utils.encodeFunctionCall('swapUSDTToUSDB(uint256)', [amountWei]);
         txHash = await web3Utils.sendTransaction({
           to: BAM_SWAP_ADDRESS,
           data,
@@ -466,7 +466,7 @@ const SwapPage = () => {
         });
       } else if (fromToken.symbol === 'USDB' && toToken.symbol === 'USDT') {
         await approveToken(TOKEN_ADDRESSES.USDB, amountWei);
-        const data = ContractEncoder.encodeFunctionCall('swapUSDBToUSDT(uint256)', [amountWei]);
+        const data = web3Utils.encodeFunctionCall('swapUSDBToUSDT(uint256)', [amountWei]);
         txHash = await web3Utils.sendTransaction({
           to: BAM_SWAP_ADDRESS,
           data,
@@ -474,18 +474,35 @@ const SwapPage = () => {
         });
       } else if (fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') {
         await approveToken(TOKEN_ADDRESSES.USDT, amountWei);
-        const data = ContractEncoder.encodeFunctionCall('buyBAMWithUSDT(uint256)', [amountWei]);
+        const data = web3Utils.encodeFunctionCall('buyBAMWithUSDT(uint256)', [amountWei]);
         txHash = await web3Utils.sendTransaction({
           to: BAM_SWAP_ADDRESS,
           data,
           from: walletAddress
         });
       } else if (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM') {
-        const data = ContractEncoder.encodeFunctionCall('buyBAMWithBNB()');
+        const data = web3Utils.encodeFunctionCall('buyBAMWithBNB()');
         txHash = await web3Utils.sendTransaction({
           to: BAM_SWAP_ADDRESS,
           data,
           value: amountWei,
+          from: walletAddress
+        });
+      } else if (fromToken.symbol === 'BAM' && toToken.symbol === 'USDT') {
+        await approveToken(TOKEN_ADDRESSES.BAM, amountWei);
+        const data = web3Utils.encodeFunctionCall('sellBAMForUSDT(uint256)', [amountWei]);
+        txHash = await web3Utils.sendTransaction({
+          to: BAM_SWAP_ADDRESS,
+          data,
+          from: walletAddress
+        });
+      } else if (fromToken.symbol === 'BAM' && toToken.symbol === 'BNB') {
+        await approveToken(TOKEN_ADDRESSES.BAM, amountWei);
+        const data = web3Utils.encodeFunctionCall('sellBAMForBNB(uint256)', [amountWei]);
+        txHash = await web3Utils.sendTransaction({
+          to: BAM_SWAP_ADDRESS,
+          data,
+          value: '0',
           from: walletAddress
         });
       }
@@ -506,7 +523,7 @@ const SwapPage = () => {
 
   // Approve token spending
   const approveToken = async (tokenAddress: string, amount: string) => {
-    const data = ContractEncoder.encodeFunctionCall('approve(address,uint256)', [BAM_SWAP_ADDRESS, amount]);
+    const data = web3Utils.encodeFunctionCall('approve(address,uint256)', [BAM_SWAP_ADDRESS, amount]);
     await web3Utils.sendTransaction({
       to: tokenAddress,
       data,
