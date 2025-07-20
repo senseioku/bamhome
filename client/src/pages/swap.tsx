@@ -452,12 +452,12 @@ const SwapPage = () => {
 
       let txHash = '';
       const amountWei = web3Utils.toWei(fromAmount);
-      console.log('Transaction details:', {
-        fromAmount,
-        amountWei,
-        fromToken: fromToken.symbol,
-        toToken: toToken.symbol
-      });
+      console.log('=== SWAP TRANSACTION DEBUG ===');
+      console.log('From:', fromAmount, fromToken.symbol);
+      console.log('To:', toToken.symbol);
+      console.log('Amount in Wei:', amountWei);
+      console.log('Contract Address:', BAM_SWAP_ADDRESS);
+      console.log('User Address:', walletAddress);
 
       // Different swap functions based on token pair
       if (fromToken.symbol === 'USDT' && toToken.symbol === 'USDB') {
@@ -465,6 +465,8 @@ const SwapPage = () => {
         await approveToken(TOKEN_ADDRESSES.USDT, amountWei);
         // Then execute swap
         const data = web3Utils.encodeFunctionCall('swapUSDTToUSDB(uint256)', [amountWei]);
+        console.log('USDT→USDB Function Data:', data);
+        console.log('Function selector should be:', web3Utils.keccak256('swapUSDTToUSDB(uint256)'));
         txHash = await web3Utils.sendTransaction({
           to: BAM_SWAP_ADDRESS,
           data,
