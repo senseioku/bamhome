@@ -68,6 +68,9 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Fixed React Fragment warnings and improved code stability
 ✓ Enhanced number formatting to remove decimals for 6+ digit amounts
 ✓ Added proper locale formatting with commas for large numbers
+✓ Added real USD equivalent pricing for all swaps like Uniswap
+✓ Implemented USD value displays under input amounts and in quote details
+✓ Real-time USD calculations using live token prices (BNB, BAM, USDT/USDB)
 
 ## User Preferences
 

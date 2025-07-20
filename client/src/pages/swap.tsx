@@ -120,6 +120,51 @@ const SwapPage = () => {
     }
   };
 
+  // Helper function to get token price in USD
+  const getTokenUSDPrice = (tokenSymbol: string): number => {
+    if (priceInfo?.isValidPrice) {
+      switch (tokenSymbol) {
+        case 'BNB':
+          return priceInfo.bnbPrice;
+        case 'BAM':
+          return priceInfo.bamPrice;
+        case 'USDT':
+        case 'USDB':
+          return 1; // Stablecoins
+        default:
+          return 0;
+      }
+    }
+    
+    // Fallback prices when contract data unavailable
+    switch (tokenSymbol) {
+      case 'BNB':
+        return 692; // Approximate BNB price
+      case 'BAM':
+        return 0.0000001; // BAM price from contract
+      case 'USDT':
+      case 'USDB':
+        return 1; // Stablecoins
+      default:
+        return 0;
+    }
+  };
+
+  // Helper function to calculate USD value
+  const calculateUSDValue = (amount: string, tokenSymbol: string): string => {
+    const numAmount = parseFloat(amount || '0');
+    const price = getTokenUSDPrice(tokenSymbol);
+    const usdValue = numAmount * price;
+    
+    if (usdValue === 0) return '$0.00';
+    if (usdValue < 0.01) return '< $0.01';
+    
+    return `$${usdValue.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
+  };
+
   // Update token balances
   const updateBalances = async (address: string) => {
     const newBalances: Record<string, string> = {};
@@ -593,6 +638,11 @@ const SwapPage = () => {
                   <TokenSelector token={fromToken} onSelect={setFromToken} label="from" />
                 </div>
               </div>
+              {fromAmount && parseFloat(fromAmount) > 0 && (
+                <div className="text-sm text-gray-400 mt-2 px-1">
+                  {calculateUSDValue(fromAmount, fromToken.symbol)}
+                </div>
+              )}
             </div>
 
             {/* Swap Button */}
@@ -622,6 +672,11 @@ const SwapPage = () => {
                   <TokenSelector token={toToken} onSelect={setToToken} label="to" />
                 </div>
               </div>
+              {toAmount && parseFloat(toAmount) > 0 && (
+                <div className="text-sm text-gray-400 mt-2 px-1">
+                  {calculateUSDValue(toAmount, toToken.symbol)}
+                </div>
+              )}
             </div>
 
             {/* Enhanced Quote Information */}
@@ -638,14 +693,17 @@ const SwapPage = () => {
                       <Zap className="w-3 h-3 mr-1" />
                       Network Fee ({quote.feePercentage}%)
                     </span>
-                    <span className="text-white font-medium">{web3Utils.formatAmount(quote.fee)} {fromToken.symbol}</span>
+                    <div className="text-right">
+                      <span className="text-white font-medium">{web3Utils.formatAmount(quote.fee)} {fromToken.symbol}</span>
+                      <div className="text-xs text-gray-500">{calculateUSDValue(quote.fee, fromToken.symbol)}</div>
+                    </div>
                   </div>
                   
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-400">You Receive</span>
                     <div className="text-right">
                       <span className="text-white font-medium">{web3Utils.formatAmount(quote.outputAmount)} {toToken.symbol}</span>
-                      <div className="text-xs text-gray-500">After fees</div>
+                      <div className="text-xs text-gray-500">{calculateUSDValue(quote.outputAmount, toToken.symbol)}</div>
                     </div>
                   </div>
                   
