@@ -1186,87 +1186,7 @@ const SwapPage = () => {
               </Alert>
             )}
 
-            {/* Input Validation Warnings */}
-            {fromAmount && (
-              <>
-                {parseFloat(fromAmount) < 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && (
-                  <Alert className="border-red-500/30 bg-red-500/10 mb-3">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription className="text-red-200 text-sm">
-                      ❌ Minimum swap amount: 1 {fromToken.symbol}
-                    </AlertDescription>
-                  </Alert>
-                )}
-                
-                {/* Enhanced BAM Purchase Validation */}
-                {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && parseFloat(fromAmount) !== 1) && (
-                  <Alert className="border-orange-500/30 bg-orange-500/10 mb-3">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription className="text-orange-200 text-sm">
-                      <div className="space-y-1">
-                        <div className="font-medium">🎯 BAM Purchase Validation:</div>
-                        <div>Required: Exactly 1 USDT</div>
-                        <div>Current: {fromAmount} USDT</div>
-                        <div className="text-xs text-orange-300">
-                          {parseFloat(fromAmount) > 1 ? 
-                            `Reduce amount by ${(parseFloat(fromAmount) - 1).toFixed(6)} USDT` :
-                            `Add ${(1 - parseFloat(fromAmount)).toFixed(6)} USDT`
-                          }
-                        </div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
 
-                {/* BNB to BAM Purchase Validation */}
-                {((fromToken.symbol === 'BNB' && toToken.symbol === 'BAM') && priceInfo) && (
-                  <Alert className="border-blue-500/30 bg-blue-500/10 mb-3">
-                    <Info className="h-4 w-4" />
-                    <AlertDescription className="text-blue-200 text-sm">
-                      <div className="space-y-1">
-                        <div className="font-medium">💡 BNB to BAM Purchase:</div>
-                        <div>BNB Price: ${priceInfo.bnbPrice.toFixed(2)}</div>
-                        <div>Required: ~${(1 / priceInfo.bnbPrice).toFixed(6)} BNB (≈ 1 USDT)</div>
-                        <div className="text-xs text-blue-300">Automatically calculated for 10M BAM tokens</div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {/* Maximum Limit Warning for Non-BAM Swaps */}
-                {parseFloat(fromAmount) > 1 && 
-                 (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && 
-                 toToken.symbol !== 'BAM' && (
-                  <Alert className="border-red-500/30 bg-red-500/10 mb-3">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription className="text-red-200 text-sm">
-                      <div className="space-y-1">
-                        <div className="font-medium">🚫 Per-Wallet Limit Exceeded:</div>
-                        <div>Maximum: 1 {fromToken.symbol} per wallet per transaction</div>
-                        <div>Current: {fromAmount} {fromToken.symbol}</div>
-                        <div className="text-xs text-red-300">Reduce amount to 1 {fromToken.symbol} or less</div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {balances[fromToken.symbol] && parseFloat(fromAmount) > parseFloat(balances[fromToken.symbol]) && (
-                  <Alert className="border-red-500/30 bg-red-500/10 mb-3">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription className="text-red-200 text-sm">
-                      <div className="space-y-1">
-                        <div className="font-medium">💰 Insufficient Balance:</div>
-                        <div>Required: {fromAmount} {fromToken.symbol}</div>
-                        <div>Available: {formatDisplayAmount(balances[fromToken.symbol], fromToken.symbol)} {fromToken.symbol}</div>
-                        <div className="text-xs text-red-300">
-                          Need {(parseFloat(fromAmount) - parseFloat(balances[fromToken.symbol])).toFixed(6)} more {fromToken.symbol}
-                        </div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </>
-            )}
 
             {/* To Token */}
             <div className="space-y-0.5 sm:space-y-2 mb-1.5 sm:mb-3">
@@ -1497,10 +1417,10 @@ const SwapPage = () => {
           <p>💎 Professional-grade DeFi with minimal fees</p>
         </div>
 
-        {/* Contract Status Warnings - Below Main Interface */}
-        {contractStatus && (
+        {/* Contextual Warnings - Only show when user has invalid input */}
+        {contractStatus && fromAmount && parseFloat(fromAmount) > 0 && (
           <div className="mt-6 space-y-3 max-w-sm sm:max-w-lg mx-auto">
-            {/* Main Contract Paused */}
+            {/* Main Contract Paused - Only if user is trying to swap */}
             {contractStatus.isPaused && (
               <Alert className="border-red-500/50 bg-red-500/20 backdrop-blur-sm">
                 <AlertCircle className="h-4 w-4" />
@@ -1511,10 +1431,36 @@ const SwapPage = () => {
               </Alert>
             )}
 
-            {/* Specific Function Paused Warnings */}
+            {/* BAM Purchase Invalid Amount */}
+            {!contractStatus.isPaused && 
+             ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && parseFloat(fromAmount) !== 1) && (
+              <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-orange-200 text-sm">
+                  <div className="font-medium">⚠️ Invalid BAM Purchase Amount</div>
+                  <div className="text-xs mt-1">BAM purchases require exactly 1 USDT. Current: {fromAmount} USDT</div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Per-Wallet Limit Exceeded */}
+            {!contractStatus.isPaused && 
+             parseFloat(fromAmount) > 1 && 
+             (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && 
+             toToken.symbol !== 'BAM' && (
+              <Alert className="border-red-500/50 bg-red-500/20 backdrop-blur-sm">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-red-200 text-sm">
+                  <div className="font-medium">🚫 Amount Exceeds Limit</div>
+                  <div className="text-xs mt-1">Maximum 1 {fromToken.symbol} per transaction. Current: {fromAmount} {fromToken.symbol}</div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Function Paused - Only show if user selected a paused function */}
             {!contractStatus.isPaused && (
               <>
-                {/* USDT to BAM paused */}
+                {/* BAM Purchases Paused */}
                 {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
                   (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && 
                   contractStatus.functionPaused.usdtToBam && (
@@ -1522,12 +1468,12 @@ const SwapPage = () => {
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription className="text-orange-200 text-sm">
                       <div className="font-medium">⏸️ BAM Purchases Paused</div>
-                      <div className="text-xs mt-1">BAM token purchases are temporarily disabled.</div>
+                      <div className="text-xs mt-1">This function is temporarily disabled. Try other swap pairs.</div>
                     </AlertDescription>
                   </Alert>
                 )}
 
-                {/* USDT to USDB paused */}
+                {/* USDT→USDB Paused */}
                 {fromToken.symbol === 'USDT' && toToken.symbol === 'USDB' && 
                   contractStatus.functionPaused.usdtToUsdb && (
                   <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
@@ -1539,7 +1485,7 @@ const SwapPage = () => {
                   </Alert>
                 )}
 
-                {/* USDB to USDT paused */}
+                {/* USDB→USDT Paused */}
                 {fromToken.symbol === 'USDB' && toToken.symbol === 'USDT' && 
                   contractStatus.functionPaused.usdbToUsdt && (
                   <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
@@ -1551,27 +1497,31 @@ const SwapPage = () => {
                   </Alert>
                 )}
 
-                {/* BAM selling paused */}
+                {/* BAM Selling Paused */}
                 {fromToken.symbol === 'BAM' && 
                   (contractStatus.functionPaused.bamToUsdt || contractStatus.functionPaused.bamToBnb) && (
                   <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription className="text-orange-200 text-sm">
                       <div className="font-medium">⏸️ BAM Selling Paused</div>
-                      <div className="text-xs mt-1">BAM token sales are temporarily disabled.</div>
+                      <div className="text-xs mt-1">BAM sales are temporarily disabled. Try purchasing instead.</div>
                     </AlertDescription>
                   </Alert>
                 )}
               </>
             )}
 
-            {/* Connection Status */}
-            {!walletAddress && (
-              <Alert className="border-blue-500/50 bg-blue-500/20 backdrop-blur-sm">
-                <Info className="h-4 w-4" />
-                <AlertDescription className="text-blue-200 text-sm">
-                  <div className="font-medium">💡 Connect Wallet</div>
-                  <div className="text-xs mt-1">Connect your wallet to check current swap availability.</div>
+            {/* Insufficient Balance Warning */}
+            {balances[fromToken.symbol] && 
+             parseFloat(fromAmount) > parseFloat(balances[fromToken.symbol]) && (
+              <Alert className="border-red-500/50 bg-red-500/20 backdrop-blur-sm">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-red-200 text-sm">
+                  <div className="font-medium">💰 Insufficient Balance</div>
+                  <div className="text-xs mt-1">
+                    Need: {fromAmount} {fromToken.symbol} | 
+                    Available: {formatDisplayAmount(balances[fromToken.symbol], fromToken.symbol)} {fromToken.symbol}
+                  </div>
                 </AlertDescription>
               </Alert>
             )}
