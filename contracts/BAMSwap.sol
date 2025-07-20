@@ -45,9 +45,9 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     uint256 public constant FEE_DENOMINATOR = 10000; // 100.00%
     uint256 public constant PAYMENT_DISTRIBUTION_RATE = 9000; // 90% (9000 basis points)
     
-    // Fee and payment addresses
-    address public constant FEE_RECIPIENT = 0x65b504C7204FF08C52cAf69eF090A2B0E763C00b;
-    address public constant PAYMENT_RECIPIENT = 0xEbF9c1C3F513D8f043a9A6A631ddc72cc1092F71;
+    // Fee and payment addresses (updatable by owner)
+    address public feeRecipient = 0x65b504C7204FF08C52cAf69eF090A2B0E763C00b;
+    address public paymentRecipient = 0xEbF9c1C3F513D8f043a9A6A631ddc72cc1092F71;
     
     // Chainlink Price Feeds on BSC Mainnet
     AggregatorV3Interface internal bnbPriceFeed;
@@ -95,6 +95,8 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     event BAMPriceUpdated(uint256 oldPrice, uint256 newPrice);
     event MinimumPurchaseEnforced(address indexed user, uint256 amount, string purchaseType);
     event MinimumSwapEnforced(address indexed user, uint256 amount, string swapType);
+    event FeeRecipientUpdated(address oldRecipient, address newRecipient);
+    event PaymentRecipientUpdated(address oldRecipient, address newRecipient);
 
     constructor() Ownable(msg.sender) {
         // BSC Mainnet BNB/USD Price Feed
@@ -128,12 +130,12 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         
         // Distribute USDT payment: fee to fee recipient, 90% to payment recipient
         if (fee > 0) {
-            USDT.safeTransfer(FEE_RECIPIENT, fee);
-            emit FeeCollected(address(USDT), fee, FEE_RECIPIENT);
+            USDT.safeTransfer(feeRecipient, fee);
+            emit FeeCollected(address(USDT), fee, feeRecipient);
         }
         
         if (paymentToRecipient > 0) {
-            USDT.safeTransfer(PAYMENT_RECIPIENT, paymentToRecipient);
+            USDT.safeTransfer(paymentRecipient, paymentToRecipient);
         }
         
         // Transfer USDB to user (amount after fee deduction)
@@ -164,8 +166,8 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         // USDB payments remain in contract (no distribution to payment recipient)
         // Only transfer fee to fee recipient
         if (fee > 0) {
-            USDB.safeTransfer(FEE_RECIPIENT, fee);
-            emit FeeCollected(address(USDB), fee, FEE_RECIPIENT);
+            USDB.safeTransfer(feeRecipient, fee);
+            emit FeeCollected(address(USDB), fee, feeRecipient);
         }
         
         // Transfer USDT to user (amount after fee)
@@ -205,12 +207,12 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         require(paymentToRecipient + fee + remainingInContract == usdtAmount, "Payment distribution error");
         
         if (fee > 0) {
-            USDT.safeTransfer(FEE_RECIPIENT, fee);
-            emit FeeCollected(address(USDT), fee, FEE_RECIPIENT);
+            USDT.safeTransfer(feeRecipient, fee);
+            emit FeeCollected(address(USDT), fee, feeRecipient);
         }
         
         if (paymentToRecipient > 0) {
-            USDT.safeTransfer(PAYMENT_RECIPIENT, paymentToRecipient);
+            USDT.safeTransfer(paymentRecipient, paymentToRecipient);
         }
         
         // Transfer BAM tokens to user
@@ -255,12 +257,12 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         require(paymentToRecipient + fee + remainingInContract == msg.value, "Payment distribution error");
         
         if (fee > 0) {
-            payable(FEE_RECIPIENT).transfer(fee);
-            emit FeeCollected(address(0), fee, FEE_RECIPIENT);
+            payable(feeRecipient).transfer(fee);
+            emit FeeCollected(address(0), fee, feeRecipient);
         }
         
         if (paymentToRecipient > 0) {
-            payable(PAYMENT_RECIPIENT).transfer(paymentToRecipient);
+            payable(paymentRecipient).transfer(paymentToRecipient);
         }
         
         // Transfer BAM tokens to user
@@ -295,8 +297,8 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         // BAM payments remain in contract (no distribution to payment recipient)
         // Only transfer fee to fee recipient
         if (fee > 0) {
-            USDT.safeTransfer(FEE_RECIPIENT, fee);
-            emit FeeCollected(address(USDT), fee, FEE_RECIPIENT);
+            USDT.safeTransfer(feeRecipient, fee);
+            emit FeeCollected(address(USDT), fee, feeRecipient);
         }
         
         // Transfer USDT to user (amount after fee)
@@ -332,8 +334,8 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         // BAM payments remain in contract (no distribution to payment recipient)
         // Only transfer fee to fee recipient in BNB
         if (fee > 0) {
-            payable(FEE_RECIPIENT).transfer(fee);
-            emit FeeCollected(address(0), fee, FEE_RECIPIENT);
+            payable(feeRecipient).transfer(fee);
+            emit FeeCollected(address(0), fee, feeRecipient);
         }
         
         // Transfer remaining BNB to user (amount after fee)
@@ -641,6 +643,33 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function getMinimumSwap() external pure returns (uint256) {
         return MIN_SWAP_AMOUNT;
+    }
+
+    /**
+     * @dev Update fee recipient address (owner only)
+     */
+    function updateFeeRecipient(address newRecipient) external onlyOwner {
+        require(newRecipient != address(0), "Invalid fee recipient address");
+        address oldRecipient = feeRecipient;
+        feeRecipient = newRecipient;
+        emit FeeRecipientUpdated(oldRecipient, newRecipient);
+    }
+
+    /**
+     * @dev Update payment recipient address (owner only)
+     */
+    function updatePaymentRecipient(address newRecipient) external onlyOwner {
+        require(newRecipient != address(0), "Invalid payment recipient address");
+        address oldRecipient = paymentRecipient;
+        paymentRecipient = newRecipient;
+        emit PaymentRecipientUpdated(oldRecipient, newRecipient);
+    }
+
+    /**
+     * @dev Get current recipients
+     */
+    function getRecipients() external view returns (address fee, address payment) {
+        return (feeRecipient, paymentRecipient);
     }
 
     /**
