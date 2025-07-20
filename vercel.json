@@ -1,7 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "rm -rf dist && node build.js",
+  "buildCommand": "cd client && npx vite build --outDir ../dist/public --emptyOutDir",
   "outputDirectory": "dist/public",
   "installCommand": "npm install",
-  "devCommand": "npm run dev"
+  "devCommand": "npm run dev",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
