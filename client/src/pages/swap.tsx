@@ -1212,6 +1212,68 @@ const SwapPage = () => {
           )}
         </div>
 
+        {/* Popular Projects Quick Access */}
+        <div className="bg-gray-900/60 border border-gray-700 backdrop-blur-sm rounded-lg p-3 mb-4">
+          <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center">
+            <span className="mr-2">⭐</span>
+            Popular BAM Projects
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <a 
+              href="https://apex.bam-ecosystem.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-lg p-2 hover:from-purple-500/30 hover:to-purple-600/30 transition-all duration-200"
+            >
+              <div className="flex items-center space-x-2">
+                <span className="text-lg">⛏️</span>
+                <div>
+                  <div className="text-xs font-medium text-white">BAM ApexMiner</div>
+                  <div className="text-xs text-purple-300">Mining Platform</div>
+                </div>
+              </div>
+            </a>
+            <a 
+              href="https://vip.bam-ecosystem.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-500/30 rounded-lg p-2 hover:from-yellow-500/30 hover:to-yellow-600/30 transition-all duration-200"
+            >
+              <div className="flex items-center space-x-2">
+                <span className="text-lg">👑</span>
+                <div>
+                  <div className="text-xs font-medium text-white">BAM VIP Access</div>
+                  <div className="text-xs text-yellow-300">Premium Features</div>
+                </div>
+              </div>
+            </a>
+            <button 
+              onClick={() => setShowLimitsModal(true)}
+              className="bg-gradient-to-r from-green-500/20 to-green-600/20 border border-green-500/30 rounded-lg p-2 hover:from-green-500/30 hover:to-green-600/30 transition-all duration-200"
+            >
+              <div className="flex items-center space-x-2">
+                <span className="text-lg">🔄</span>
+                <div>
+                  <div className="text-xs font-medium text-white">BAM Swap</div>
+                  <div className="text-xs text-green-300">Current Page</div>
+                </div>
+              </div>
+            </button>
+            <a 
+              href="/#projects" 
+              className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 border border-blue-500/30 rounded-lg p-2 hover:from-blue-500/30 hover:to-blue-600/30 transition-all duration-200"
+            >
+              <div className="flex items-center space-x-2">
+                <span className="text-lg">🎁</span>
+                <div>
+                  <div className="text-xs font-medium text-white">BAM Drops</div>
+                  <div className="text-xs text-blue-300">Coming Soon</div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
         {/* Main Swap Card - Compact desktop sizing */}
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
           <CardContent className="p-4 sm:p-5 lg:p-4 xl:p-5">
