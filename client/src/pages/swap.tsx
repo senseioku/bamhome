@@ -859,18 +859,18 @@ const SwapPage = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="p-2 sm:p-4 pt-20">
-        <div className="max-w-md sm:max-w-lg mx-auto pt-4 sm:pt-8">
+      <div className="p-2 sm:p-4 pt-24 sm:pt-28">
+        <div className="max-w-md sm:max-w-lg mx-auto">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <p className="text-sm sm:text-base text-gray-400 mb-4">Pioneering Community Growth and Wealth</p>
+          <p className="text-sm sm:text-base text-gray-400 mb-6">Pioneering Community Growth and Wealth</p>
           {priceInfo && (
-            <div className="flex justify-center items-center space-x-2 sm:space-x-4 mt-4 text-xs sm:text-sm">
-              <Badge variant="outline" className="text-green-400 border-green-400 px-2 py-1">
+            <div className="flex justify-center items-center space-x-2 sm:space-x-4 mb-6 text-xs sm:text-sm">
+              <Badge variant="outline" className="text-green-400 border-green-400 px-3 py-1.5">
                 <TrendingUp className="w-3 h-3 mr-1" />
                 BNB ${priceInfo.bnbPrice.toFixed(2)}
               </Badge>
-              <Badge variant="outline" className="text-yellow-400 border-yellow-400 px-2 py-1">
+              <Badge variant="outline" className="text-yellow-400 border-yellow-400 px-3 py-1.5">
                 <Activity className="w-3 h-3 mr-1" />
                 BAM $0.0000001
               </Badge>
