@@ -63,13 +63,13 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     bool public useFallbackPrice = false;
     bool public emergencyMode = false;
     
-    // Individual pause controls for each swap function
-    bool public swapUSDTToUSDBPaused = false;
-    bool public swapUSDBToUSDTPaused = false;
-    bool public buyBAMWithUSDTPaused = false;
-    bool public buyBAMWithBNBPaused = false;
-    bool public sellBAMForUSDTPaused = false;
-    bool public sellBAMForBNBPaused = false;
+    // Individual pause controls for each swap function (default: only BAM purchases enabled)
+    bool public swapUSDTToUSDBPaused = true; // PAUSED by default
+    bool public swapUSDBToUSDTPaused = true; // PAUSED by default
+    bool public buyBAMWithUSDTPaused = false; // ENABLED - BAM purchases allowed
+    bool public buyBAMWithBNBPaused = false; // ENABLED - BAM purchases allowed  
+    bool public sellBAMForUSDTPaused = true; // PAUSED by default
+    bool public sellBAMForBNBPaused = true; // PAUSED by default
     
     // Wallet purchase tracking for BAM purchases (1 USDT min, 10 USDT max per wallet)
     mapping(address => uint256) public walletPurchases;

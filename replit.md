@@ -90,6 +90,8 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Contract capacity: Can handle 10 unique wallets maxing out (10 USDT each) = 100 USDT total
 ✓ Alternative: 100 individual wallets buying 1 USDT each = 100 USDT total capacity
 ✓ Added owner-controlled fee and payment recipient updates for future flexibility
+✓ Updated default pause states: Only BAM purchases (USDT→BAM, BNB→BAM) enabled by default
+✓ All other functions (swaps, selling) paused by default as requested
 ✓ Contract fully ready for deployment with all requested features implemented
 
 ## User Preferences
