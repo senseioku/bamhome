@@ -167,6 +167,7 @@ event SellBAMForUSDT(address indexed user, uint256 bamAmount, uint256 usdtAmount
 event SellBAMForBNB(address indexed user, uint256 bamAmount, uint256 bnbAmount, uint256 bnbPrice, uint256 fee);
 event FeeCollected(address indexed token, uint256 amount, address recipient);
 event PaymentDistributed(address indexed token, uint256 totalAmount, uint256 toRecipient, uint256 remaining);
+event SwapFunctionPaused(string functionName, bool paused);
 event PriceSourceChanged(bool isUsingFallback, uint256 price);
 event FallbackPriceUpdated(uint256 oldPrice, uint256 newPrice);
 event PriceFeedUpdated(address oldFeed, address newFeed);
@@ -200,7 +201,16 @@ event EmergencyWithdraw(address indexed token, uint256 amount);
 - `toggleEmergencyMode(bool)`: Enable/disable emergency mode
 - `addLiquidity(address, uint256)`: Add token liquidity
 - `emergencyWithdraw(address, uint256)`: Emergency token withdrawal
-- `pause()`/`unpause()`: Pause/unpause contract
+- `pause()`/`unpause()`: Pause/unpause entire contract
+
+### Individual Pause Controls
+- `pauseSwapUSDTToUSDB(bool)`: Pause/unpause USDT→USDB swaps
+- `pauseSwapUSDBToUSDT(bool)`: Pause/unpause USDB→USDT swaps
+- `pauseBuyBAMWithUSDT(bool)`: Pause/unpause BAM purchases with USDT
+- `pauseBuyBAMWithBNB(bool)`: Pause/unpause BAM purchases with BNB
+- `pauseSellBAMForUSDT(bool)`: Pause/unpause BAM sales for USDT
+- `pauseSellBAMForBNB(bool)`: Pause/unpause BAM sales for BNB
+- `getPauseStatus()`: Get pause status for all functions
 
 ## Deployment
 

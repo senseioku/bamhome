@@ -53,6 +53,14 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     uint256 public fallbackBnbPrice = 600e18; // $600 fallback price
     bool public useFallbackPrice = false;
     bool public emergencyMode = false;
+    
+    // Individual pause controls for each swap function
+    bool public swapUSDTToUSDBPaused = false;
+    bool public swapUSDBToUSDTPaused = false;
+    bool public buyBAMWithUSDTPaused = false;
+    bool public buyBAMWithBNBPaused = false;
+    bool public sellBAMForUSDTPaused = false;
+    bool public sellBAMForBNBPaused = false;
 
     // Events
     event SwapUSDTToUSDB(address indexed user, uint256 amount, uint256 fee);
@@ -67,6 +75,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     event FallbackPriceUpdated(uint256 oldPrice, uint256 newPrice);
     event PriceFeedUpdated(address oldFeed, address newFeed);
     event EmergencyModeToggled(bool enabled);
+    event SwapFunctionPaused(string functionName, bool paused);
     event EmergencyWithdraw(address indexed token, uint256 amount);
 
     constructor() Ownable(msg.sender) {
@@ -79,6 +88,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * Example: 10,000 USDT → 9,950 USDB (50 USDT fee + 9,000 USDT to recipient + 950 USDT stays)
      */
     function swapUSDTToUSDB(uint256 amount) external nonReentrant whenNotPaused {
+        require(!swapUSDTToUSDBPaused, "USDT to USDB swap is paused");
         require(amount > 0, "Amount must be greater than 0");
         
         // Calculate fee (0.5% of amount)
@@ -117,6 +127,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * USDB payments remain in contract, no distribution
      */
     function swapUSDBToUSDT(uint256 amount) external nonReentrant whenNotPaused {
+        require(!swapUSDBToUSDTPaused, "USDB to USDT swap is paused");
         require(amount > 0, "Amount must be greater than 0");
         
         // Calculate fee (1.5% of amount)
@@ -146,6 +157,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * USDT payment distribution: 90% to recipient, fee to fee recipient, remainder stays in contract
      */
     function buyBAMWithUSDT(uint256 usdtAmount) external nonReentrant whenNotPaused {
+        require(!buyBAMWithUSDTPaused, "Buy BAM with USDT is paused");
         require(usdtAmount > 0, "Amount must be greater than 0");
         
         // Calculate fee (0.5% of amount)
@@ -183,6 +195,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * BNB payment distribution: 90% to recipient, fee to fee recipient, remainder stays in contract
      */
     function buyBAMWithBNB() external payable nonReentrant whenNotPaused {
+        require(!buyBAMWithBNBPaused, "Buy BAM with BNB is paused");
         require(msg.value > 0, "BNB amount must be greater than 0");
         
         (uint256 bnbPrice, bool isValidPrice) = getBNBPriceWithValidation();
@@ -220,6 +233,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * BAM payments remain in contract, no distribution
      */
     function sellBAMForUSDT(uint256 bamAmount) external nonReentrant whenNotPaused {
+        require(!sellBAMForUSDTPaused, "Sell BAM for USDT is paused");
         require(bamAmount > 0, "Amount must be greater than 0");
         
         // Calculate USDT equivalent
@@ -253,6 +267,7 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * BAM payments remain in contract, no distribution
      */
     function sellBAMForBNB(uint256 bamAmount) external nonReentrant whenNotPaused {
+        require(!sellBAMForBNBPaused, "Sell BAM for BNB is paused");
         require(bamAmount > 0, "Amount must be greater than 0");
         
         (uint256 bnbPrice, bool isValidPrice) = getBNBPriceWithValidation();
@@ -473,6 +488,62 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      */
     function pause() external onlyOwner { _pause(); }
     function unpause() external onlyOwner { _unpause(); }
+    
+    /**
+     * @dev Individual pause controls for each swap function
+     */
+    function pauseSwapUSDTToUSDB(bool _paused) external onlyOwner {
+        swapUSDTToUSDBPaused = _paused;
+        emit SwapFunctionPaused("swapUSDTToUSDB", _paused);
+    }
+    
+    function pauseSwapUSDBToUSDT(bool _paused) external onlyOwner {
+        swapUSDBToUSDTPaused = _paused;
+        emit SwapFunctionPaused("swapUSDBToUSDT", _paused);
+    }
+    
+    function pauseBuyBAMWithUSDT(bool _paused) external onlyOwner {
+        buyBAMWithUSDTPaused = _paused;
+        emit SwapFunctionPaused("buyBAMWithUSDT", _paused);
+    }
+    
+    function pauseBuyBAMWithBNB(bool _paused) external onlyOwner {
+        buyBAMWithBNBPaused = _paused;
+        emit SwapFunctionPaused("buyBAMWithBNB", _paused);
+    }
+    
+    function pauseSellBAMForUSDT(bool _paused) external onlyOwner {
+        sellBAMForUSDTPaused = _paused;
+        emit SwapFunctionPaused("sellBAMForUSDT", _paused);
+    }
+    
+    function pauseSellBAMForBNB(bool _paused) external onlyOwner {
+        sellBAMForBNBPaused = _paused;
+        emit SwapFunctionPaused("sellBAMForBNB", _paused);
+    }
+    
+    /**
+     * @dev Get pause status for all swap functions
+     */
+    function getPauseStatus() external view returns (
+        bool usdtToUsdb,
+        bool usdbToUsdt,
+        bool buyWithUsdt,
+        bool buyWithBnb,
+        bool sellForUsdt,
+        bool sellForBnb,
+        bool globalPause
+    ) {
+        return (
+            swapUSDTToUSDBPaused,
+            swapUSDBToUSDTPaused,
+            buyBAMWithUSDTPaused,
+            buyBAMWithBNBPaused,
+            sellBAMForUSDTPaused,
+            sellBAMForBNBPaused,
+            paused()
+        );
+    }
 
     /**
      * @dev Get comprehensive contract information
