@@ -5,18 +5,20 @@ A simple, fast, efficient and secure swap contract for the BAM ecosystem on Bina
 ## Features
 
 ### Core Functionality
-- **USDB ↔ USDT Swaps**: 1:1 ratio with 0.5% swap fee
-- **BAM Token Purchase**: Fixed price at $0.0000001
-- **Multi-currency Support**: Accept USDT and BNB for BAM purchases
+- **USDB ↔ USDT Swaps**: 1:1 ratio with differential fees (0.5% and 1.5%)
+- **BAM Token Trading**: Buy/sell BAM with USDT and BNB at fixed price $0.0000001
+- **Multi-currency Support**: Accept USDT and BNB for BAM trading
 - **Real-time Quotes**: Get swap quotes including fees before execution
 - **Live Price Feeds**: Automatic BNB price updates via Chainlink oracles
+- **No Cross-Pairs**: No USDT ↔ BNB swaps (future upgrade)
 
 ### Fee Structure
 - **Low Fee (0.5%)**: USDT→USDB, USDT→BAM, BNB→BAM
 - **High Fee (1.5%)**: USDB→USDT, BAM→USDT, BAM→BNB
-- **Fee Distribution**: All fees go to designated fee recipient
-- **Payment Distribution**: Only USDT/BNB payments: 90% to recipient, 10% remains in contract
-- **Token Retention**: BAM/USDB payments stay in contract (no distribution)
+- **Fee Distribution**: All fees go to designated fee recipient (`0x65b504...00b`)
+- **Payment Distribution**: ONLY for USDT/BNB payments: 90% to recipient (`0xEbF9c1...F71`), remainder in contract
+- **Token Retention**: BAM/USDB payments stay in contract (NO distribution to recipients)
+- **No Cross-Pairs**: No BNB ↔ USDT swaps allowed
 - **Transparent Fees**: All fees and distributions logged via events
 
 ### Price Oracle Features
@@ -79,7 +81,7 @@ bamSwap.buyBAMWithUSDT(usdtAmount);
 - **Fee (0.5%)**: 50 USDT → Fee Recipient (`0x65b504...00b`)
 - **Payment (90%)**: 9,000 USDT → Payment Recipient (`0xEbF9c1...F71`)
 - **Contract Keeps**: 950 USDT
-- **User Receives**: 10,000 USDB
+- **User Receives**: 9,950 USDB (10,000 - 50 fee)
 
 ### USDB → USDT Swap (10,000 USDB)
 - **User Input**: 10,000 USDB
@@ -96,10 +98,21 @@ bamSwap.buyBAMWithUSDT(usdtAmount);
 
 ### BAM Sale for USDT (10,000,000,000 BAM)
 - **User Input**: 10,000,000,000 BAM tokens
-- **BAM Payment**: Stays in contract (no distribution)
+- **BAM Payment**: Stays in contract (NO distribution)
 - **USDT Equivalent**: 1,000 USDT
 - **Fee (1.5%)**: 15 USDT → Fee Recipient (`0x65b504...00b`)
 - **User Receives**: 985 USDT
+
+### BAM Sale for BNB (10,000,000,000 BAM at $600 BNB)
+- **User Input**: 10,000,000,000 BAM tokens
+- **BAM Payment**: Stays in contract (NO distribution)
+- **BNB Equivalent**: ~1.667 BNB (1000 USD ÷ 600 USD/BNB)
+- **Fee (1.5%)**: 0.025 BNB → Fee Recipient (`0x65b504...00b`)
+- **User Receives**: 1.642 BNB
+
+### Supported Swap Pairs
+✅ **Allowed**: USDT ↔ USDB, USDT ↔ BAM, BNB ↔ BAM
+❌ **Not Allowed**: USDT ↔ BNB (reserved for future upgrade)
 
 ### Buy BAM with BNB
 ```solidity

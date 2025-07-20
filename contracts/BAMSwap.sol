@@ -75,22 +75,24 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     }
 
     /**
-     * @dev Swap USDT to USDB at 1:1 ratio with 0.5% fee
-     * Payment distribution: 90% to recipient, fee to fee recipient, remainder stays in contract
+     * @dev Swap USDT to USDB with 0.5% fee (user receives reduced USDB)
+     * Example: 10,000 USDT → 9,950 USDB (50 USDT fee + 9,000 USDT to recipient + 950 USDT stays)
      */
     function swapUSDTToUSDB(uint256 amount) external nonReentrant whenNotPaused {
         require(amount > 0, "Amount must be greater than 0");
         
         // Calculate fee (0.5% of amount)
         uint256 fee = (amount * LOW_FEE_RATE) / FEE_DENOMINATOR;
+        // User receives USDB after fee deduction
+        uint256 usdbToUser = amount - fee;
         
-        // Calculate payment distribution for USDT (90% to recipient)
+        // Calculate USDT payment distribution (90% to recipient)
         uint256 paymentToRecipient = (amount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
         uint256 remainingInContract = amount - paymentToRecipient - fee;
         
-        require(USDB.balanceOf(address(this)) >= amount, "Insufficient USDB liquidity");
+        require(USDB.balanceOf(address(this)) >= usdbToUser, "Insufficient USDB liquidity");
         
-        // Transfer full amount from user
+        // Transfer full USDT amount from user
         USDT.safeTransferFrom(msg.sender, address(this), amount);
         
         // Distribute USDT payment: fee to fee recipient, 90% to payment recipient
@@ -103,10 +105,10 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
             USDT.safeTransfer(PAYMENT_RECIPIENT, paymentToRecipient);
         }
         
-        // Transfer full USDB amount to user (no fee deduction from USDB)
-        USDB.safeTransfer(msg.sender, amount);
+        // Transfer USDB to user (amount after fee deduction)
+        USDB.safeTransfer(msg.sender, usdbToUser);
         
-        emit SwapUSDTToUSDB(msg.sender, amount, fee);
+        emit SwapUSDTToUSDB(msg.sender, usdbToUser, fee);
         emit PaymentDistributed(address(USDT), amount, paymentToRecipient, remainingInContract);
     }
 
@@ -270,13 +272,13 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
         BAM.safeTransferFrom(msg.sender, address(this), bamAmount);
         
         // BAM payments remain in contract (no distribution to payment recipient)
-        // Only transfer fee to fee recipient
+        // Only transfer fee to fee recipient in BNB
         if (fee > 0) {
             payable(FEE_RECIPIENT).transfer(fee);
             emit FeeCollected(address(0), fee, FEE_RECIPIENT);
         }
         
-        // Transfer BNB to user (amount after fee)
+        // Transfer remaining BNB to user (amount after fee)
         payable(msg.sender).transfer(bnbAfterFee);
         
         emit SellBAMForBNB(msg.sender, bamAmount, bnbAfterFee, bnbPrice, fee);
