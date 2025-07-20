@@ -368,9 +368,11 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
      * BAM price = $0.0000001, so 1 USDT = 10,000,000 BAM tokens
      */
     function calculateBAMFromUSDT(uint256 usdtAmount) public view returns (uint256) {
-        // usdtAmount is in 18 decimals, bamPriceInUSD represents current BAM price
-        // 1 USDT (1e18) / current BAM price = BAM tokens
-        return (usdtAmount * 1e18) / bamPriceInUSD;
+        // FIXED: Correct BAM calculation for $0.0000001 per BAM
+        // If BAM costs $0.0000001, then 1 USDT ($1.00) buys 10,000,000 BAM tokens
+        // bamPriceInUSD = 100 represents 0.0000001 USD in our system
+        // Formula: usdtAmount * (1e18 / bamPriceInUSD) = BAM tokens in wei
+        return (usdtAmount * 1e18) / (bamPriceInUSD * 1e12);
     }
 
     /**
@@ -379,8 +381,8 @@ contract BAMSwap is ReentrancyGuard, Ownable, Pausable {
     function calculateBAMFromBNB(uint256 bnbAmount, uint256 bnbPrice) public view returns (uint256) {
         // Convert BNB to USD value: bnbAmount (18 decimals) * bnbPrice (18 decimals) / 1e18
         uint256 usdValue = (bnbAmount * bnbPrice) / 1e18;
-        // Convert USD to BAM tokens using current BAM price
-        return (usdValue * 1e18) / bamPriceInUSD;
+        // Convert USD to BAM tokens using current BAM price - FIXED
+        return (usdValue * 1e18) / (bamPriceInUSD * 1e12);
     }
 
     /**
