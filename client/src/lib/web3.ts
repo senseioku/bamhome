@@ -120,22 +120,32 @@ export class Web3Utils {
     if (!provider) throw new Error('No provider available');
 
     try {
+      console.log('Estimating gas for transaction:', txParams);
       const gasEstimate = await provider.request({
         method: 'eth_estimateGas',
         params: [txParams],
       });
-      // Add 20% buffer to the estimate
-      const gasLimit = Math.floor(parseInt(gasEstimate, 16) * 1.2);
+      console.log('Raw gas estimate:', gasEstimate, 'decimal:', parseInt(gasEstimate, 16));
+      // Add 50% buffer to the estimate for safety (increased from 20%)
+      const gasLimit = Math.floor(parseInt(gasEstimate, 16) * 1.5);
+      console.log('Final gas limit with buffer:', gasLimit);
       return `0x${gasLimit.toString(16)}`;
     } catch (error) {
       console.error('Gas estimation failed, using default:', error);
-      // Fallback gas limits based on transaction type
-      if (txParams.data && txParams.data.startsWith('0xa9059cbb')) {
+      
+      // Enhanced fallback logic with specific handling for BNB to BAM
+      if (txParams.data && txParams.data.includes('buyBAMWithBNB')) {
+        console.log('Using high gas limit for BNB to BAM purchase');
+        return '0x7A120'; // 500,000 gas for BNB to BAM purchases
+      } else if (txParams.data && txParams.data.startsWith('0xa9059cbb')) {
         return '0x186A0'; // 100,000 for token transfers
+      } else if (txParams.data && txParams.data.length > 2) {
+        // Contract function call
+        return '0x4C4B40'; // 500,000 for contract calls
       } else if (txParams.value && txParams.value !== '0x0') {
-        return '0x5208'; // 21,000 for BNB transfers
+        return '0x5208'; // 21,000 for simple BNB transfers
       } else {
-        return '0x4C4B40'; // 500,000 for complex contract calls
+        return '0x4C4B40'; // 500,000 for complex operations
       }
     }
   }
