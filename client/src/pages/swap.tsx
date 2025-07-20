@@ -677,8 +677,7 @@ const SwapPage = () => {
         <div className="max-w-md sm:max-w-lg mx-auto pt-4 sm:pt-8">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">BAM Swap</h1>
-          <p className="text-sm sm:text-base text-gray-400">Professional DeFi Trading Interface</p>
+          <p className="text-sm sm:text-base text-gray-400 mb-4">Pioneering Community Growth and Wealth</p>
           {priceInfo && (
             <div className="flex justify-center items-center space-x-2 sm:space-x-4 mt-4 text-xs sm:text-sm">
               <Badge variant="outline" className="text-green-400 border-green-400 px-2 py-1">
