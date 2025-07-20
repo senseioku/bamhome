@@ -86,8 +86,8 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Updated minimum purchase: Increased from 1 USDT to 5 USDT as requested  
 ✓ Verified fix: 1 USDT = 10,000,000 BAM (mathematically correct)
 ✓ Current contract liquidity verified: 60,000 USDB, 100 USDT, 1,000,000,000 BAM, 0.11 BNB
-✓ Contract capacity: Can handle 20,000 orders of 5 USDT each (massive BAM liquidity available)
-✓ Total purchase capacity: 100,000 USDT worth of BAM purchases before liquidity exhaustion
+✓ Contract capacity: Can handle 20 orders of 5 USDT each (1B BAM ÷ 50M BAM per order)
+✓ Total purchase capacity: 100 USDT worth of BAM purchases before liquidity exhaustion
 
 ## User Preferences
 
