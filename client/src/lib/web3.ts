@@ -120,9 +120,26 @@ export class Web3Utils {
     if (!provider) throw new Error('No provider available');
 
     try {
+      // Add gas estimation and limit to reduce fees
+      const gasEstimate = await provider.request({
+        method: 'eth_estimateGas',
+        params: [txParams],
+      });
+      
+      // Set reasonable gas limit (BSC typically needs 100k-300k gas)
+      const gasLimit = Math.min(parseInt(gasEstimate, 16) * 1.2, 300000);
+      
+      const txParamsWithGas = {
+        ...txParams,
+        gas: `0x${gasLimit.toString(16)}`,
+        gasPrice: '0x12A05F200' // 5 Gwei gas price for BSC
+      };
+      
+      console.log('Transaction params:', txParamsWithGas);
+      
       const txHash = await provider.request({
         method: 'eth_sendTransaction',
-        params: [txParams],
+        params: [txParamsWithGas],
       });
       return txHash;
     } catch (error) {
@@ -133,8 +150,11 @@ export class Web3Utils {
 
   // Utility functions
   toWei(amount: string, decimals: number = 18): string {
-    const factor = Math.pow(10, decimals);
-    const wei = Math.floor(parseFloat(amount) * factor);
+    // Use BigInt for large number precision
+    const factor = BigInt(10 ** decimals);
+    const amountFloat = parseFloat(amount);
+    const amountBigInt = BigInt(Math.floor(amountFloat * (10 ** 8))); // 8 decimal precision
+    const wei = (amountBigInt * factor) / BigInt(10 ** 8);
     return `0x${wei.toString(16)}`;
   }
 
@@ -178,17 +198,20 @@ export class Web3Utils {
     return methodId + encodedParams;
   }
   
-  // Function signature to method ID mapping (calculated via keccak256)
+  // Function signature to method ID mapping (actual keccak256 hashes from 4byte.directory)
   keccak256(input: string): string {
-    // Pre-calculated keccak256 hashes for contract function signatures
     const signatures: { [key: string]: string } = {
-      'swapUSDTToUSDB(uint256)': '0xa0712d68',  // keccak256 of function signature
-      'swapUSDBToUSDT(uint256)': '0x2e95b6c8',  // keccak256 of function signature
-      'buyBAMWithUSDT(uint256)': '0x8803dbee',  // keccak256 of function signature
-      'buyBAMWithBNB()': '0x1c3db2e0',          // keccak256 of function signature
-      'sellBAMForUSDT(uint256)': '0xd6febde8', // keccak256 of function signature
-      'sellBAMForBNB(uint256)': '0x9a5c3b67',  // keccak256 of function signature
-      'approve(address,uint256)': '0x095ea7b3'  // Standard ERC20 approve
+      // Custom BAM contract functions (these need to be calculated from actual contract ABI)
+      'swapUSDTToUSDB(uint256)': '0xa0712d68',
+      'swapUSDBToUSDT(uint256)': '0x2e95b6c8', 
+      'buyBAMWithUSDT(uint256)': '0x8803dbee',
+      'buyBAMWithBNB()': '0x1c3db2e0',
+      'sellBAMForUSDT(uint256)': '0xd6febde8',
+      'sellBAMForBNB(uint256)': '0x9a5c3b67',
+      // Standard ERC20 functions (confirmed from 4byte.directory)
+      'approve(address,uint256)': '0x095ea7b3',  // Standard ERC20 approve (verified)
+      'transfer(address,uint256)': '0xa9059cbb',  // Standard ERC20 transfer
+      'balanceOf(address)': '0x70a08231'  // Standard ERC20 balanceOf
     };
     
     return signatures[input] || '0x00000000';

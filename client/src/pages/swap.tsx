@@ -452,6 +452,12 @@ const SwapPage = () => {
 
       let txHash = '';
       const amountWei = web3Utils.toWei(fromAmount);
+      console.log('Transaction details:', {
+        fromAmount,
+        amountWei,
+        fromToken: fromToken.symbol,
+        toToken: toToken.symbol
+      });
 
       // Different swap functions based on token pair
       if (fromToken.symbol === 'USDT' && toToken.symbol === 'USDB') {
