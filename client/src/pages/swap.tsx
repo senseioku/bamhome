@@ -765,12 +765,30 @@ const SwapPage = () => {
         setTxStatus('success');
         console.log('✅ Transaction confirmed on blockchain');
         
-        // Show "Add BAM Token" notification if user bought BAM
+        // Automatically add BAM token and show notification if user bought BAM
         if (toToken.symbol === 'BAM') {
-          setTimeout(() => {
-            setShowAddTokenNotification(true);
-            setTimeout(() => setShowAddTokenNotification(false), 4000);
-          }, 1000);
+          setTimeout(async () => {
+            try {
+              // Automatically add BAM token to wallet
+              const result = await web3Utils.addTokenToWallet(
+                TOKEN_ADDRESSES.BAM,
+                'BAM',
+                18,
+                `${window.location.origin}/assets/bamToken_1752877645023.png`
+              );
+              
+              if (result) {
+                setShowAddTokenNotification(true);
+                setTimeout(() => setShowAddTokenNotification(false), 4000);
+              } else {
+                // If auto-add fails, show manual option
+                console.log('Auto-add failed, user can still manually add token');
+              }
+            } catch (error) {
+              console.log('Auto-add BAM token failed:', error);
+              // Silent failure - user can still manually add via button
+            }
+          }, 1500);
         }
         
         // Update balances after confirmed transaction
@@ -1285,7 +1303,10 @@ const SwapPage = () => {
             <div className="bg-green-500/90 border border-green-400 rounded-lg p-3 backdrop-blur-sm">
               <div className="flex items-center space-x-2 text-white">
                 <CheckCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">BAM Token Added!</span>
+                <div className="text-sm">
+                  <div className="font-medium">BAM Token Added!</div>
+                  <div className="text-xs opacity-90">Check your wallet assets</div>
+                </div>
               </div>
             </div>
           </div>

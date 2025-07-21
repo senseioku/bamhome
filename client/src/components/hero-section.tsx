@@ -108,7 +108,10 @@ export default function HeroSection() {
               <div className="bg-green-500/90 border border-green-400 rounded-lg p-3 backdrop-blur-sm">
                 <div className="flex items-center space-x-2 text-white">
                   <CheckCircle className="w-4 h-4" />
-                  <span className="text-sm font-medium">BAM Token Added!</span>
+                  <div className="text-sm">
+                    <div className="font-medium">BAM Token Added!</div>
+                    <div className="text-xs opacity-90">Check your wallet assets</div>
+                  </div>
                 </div>
               </div>
             </div>
