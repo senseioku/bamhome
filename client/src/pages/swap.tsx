@@ -62,6 +62,7 @@ const SwapPage = () => {
   const [showLimitsModal, setShowLimitsModal] = useState(false);
   const [hasAlreadyPurchased, setHasAlreadyPurchased] = useState<boolean>(false);
   const [isCheckingPurchaseHistory, setIsCheckingPurchaseHistory] = useState<boolean>(false);
+  const [showAddTokenNotification, setShowAddTokenNotification] = useState<boolean>(false);
 
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
@@ -338,6 +339,36 @@ const SwapPage = () => {
     setWalletAddress('');
     setBalances({});
     setHasAlreadyPurchased(false);
+  };
+
+  // Add BAM token to wallet
+  const addBAMTokenToWallet = async () => {
+    if (!walletAddress) {
+      setError('Please connect your wallet first');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const result = await web3Utils.addTokenToWallet(
+        TOKEN_ADDRESSES.BAM,
+        'BAM',
+        18,
+        `${window.location.origin}/assets/bamToken_1752877645023.png`
+      );
+      
+      if (result) {
+        setError('');
+        setShowAddTokenNotification(true);
+        setTimeout(() => setShowAddTokenNotification(false), 3000);
+        console.log('BAM token added to wallet successfully');
+      }
+    } catch (error: any) {
+      console.error('Failed to add BAM token:', error);
+      setError(error.message || 'Failed to add BAM token to wallet');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Copy address to clipboard
@@ -734,6 +765,14 @@ const SwapPage = () => {
         setTxStatus('success');
         console.log('✅ Transaction confirmed on blockchain');
         
+        // Show "Add BAM Token" notification if user bought BAM
+        if (toToken.symbol === 'BAM') {
+          setTimeout(() => {
+            setShowAddTokenNotification(true);
+            setTimeout(() => setShowAddTokenNotification(false), 4000);
+          }, 1000);
+        }
+        
         // Update balances after confirmed transaction
         setTimeout(() => updateBalances(walletAddress), 2000);
       } catch (confirmError) {
@@ -1104,6 +1143,10 @@ const SwapPage = () => {
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Address
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={addBAMTokenToWallet} className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 text-xs">
+                      <Star className="w-3 h-3 mr-1" />
+                      Add BAM
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={disconnectWallet} className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
                       <LogOut className="w-4 h-4 mr-2" />
                       Disconnect Wallet
@@ -1179,12 +1222,18 @@ const SwapPage = () => {
                               </div>
                             )}
                           </div>
-                          <Button onClick={copyAddress} variant="outline" className="w-full text-gray-300 border-gray-600">
-                            <Copy className="w-4 h-4 mr-2" />
-                            Copy Address
-                          </Button>
-                          <Button onClick={disconnectWallet} variant="outline" className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10">
-                            <LogOut className="w-4 h-4 mr-2" />
+                          <div className="grid grid-cols-2 gap-2">
+                            <Button onClick={copyAddress} variant="outline" className="text-gray-300 border-gray-600 text-xs">
+                              <Copy className="w-3 h-3 mr-1" />
+                              Copy
+                            </Button>
+                            <Button onClick={addBAMTokenToWallet} variant="outline" className="text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/10 text-xs">
+                              <Star className="w-3 h-3 mr-1" />
+                              Add BAM
+                            </Button>
+                          </div>
+                          <Button onClick={disconnectWallet} variant="outline" className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10 text-xs">
+                            <LogOut className="w-3 h-3 mr-1" />
                             Disconnect
                           </Button>
                         </div>
@@ -1229,6 +1278,18 @@ const SwapPage = () => {
             </div>
           )}
         </div>
+
+        {/* Success Notification for Adding BAM Token */}
+        {showAddTokenNotification && (
+          <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
+            <div className="bg-green-500/90 border border-green-400 rounded-lg p-3 backdrop-blur-sm">
+              <div className="flex items-center space-x-2 text-white">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-sm font-medium">BAM Token Added!</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Main Swap Card - Compact desktop sizing */}
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">

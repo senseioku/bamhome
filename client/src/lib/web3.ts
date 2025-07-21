@@ -303,6 +303,33 @@ export class Web3Utils {
   isValidAddress(address: string): boolean {
     return /^0x[a-fA-F0-9]{40}$/.test(address);
   }
+
+  async addTokenToWallet(tokenAddress: string, tokenSymbol: string, tokenDecimals: number, tokenImage?: string) {
+    const provider = await this.getProvider();
+    if (!provider) {
+      throw new Error('No wallet detected. Please install MetaMask or another Web3 wallet.');
+    }
+
+    try {
+      const result = await provider.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: tokenAddress,
+            symbol: tokenSymbol,
+            decimals: tokenDecimals,
+            image: tokenImage,
+          },
+        },
+      });
+      
+      return result;
+    } catch (error) {
+      console.error('Failed to add token to wallet:', error);
+      throw error;
+    }
+  }
 }
 
 export const web3Utils = new Web3Utils();

@@ -1,12 +1,42 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Rocket, TrendingUp } from "lucide-react";
+import { Rocket, TrendingUp, Star, CheckCircle } from "lucide-react";
+import { web3Utils } from "@/lib/web3";
+import { TOKEN_ADDRESSES } from "@/lib/contracts";
+import { useState } from "react";
 
 export default function HeroSection() {
+  const [showAddTokenNotification, setShowAddTokenNotification] = useState(false);
+  
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const addBAMTokenToWallet = async () => {
+    try {
+      const provider = await web3Utils.getProvider();
+      if (!provider) {
+        alert('Please install MetaMask or another Web3 wallet to add BAM token');
+        return;
+      }
+
+      const result = await web3Utils.addTokenToWallet(
+        TOKEN_ADDRESSES.BAM,
+        'BAM',
+        18,
+        `${window.location.origin}/assets/bamToken_1752877645023.png`
+      );
+      
+      if (result) {
+        setShowAddTokenNotification(true);
+        setTimeout(() => setShowAddTokenNotification(false), 3000);
+      }
+    } catch (error: any) {
+      console.error('Failed to add BAM token:', error);
+      alert('Failed to add BAM token to wallet. Please make sure you have a Web3 wallet installed.');
     }
   };
 
@@ -61,7 +91,28 @@ export default function HeroSection() {
               <TrendingUp className="mr-2 h-5 w-5" />
               View Tokenomics
             </Button>
+            <Button 
+              onClick={addBAMTokenToWallet}
+              variant="outline"
+              size="sm"
+              className="border border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10 font-medium px-4 py-2 rounded-full transition-all duration-300 text-xs"
+            >
+              <Star className="mr-1 h-3 w-3" />
+              Add BAM Token
+            </Button>
           </div>
+
+          {/* Success Notification */}
+          {showAddTokenNotification && (
+            <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
+              <div className="bg-green-500/90 border border-green-400 rounded-lg p-3 backdrop-blur-sm">
+                <div className="flex items-center space-x-2 text-white">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">BAM Token Added!</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         
         {/* Stats Cards */}
