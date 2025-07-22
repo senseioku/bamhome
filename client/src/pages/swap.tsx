@@ -594,9 +594,9 @@ const SwapPage = () => {
       
       if (currentMilestone >= 100 && estimatedHolders % 100 < 5) { // Show for first 5 holders past milestone
         if (bamBalance <= 0) {
-          setMilestoneMessage(`🎉 Presale 1 Ends! Wait for Presale 2 @ higher price. Grab yours before Public Launch to Uniswap & PancakeSwap!`);
+          setMilestoneMessage(`🎉 Presale 2 Complete! Get ready for Uniswap & PancakeSwap launch at premium prices!`);
         } else {
-          setMilestoneMessage(`🎉 Milestone: ${currentMilestone}+ BAM Holders! Presale 1 filling fast - secure before Presale 2 price increase!`);
+          setMilestoneMessage(`🎉 Milestone: ${currentMilestone}+ BAM Holders! Presale 2 active - secure before DEX launch!`);
         }
         setShowMilestoneNotification(true);
         setTimeout(() => setShowMilestoneNotification(false), 8000);
@@ -730,8 +730,8 @@ const SwapPage = () => {
     // Check contract balance first
     if (!checkSufficientContractBalance(fromToken.symbol, toToken.symbol, fromAmount)) {
       if (toToken.symbol === 'BAM') {
-        setError('Presale 1 Sold Out! Wait for Presale 2 announcement - higher price but still below DEX launch!');
-        setMilestoneMessage('🎉 Presale 1 Complete! Presale 2 launching soon @ higher price. Secure before Uniswap & PancakeSwap listing!');
+        setError('Presale 2 Sold Out! Get ready for Uniswap & PancakeSwap launch at even higher prices!');
+        setMilestoneMessage('🎉 Presale 2 Complete! Prepare for DEX launch on Uniswap & PancakeSwap!');
         setShowMilestoneNotification(true);
         setTimeout(() => setShowMilestoneNotification(false), 10000);
       } else {
@@ -1435,9 +1435,9 @@ const SwapPage = () => {
               <div className="flex items-start space-x-3 text-white">
                 <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <div className="text-sm">
-                  <div className="font-bold mb-1">Presale 1 Ending Soon!</div>
+                  <div className="font-bold mb-1">Presale 2 Ending Soon!</div>
                   <div className="text-xs opacity-90 leading-relaxed">
-                    Only a few spots left in Presale 1! Secure your BAM before Presale 2 @ higher price. Don't miss out before Uniswap & PancakeSwap launch!
+                    Limited spots left in Presale 2! Secure your BAM at $0.0000002 before Uniswap & PancakeSwap launch at higher prices!
                   </div>
                 </div>
               </div>
@@ -1471,12 +1471,12 @@ const SwapPage = () => {
                   <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-yellow-400 font-bold text-sm">PRESALE 1 ACTIVE</div>
+                  <div className="text-yellow-400 font-bold text-sm">PRESALE 2 ACTIVE</div>
                   <div className="text-yellow-200 text-xs leading-tight">
                     {contractBalances.BAM ? (
-                      <>Current price: $0.0000001 • Next: Presale 2 @ higher price • Final: Uniswap & PancakeSwap</>
+                      <>PRESALE 2 ACTIVE: $0.0000002 per BAM • 2 USDT = 5M BAM • Before Uniswap & PancakeSwap</>
                     ) : (
-                      <>Presale 1 Complete! • Wait for Presale 2 @ higher price • Before DEX listing</>
+                      <>Presale 2 Complete! • Wait for DEX listing on Uniswap & PancakeSwap</>
                     )}
                   </div>
                 </div>
