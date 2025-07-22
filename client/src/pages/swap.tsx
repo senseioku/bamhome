@@ -61,6 +61,7 @@ const SwapPage = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showLimitsModal, setShowLimitsModal] = useState(false);
   const [hasAlreadyPurchased, setHasAlreadyPurchased] = useState<boolean>(false);
+  const [showPurchasedWarning, setShowPurchasedWarning] = useState<boolean>(false);
   const [isCheckingPurchaseHistory, setIsCheckingPurchaseHistory] = useState<boolean>(false);
   const [showAddTokenNotification, setShowAddTokenNotification] = useState<boolean>(false);
   const [contractBalances, setContractBalances] = useState<{[key: string]: string}>({});
@@ -269,6 +270,12 @@ const SwapPage = () => {
       // If purchase amount > 0, wallet has already purchased
       const hasPurchased = purchaseAmount && BigInt(purchaseAmount.toString()) > BigInt(0);
       setHasAlreadyPurchased(Boolean(hasPurchased));
+      
+      // Auto-dismiss purchase warning after 5 seconds
+      if (hasPurchased) {
+        setShowPurchasedWarning(true);
+        setTimeout(() => setShowPurchasedWarning(false), 5000);
+      }
       
       console.log(`🔍 Purchase history result for ${address}:`, hasPurchased ? '🚫 Already purchased' : '✅ No previous purchase');
     } catch (error: any) {
@@ -1233,8 +1240,8 @@ const SwapPage = () => {
                 />
                 <div className="flex items-center space-x-2">
                   <span className="text-xl font-bold gradient-text">BAM Swap</span>
-                  <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
-                    Soon
+                  <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                    Live
                   </span>
                 </div>
               </div>
@@ -1594,15 +1601,13 @@ const SwapPage = () => {
             {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
               (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && (
               <>
-                {hasAlreadyPurchased ? (
-                  <Alert className="border-red-500/30 bg-red-500/10 mb-3">
+                {hasAlreadyPurchased && showPurchasedWarning ? (
+                  <Alert className="border-red-500/30 bg-red-500/10 mb-3 animate-fadeIn">
                     <AlertCircle className="h-4 w-4 text-red-400" />
                     <AlertDescription className="text-red-200 text-sm">
                       <div className="space-y-1">
-                        <div className="font-medium">🚫 Already Purchased BAM:</div>
-                        <div className="text-xs">
-                          Your wallet has already bought BAM tokens. Only one purchase per wallet is allowed.
-                        </div>
+                        <div className="font-medium">🚫 Already Purchased:</div>
+                        <div className="text-xs">One purchase per wallet allowed.</div>
                       </div>
                     </AlertDescription>
                   </Alert>

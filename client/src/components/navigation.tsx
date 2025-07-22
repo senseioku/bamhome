@@ -89,7 +89,7 @@ export default function Navigation() {
                     >
                       <span className="mr-2">🔄</span>
                       BAM Swap
-                      <span className="ml-auto text-xs bg-primary/20 text-primary px-2 py-1 rounded">Ready</span>
+                      <span className="ml-auto text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Live</span>
                     </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem>

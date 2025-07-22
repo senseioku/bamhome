@@ -153,6 +153,10 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Added Presale 3 → Final DEX launch messaging throughout notification system
 ✓ Contract price set to maximum allowed (1e12) due to safety limits preventing exact $0.000002 target
 ✓ Purchase limits updated: 2 USDT minimum, 5 USDT maximum per wallet for flexible purchasing
+✓ Changed "Soon" to "Live" status for BAM Swap across navigation and interface
+✓ Implemented auto-dismissing notifications: purchase warnings (5s), balance errors (4s), general errors (5s)
+✓ Added mobile optimization for screens under 620px with compact layouts and responsive sizing
+✓ Enhanced user experience with fadeIn animations and automatic notification cleanup
 
 ## User Preferences
 
