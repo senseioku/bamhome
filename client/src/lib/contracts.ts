@@ -1,5 +1,5 @@
-// BAM Swap Contract Configuration - V2 DEPLOYED CONTRACT  
-export const BAM_SWAP_ADDRESS = "0xF30A71a63c1dF17eA47ed80A164d9C5a75A7747E";
+// BAM Swap Contract Configuration - V3 FIXED CONTRACT  
+export const BAM_SWAP_ADDRESS = "0x6fCbbc0834E9c0E3AFc4A96F47a19E29b6261934";
 
 // BSC Mainnet Configuration
 export const BSC_CHAIN_ID = 56;
