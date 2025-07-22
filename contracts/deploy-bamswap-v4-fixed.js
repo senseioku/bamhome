@@ -9,11 +9,11 @@ async function main() {
   const BAM_ADDRESS = "0xA779f03b752fa2442e6A23f145b007f2160F9a7D";
   
   // Recipients - YOU MUST UPDATE THESE ADDRESSES
-  const FEE_RECIPIENT = "YOUR_FEE_RECIPIENT_ADDRESS_HERE"; // Update with your fee recipient wallet
-  const PAYMENT_RECIPIENT = "YOUR_PAYMENT_RECIPIENT_ADDRESS_HERE"; // Update with your payment recipient wallet
+  const FEE_RECIPIENT = "0x65b504C7204FF08C52cAf69eF090A2B0E763C00b"; // Update with your fee recipient wallet
+  const PAYMENT_RECIPIENT = "0xEbF9c1C3F513D8f043a9A6A631ddc72cc1092F71"; // Update with your payment recipient wallet
 
   // Validate addresses are set
-  if (FEE_RECIPIENT === "YOUR_FEE_RECIPIENT_ADDRESS_HERE" || PAYMENT_RECIPIENT === "YOUR_PAYMENT_RECIPIENT_ADDRESS_HERE") {
+  if (FEE_RECIPIENT === "0x65b504C7204FF08C52cAf69eF090A2B0E763C00b" || PAYMENT_RECIPIENT === "0xEbF9c1C3F513D8f043a9A6A631ddc72cc1092F71") {
     throw new Error("❌ PLEASE UPDATE FEE_RECIPIENT and PAYMENT_RECIPIENT addresses before deploying!");
   }
 
