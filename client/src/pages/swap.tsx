@@ -2139,6 +2139,11 @@ function SwapMobileNavigation({
 }: SwapMobileNavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   
+  // Debug logging for mobile nav state
+  useEffect(() => {
+    console.log('Mobile nav isOpen state changed:', isOpen);
+  }, [isOpen]);
+  
   // Prevent body scroll when mobile nav is open
   useEffect(() => {
     if (isOpen) {
@@ -2192,7 +2197,10 @@ function SwapMobileNavigation({
         <Button 
           variant="ghost" 
           size="icon"
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            console.log('Mobile menu button clicked, setting isOpen to true');
+            setIsOpen(true);
+          }}
           className="relative z-50 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 hover:text-yellow-300"
         >
           <Menu className="h-6 w-6" />
