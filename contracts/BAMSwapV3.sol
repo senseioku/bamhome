@@ -30,9 +30,9 @@ contract BAMSwapV3 is Ownable, ReentrancyGuard, Pausable {
     bool public useFallbackPrice;
     uint256 public fallbackBnbPrice; // In USD with 8 decimals
     
-    // BAM token pricing (in USD with 12 decimals precision)
-    uint256 public bamPriceInUSD = 1e6; // Default $0.000001 per BAM (1e6 for correct calculation)
-    uint256 public constant MIN_BAM_PRICE = 1e2;  // $0.0000001 minimum  
+    // BAM token pricing (V1 CORRECT CALCULATION RESTORED)
+    uint256 public bamPriceInUSD = 1e11; // CORRECT: gives 10M BAM per USDT as intended
+    uint256 public constant MIN_BAM_PRICE = 1e10;  // $0.0000001 minimum  
     uint256 public constant MAX_BAM_PRICE = 1e12; // $1.00 maximum
     
     // Purchase limits (in USDT with 18 decimals)
