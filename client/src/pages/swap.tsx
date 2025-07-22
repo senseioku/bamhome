@@ -1416,11 +1416,9 @@ const SwapPage = () => {
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50">
           <div className="glassmorphism-golden rounded-3xl p-12 text-center max-w-md mx-4">
             <div className="relative flex items-center justify-center mb-8">
-              <img 
-                src="/attached_assets/bamToken_1753182165828.png" 
-                alt="BAM Token" 
-                className="w-24 h-24 rounded-full animate-swap-rotate"
-              />
+              <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-2xl font-bold text-black animate-swap-rotate shadow-lg border-4 border-yellow-300">
+                BAM
+              </div>
               <div className="absolute -top-4 -left-8 text-3xl animate-money-fly">💰</div>
               <div className="absolute -top-4 -right-8 text-3xl animate-money-fly" style={{animationDelay: '0.3s'}}>💎</div>
               <div className="absolute -bottom-4 -left-8 text-3xl animate-money-fly" style={{animationDelay: '0.6s'}}>🚀</div>
@@ -1433,8 +1431,8 @@ const SwapPage = () => {
             <p className="text-sm text-yellow-300/90 mb-6">
               Welcome to the community-driven DeFi revolution
             </p>
-            <div className="w-full bg-yellow-900/30 rounded-full h-3">
-              <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 h-3 rounded-full animate-pulse w-full"></div>
+            <div className="w-full bg-yellow-900/50 rounded-full h-4 border border-yellow-600/30">
+              <div className="bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-300 h-full rounded-full animate-progress-fill shadow-inner"></div>
             </div>
             <p className="text-xs text-yellow-300 mt-3">Initializing swap interface...</p>
           </div>
