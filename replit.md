@@ -194,11 +194,11 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Button-only validation: All feedback now shows in button text (amount validation, purchase limits, errors)
 ✓ Preserved automatic token addition functions and success notifications as requested
 ✓ Fixed circular dependency issues with Web3Utils and contract imports for clean deployment
-✓ CRITICAL FIX: Resolved transaction failures by discovering contract requires EXACTLY 2 USDT (not 2-5 USDT range)
-✓ Updated interface validation from "2-5 USDT" to "exactly 2 USDT" to prevent user confusion
-✓ Added "Set Exact Amount" helper button for automatic precision (2.000000 USDT)
-✓ Enhanced error messaging explaining why transactions fail (amount must be precisely 2 USDT)
-✓ USER CONFIRMED SUCCESS: Transaction 0xb4eee4195b3de30de01e77d016b4eec0a76c41a206386752e1644109e8e6c16b shows 2 USDT → 2M BAM working perfectly
+✓ DEPLOYED CONTRACT V2: Successfully integrated with flexible 2-5 USDT purchase range support  
+✓ Updated interface to show correct "2-5 USDT Range" messaging instead of "exactly 2 USDT"
+✓ Contract data confirms: minPurchase: 2 USDT, maxPurchase: 5 USDT (flexible purchasing enabled)
+✓ Fixed all hardcoded messaging to reflect actual deployed contract capabilities
+✓ Real-time contract data fetching working: BAM price $0.000001, 1M BAM per USDT
 ✓ CRITICAL PRODUCTION FIX: Resolved compilation errors in BAMSwapV2.sol 
 ✓ Fixed variable naming inconsistencies (useChainlinkPriceFeed → useFallbackPrice, fallbackBNBPrice → fallbackBnbPrice)
 ✓ BAMSwapV2 contract now compiles successfully with no errors

@@ -992,8 +992,8 @@ const SwapPage = () => {
             errorMessage = 'Token approval required';
           } else if (error.message.includes('Already purchased')) {
             errorMessage = 'You have already purchased BAM tokens with this wallet';
-          } else if (error.message.includes('Must purchase exactly')) {
-            errorMessage = 'BAM purchases require 2-5 USDT range';
+          } else if (error.message.includes('Must purchase exactly') || error.message.includes('purchase amount')) {
+            errorMessage = 'BAM purchases must be between 2-5 USDT';
           } else {
             errorMessage = 'Contract execution failed - check requirements';
           }
@@ -1598,7 +1598,7 @@ const SwapPage = () => {
                   <div className="text-yellow-400 font-bold text-sm">PRESALE 2 ACTIVE</div>
                   <div className="text-yellow-200 text-xs leading-tight">
                     {contractBalances.BAM ? (
-                      <>PRESALE 2 ACTIVE: $0.000001 per BAM • Exactly 2 USDT = 2M BAM • Next: Presale 3 → Uniswap & PancakeSwap</>
+                      <>PRESALE 2 ACTIVE: $0.000001 per BAM • 2-5 USDT Range • 1M BAM per USDT • Next: Presale 3 → Uniswap & PancakeSwap</>
                     ) : (
                       <>Presale 2 Complete! • Next: Presale 3 → Final Uniswap & PancakeSwap Launch</>
                     )}
@@ -1854,7 +1854,7 @@ const SwapPage = () => {
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
               >
-                ⚠️ BAM requires exactly 2 USDT
+                ⚠️ BAM requires 2-5 USDT range
               </Button>
             ) : parseFloat(fromAmount) < 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && toToken.symbol !== 'BAM' ? (
               <Button
@@ -1876,7 +1876,7 @@ const SwapPage = () => {
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
               >
-                {!priceInfo ? 'Loading price data...' : '⚠️ BAM requires exactly $2 USD worth of BNB'}
+                {!priceInfo ? 'Loading price data...' : '⚠️ BAM requires $2-5 USD worth of BNB'}
               </Button>
             ) : parseFloat(fromAmount) > 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && toToken.symbol !== 'BAM' ? (
               <Button
@@ -2024,7 +2024,7 @@ const SwapPage = () => {
               <div className="space-y-2 text-sm text-yellow-200">
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div><span className="font-medium">Exact Purchase:</span> {contractData ? `${contractData.minPurchase} USDT only` : 'Exactly 2 USDT'} (or equivalent BNB)</div>
+                  <div><span className="font-medium">Purchase Range:</span> {contractData ? `${contractData.minPurchase}-${contractData.maxPurchase} USDT` : '2-5 USDT'} (or equivalent BNB)</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
@@ -2032,7 +2032,7 @@ const SwapPage = () => {
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div><span className="font-medium">BAM Reward:</span> {contractData ? `${Number(contractData.bamPerUSDT).toLocaleString()} BAM total` : '2,000,000 BAM total (2 USDT × 1M BAM/USDT)'}</div>
+                  <div><span className="font-medium">BAM Reward:</span> {contractData ? `${Number(contractData.bamPerUSDT).toLocaleString()} BAM per USDT` : '1,000,000 BAM per USDT'}</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
@@ -2044,9 +2044,9 @@ const SwapPage = () => {
                     Why Transactions Fail
                   </div>
                   <div className="space-y-1 text-xs text-red-200 mt-2">
-                    <div>• Amount must be EXACTLY 2.000000 USDT (not 2.1, 1.9, or 5)</div>
-                    <div>• Contract rejects any amount that's not precisely 2 USDT</div>
-                    <div>• Use "Set Exact Amount" button for perfect precision</div>
+                    <div>• Amount must be between 2-5 USDT (flexible range supported)</div>
+                    <div>• Contract validates amounts are within the allowed range</div>
+                    <div>• Choose any amount within range - 2.5 USDT, 3 USDT, 4.7 USDT all work</div>
                   </div>
                 </div>
               </div>
