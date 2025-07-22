@@ -84,6 +84,53 @@ const SwapPage = () => {
     functionPaused: { [key: string]: boolean };
     lastChecked: number;
   } | null>(null);
+  
+  // Real-time contract data
+  const [contractData, setContractData] = useState<{
+    bamPrice: string;
+    minPurchase: string;
+    maxPurchase: string;
+    bamPerUSDT: string;
+    lastUpdated: number;
+  } | null>(null);
+
+  // Fetch real-time contract data
+  const fetchContractData = async () => {
+    try {
+      if (!window.web3 || !walletAddress) return;
+      
+      const contract = new window.web3.eth.Contract(
+        COMPLETE_BAM_SWAP_ABI,
+        CONTRACT_ADDRESS
+      );
+
+      // Fetch current contract parameters
+      const [bamPriceInUSD, minPurchaseLimit, maxPurchaseLimit] = await Promise.all([
+        contract.methods.bamPriceInUSD().call(),
+        contract.methods.minPurchaseLimit().call(),
+        contract.methods.maxPurchaseLimit().call()
+      ]);
+
+      // Convert bamPriceInUSD to actual price (contract stores as integer, divide by 1e11 for current price)
+      const bamPrice = (Number(bamPriceInUSD) / 1e11).toFixed(9); 
+      const minPurchase = window.web3.utils.fromWei(minPurchaseLimit.toString(), 'ether');
+      const maxPurchase = window.web3.utils.fromWei(maxPurchaseLimit.toString(), 'ether');
+      
+      // Calculate BAM tokens per USDT (based on contract's bamPriceInUSD value)
+      const bamPerUSDT = Number(bamPriceInUSD).toLocaleString();
+
+      setContractData({
+        bamPrice,
+        minPurchase,
+        maxPurchase,
+        bamPerUSDT,
+        lastUpdated: Date.now()
+      });
+
+    } catch (error) {
+      console.error('Failed to fetch contract data:', error);
+    }
+  };
 
   // Chainlink-first price fetching with backend API
   const fetchReliablePrice = async (): Promise<{ price: number; source: string }> => {
@@ -172,6 +219,16 @@ const SwapPage = () => {
     const interval = setInterval(updatePrices, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // Fetch contract data when wallet connects
+  useEffect(() => {
+    if (walletAddress && window.web3) {
+      fetchContractData();
+      // Refresh every 2 minutes
+      const interval = setInterval(fetchContractData, 120000);
+      return () => clearInterval(interval);
+    }
+  }, [walletAddress]);
 
   // Check contract pause status for specific functions
   const checkContractStatus = async () => {
@@ -2108,11 +2165,14 @@ const SwapPage = () => {
               <h3 className="text-yellow-400 font-semibold mb-3 flex items-center">
                 <AlertCircle className="w-4 h-4 mr-2" />
                 BAM Token Purchase Limits (CRITICAL)
+                {!contractData && walletAddress && (
+                  <div className="ml-2 w-3 h-3 border border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+                )}
               </h3>
               <div className="space-y-2 text-sm text-yellow-200">
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div><span className="font-medium">Exact Amount:</span> Must be exactly 1 USDT (or equivalent BNB)</div>
+                  <div><span className="font-medium">Purchase Range:</span> {contractData ? `${contractData.minPurchase}-${contractData.maxPurchase} USDT` : '2-5 USDT'} (or equivalent BNB)</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
@@ -2120,7 +2180,7 @@ const SwapPage = () => {
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div><span className="font-medium">Fixed Reward:</span> Receive exactly 10,000,000 BAM tokens</div>
+                  <div><span className="font-medium">BAM Reward:</span> {contractData ? `${Number(contractData.bamPerUSDT).toLocaleString()} BAM per USDT` : '2M-5M BAM tokens based on amount'}</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
@@ -2157,6 +2217,9 @@ const SwapPage = () => {
                   </div>
                   <div className="text-xs text-gray-500 mt-2">
                     Last checked: {new Date(contractStatus.lastChecked).toLocaleTimeString()}
+                    {contractData && (
+                      <div>Live data updated: {new Date(contractData.lastUpdated).toLocaleTimeString()}</div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2202,7 +2265,7 @@ const SwapPage = () => {
                   </div>
                   <div>
                     <div className="text-gray-400">BAM Price</div>
-                    <div className="text-yellow-400 font-medium">$0.0000001</div>
+                    <div className="text-yellow-400 font-medium">${contractData ? contractData.bamPrice : '0.000001'}</div>
                   </div>
                   <div>
                     <div className="text-gray-400">BNB for 1 USDT</div>
@@ -2210,7 +2273,7 @@ const SwapPage = () => {
                   </div>
                   <div>
                     <div className="text-gray-400">BAM per USDT</div>
-                    <div className="text-purple-400 font-medium">10,000,000</div>
+                    <div className="text-purple-400 font-medium">{contractData ? Number(contractData.bamPerUSDT).toLocaleString() : '2,000,000'}</div>
                   </div>
                 </div>
               </div>
@@ -2226,7 +2289,7 @@ const SwapPage = () => {
               </Button>
               <Button 
                 onClick={() => {
-                  setFromAmount('1');
+                  setFromAmount(contractData ? contractData.minPurchase : '2');
                   setFromToken(TOKENS.USDT);
                   setToToken(TOKENS.BAM);
                   setShowLimitsModal(false);

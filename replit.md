@@ -177,6 +177,13 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Added subtle tooltip-style notification that appears near BAM price badge when wallet already purchased
 ✓ Updated BAM price display from $0.0000001 to current Presale 2 rate of $0.000001
 ✓ Streamlined user experience with minimal, non-intrusive notification system as requested
+✓ IMPLEMENTED: Real-time contract data fetching for purchase limits modal
+✓ Added dynamic BAM price, purchase range, and token reward calculations from live contract
+✓ Created fetchContractData() function with bamPriceInUSD, minPurchaseLimit, maxPurchaseLimit queries
+✓ Updated modal to show current contract parameters instead of hardcoded outdated values
+✓ Added automatic refresh every 2 minutes for real-time accuracy
+✓ Enhanced "Set Up BAM Purchase" button to use dynamic minimum purchase amount
+✓ All purchase limit data now reflects actual contract state on BSC mainnet
 
 ## User Preferences
 
