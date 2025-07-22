@@ -131,195 +131,103 @@ export default function Navigation() {
 
           {/* Mobile Navigation */}
           <div className="md:hidden">
-            <MobileNavigation />
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="glass-card border-border w-80 p-6">
+                <div className="flex flex-col h-full">
+                  {/* Header */}
+                  <div className="flex items-center gap-3 mb-8 pb-4 border-b border-border">
+                    <img 
+                      src="/assets/bamToken_1753182165828.png" 
+                      alt="BAM Token" 
+                      className="h-8 w-8 rounded-full"
+                    />
+                    <div>
+                      <span className="text-lg font-bold gradient-text">BAM</span>
+                      <span className="text-sm text-muted-foreground ml-2">Ecosystem</span>
+                    </div>
+                  </div>
+
+                  {/* Navigation Items */}
+                  <div className="flex flex-col space-y-3 mb-6">
+                    {navItems.map((item) => (
+                      <button
+                        key={item.href}
+                        onClick={() => scrollToSection(item.href)}
+                        className="flex items-center gap-3 p-3 rounded-lg text-left text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                      >
+                        <span className="text-lg">
+                          {item.label === "Home" ? "🏠" : 
+                           item.label === "Ecosystem" ? "🌐" :
+                           item.label === "Tokenomics" ? "💰" : "🚀"}
+                        </span>
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Platforms Section */}
+                  <div className="border-t border-border pt-6">
+                    <div className="text-sm font-semibold text-muted-foreground mb-4 px-3">Platforms</div>
+                    <div className="space-y-2">
+                      <a
+                        href="/swap"
+                        className="flex items-center justify-between p-3 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🔄</span>
+                          <span>BAM Swap</span>
+                        </div>
+                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Live</span>
+                      </a>
+                      <button
+                        onClick={() => scrollToSection("projects")}
+                        className="flex items-center justify-between p-3 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 w-full text-left"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🎁</span>
+                          <span>BAM Drops</span>
+                        </div>
+                        <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded">Soon</span>
+                      </button>
+                      <a
+                        href="https://apex.bam-ecosystem.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                      >
+                        <span className="text-lg">⛏️</span>
+                        <span>BAM ApexMiner</span>
+                      </a>
+                      <a
+                        href="https://vip.bam-ecosystem.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                      >
+                        <span className="text-lg">👑</span>
+                        <span>BAM VIP Access</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Current Page Indicator */}
+                  <div className="mt-auto pt-6 border-t border-border">
+                    <div className="text-sm text-muted-foreground mb-2">Current: Swap</div>
+                    <div className="text-xs text-muted-foreground">
+                      Connected wallet will appear here when available
+                    </div>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
     </nav>
-  );
-}
-
-// Full-screen mobile navigation component
-function MobileNavigation() {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  // Prevent body scroll when mobile nav is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    }
-    
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    };
-  }, [isOpen]);
-  
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-    setIsOpen(false); // Close sidebar after navigation
-  };
-
-  const navItems = [
-    { label: "Home", href: "home", icon: "🏠" },
-    { label: "Ecosystem", href: "ecosystem", icon: "🌐" },
-    { label: "Tokenomics", href: "tokenomics", icon: "💰" },
-    { label: "Projects", href: "projects", icon: "🚀" },
-  ];
-
-  const platformItems = [
-    { 
-      label: "BAM Swap", 
-      href: "/swap", 
-      icon: "🔄", 
-      status: "Live", 
-      statusColor: "bg-green-500/20 text-green-400" 
-    },
-    { 
-      label: "BAM Drops", 
-      onClick: () => scrollToSection("projects"), 
-      icon: "🎁", 
-      status: "Soon", 
-      statusColor: "bg-yellow-500/20 text-yellow-400" 
-    },
-    { 
-      label: "ApexMiner", 
-      href: "https://apex.bam-ecosystem.com", 
-      icon: "⛏️", 
-      external: true 
-    },
-    { 
-      label: "VIP Access", 
-      href: "https://vip.bam-ecosystem.com", 
-      icon: "👑", 
-      external: true 
-    },
-  ];
-
-  return (
-    <>
-      {/* Menu Button */}
-      <Button 
-        variant="ghost" 
-        size="icon"
-        onClick={() => setIsOpen(true)}
-        className="relative z-50"
-      >
-        <Menu className="h-6 w-6" />
-      </Button>
-
-      {/* Professional Full-screen Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 z-[100] bg-gray-800/60 backdrop-blur-xl"
-          style={{ touchAction: 'none', overscrollBehavior: 'none' }}
-          onTouchMove={(e) => e.preventDefault()}
-          onWheel={(e) => e.preventDefault()}
-        >
-          <div className="flex flex-col h-full overflow-hidden">
-            {/* Clean Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
-              <div className="flex items-center gap-3">
-                <img 
-                  src="/assets/bamToken_1753182165828.png" 
-                  alt="BAM Token" 
-                  className="h-10 w-10 rounded-full"
-                />
-                <div>
-                  <span className="text-2xl font-bold text-yellow-400">BAM</span>
-                  <span className="text-base text-gray-300 ml-2">Ecosystem</span>
-                </div>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setIsOpen(false)}
-                className="text-white hover:bg-white/10"
-              >
-                <X className="h-8 w-8" />
-              </Button>
-            </div>
-
-            {/* Professional Navigation Grid */}
-            <div className="flex-1 p-6">
-              <div className="space-y-1 mb-8">
-                {navItems.map((item) => (
-                  <button
-                    key={item.href}
-                    onClick={() => scrollToSection(item.href)}
-                    className="flex items-center gap-4 p-4 rounded-xl text-left text-white hover:bg-white/10 transition-all duration-200 w-full text-xl border border-white/5 hover:border-yellow-400/30"
-                  >
-                    <span className="text-2xl">{item.icon}</span>
-                    <span className="font-medium">{item.label}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Clean Platforms Section */}
-              <div className="border-t border-white/10 pt-6">
-                <h3 className="text-yellow-400 font-semibold mb-4 text-lg">Platform Access</h3>
-                <div className="space-y-2">
-                  {platformItems.map((item, index) => {
-                    const content = (
-                      <div className="flex items-center justify-between p-4 rounded-xl text-white hover:bg-white/10 transition-all duration-200 w-full text-lg border border-white/5 hover:border-yellow-400/30">
-                        <div className="flex items-center gap-4">
-                          <span className="text-2xl">{item.icon}</span>
-                          <span className="font-medium">{item.label}</span>
-                        </div>
-                        {item.status && (
-                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${item.statusColor}`}>
-                            {item.status}
-                          </span>
-                        )}
-                      </div>
-                    );
-
-                    if (item.href) {
-                      return (
-                        <a
-                          key={index}
-                          href={item.href}
-                          target={item.external ? "_blank" : undefined}
-                          rel={item.external ? "noopener noreferrer" : undefined}
-                          onClick={() => !item.external && setIsOpen(false)}
-                        >
-                          {content}
-                        </a>
-                      );
-                    } else if (item.onClick) {
-                      return (
-                        <button
-                          key={index}
-                          onClick={item.onClick}
-                          className="text-left w-full"
-                        >
-                          {content}
-                        </button>
-                      );
-                    }
-                    return null;
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="p-6 border-t border-white/10">
-              <div className="text-yellow-400 font-medium mb-1">BAM Swap Interface</div>
-              <div className="text-gray-400 text-sm">
-                Professional DeFi Platform • BSC Mainnet
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
   );
 }
