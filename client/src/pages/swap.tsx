@@ -344,8 +344,8 @@ const SwapPage = () => {
     // Check contract balances on page load
     checkContractBalances();
     
-    // Hide page loader after 2.5 seconds
-    setTimeout(() => setShowPageLoader(false), 2500);
+    // Hide page loader after 3 seconds (with delay)
+    setTimeout(() => setShowPageLoader(false), 3000);
     
     // Check contract balances every 30 seconds
     const balanceInterval = setInterval(checkContractBalances, 30000);
@@ -1416,9 +1416,11 @@ const SwapPage = () => {
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50">
           <div className="glassmorphism-golden rounded-3xl p-12 text-center max-w-md mx-4">
             <div className="relative flex items-center justify-center mb-8">
-              <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-4xl font-bold text-black animate-swap-rotate">
-                BAM
-              </div>
+              <img 
+                src="/attached_assets/bamToken_1753182165828.png" 
+                alt="BAM Token" 
+                className="w-24 h-24 rounded-full animate-swap-rotate"
+              />
               <div className="absolute -top-4 -left-8 text-3xl animate-money-fly">💰</div>
               <div className="absolute -top-4 -right-8 text-3xl animate-money-fly" style={{animationDelay: '0.3s'}}>💎</div>
               <div className="absolute -bottom-4 -left-8 text-3xl animate-money-fly" style={{animationDelay: '0.6s'}}>🚀</div>
@@ -1480,7 +1482,7 @@ const SwapPage = () => {
             <div className="glassmorphism-golden rounded-2xl p-8 text-center max-w-sm mx-4">
               <div className="relative flex items-center justify-center mb-6">
                 <img 
-                  src="/attached_assets/bamToken_1753039099296.png" 
+                  src="/attached_assets/bamToken_1753182165828.png" 
                   alt="BAM Token" 
                   className="w-16 h-16 rounded-full animate-swap-rotate"
                 />
@@ -1502,7 +1504,7 @@ const SwapPage = () => {
             <div className="glassmorphism-golden rounded-2xl p-8 text-center max-w-md mx-4 animate-celebration">
               <div className="relative flex items-center justify-center mb-6">
                 <img 
-                  src="/attached_assets/bamToken_1753039099296.png" 
+                  src="/attached_assets/bamToken_1753182165828.png" 
                   alt="BAM Token" 
                   className="w-20 h-20 rounded-full animate-pulse-slow"
                 />
@@ -1609,27 +1611,7 @@ const SwapPage = () => {
           </Card>
         </div>
 
-        {/* Welcome Banner */}
-        <div className="w-full max-w-lg mx-auto mb-4 sm:mb-6">
-          <div className="glassmorphism-golden rounded-lg p-3 sm:p-4 text-center">
-            <div className="flex items-center justify-center space-x-2 mb-2">
-              <div className="w-8 h-8 relative">
-                <img 
-                  src="/attached_assets/bamToken_1753039099296.png" 
-                  alt="BAM Token" 
-                  className="w-full h-full rounded-full object-cover animate-pulse-slow"
-                />
-              </div>
-              <h1 className="text-lg sm:text-xl font-bold text-yellow-400">BAM Ecosystem</h1>
-            </div>
-            <p className="text-sm sm:text-base text-yellow-200 font-medium">
-              BUILD AND MULTIPLY Wealth Together
-            </p>
-            <p className="text-xs text-yellow-300/80 mt-1">
-              Join the community-driven DeFi revolution
-            </p>
-          </div>
-        </div>
+
 
         {/* Main Swap Card - Compact desktop sizing */}
         <Card className="glassmorphism border-amber-500/40">
