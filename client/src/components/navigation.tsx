@@ -137,47 +137,90 @@ export default function Navigation() {
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="glass-card border-border">
-                <div className="flex flex-col space-y-4 mt-8">
-                  {navItems.map((item) => (
-                    <button
-                      key={item.href}
-                      onClick={() => scrollToSection(item.href)}
-                      className="text-left text-foreground hover:text-primary transition-colors duration-200"
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                  <div className="border-t border-border pt-4">
-                    <div className="text-sm text-muted-foreground mb-2">Platforms</div>
-                    <a
-                      href="/swap"
-                      className="block py-2 text-foreground hover:text-primary w-full text-left"
-                    >
-                      🔄 BAM Swap <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded ml-2">Ready</span>
-                    </a>
-                    <button
-                      onClick={() => scrollToSection("projects")}
-                      className="block py-2 text-foreground hover:text-primary w-full text-left"
-                    >
-                      🎁 BAM Drops <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded ml-2">Soon</span>
-                    </button>
-                    <a
-                      href="https://apex.bam-ecosystem.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block py-2 text-foreground hover:text-primary"
-                    >
-                      ⛏️ BAM ApexMiner
-                    </a>
-                    <a
-                      href="https://vip.bam-ecosystem.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block py-2 text-foreground hover:text-primary"
-                    >
-                      👑 BAM VIP Access
-                    </a>
+              <SheetContent side="right" className="glass-card border-border w-80 p-6">
+                <div className="flex flex-col h-full">
+                  {/* Header */}
+                  <div className="flex items-center gap-3 mb-8 pb-4 border-b border-border">
+                    <img 
+                      src="/assets/bamToken_1753182165828.png" 
+                      alt="BAM Token" 
+                      className="h-8 w-8 rounded-full"
+                    />
+                    <div>
+                      <span className="text-lg font-bold gradient-text">BAM</span>
+                      <span className="text-sm text-muted-foreground ml-2">Ecosystem</span>
+                    </div>
+                  </div>
+
+                  {/* Navigation Items */}
+                  <div className="flex flex-col space-y-3 mb-6">
+                    {navItems.map((item) => (
+                      <button
+                        key={item.href}
+                        onClick={() => scrollToSection(item.href)}
+                        className="flex items-center gap-3 p-3 rounded-lg text-left text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                      >
+                        <span className="text-lg">
+                          {item.label === "Home" ? "🏠" : 
+                           item.label === "Ecosystem" ? "🌐" :
+                           item.label === "Tokenomics" ? "💰" : "🚀"}
+                        </span>
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Platforms Section */}
+                  <div className="border-t border-border pt-6">
+                    <div className="text-sm font-semibold text-muted-foreground mb-4 px-3">Platforms</div>
+                    <div className="space-y-2">
+                      <a
+                        href="/swap"
+                        className="flex items-center justify-between p-3 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🔄</span>
+                          <span>BAM Swap</span>
+                        </div>
+                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Live</span>
+                      </a>
+                      <button
+                        onClick={() => scrollToSection("projects")}
+                        className="flex items-center justify-between p-3 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 w-full text-left"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">🎁</span>
+                          <span>BAM Drops</span>
+                        </div>
+                        <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded">Soon</span>
+                      </button>
+                      <a
+                        href="https://apex.bam-ecosystem.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                      >
+                        <span className="text-lg">⛏️</span>
+                        <span>BAM ApexMiner</span>
+                      </a>
+                      <a
+                        href="https://vip.bam-ecosystem.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+                      >
+                        <span className="text-lg">👑</span>
+                        <span>BAM VIP Access</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Current Page Indicator */}
+                  <div className="mt-auto pt-6 border-t border-border">
+                    <div className="text-sm text-muted-foreground mb-2">Current: Swap</div>
+                    <div className="text-xs text-muted-foreground">
+                      Connected wallet will appear here when available
+                    </div>
                   </div>
                 </div>
               </SheetContent>

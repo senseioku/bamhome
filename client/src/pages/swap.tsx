@@ -1132,12 +1132,9 @@ const SwapPage = () => {
             </div>
           </Button>
         </DialogTrigger>
-        <DialogContent className="bg-gray-900 border-gray-700 w-[90vw] max-w-sm sm:max-w-md max-h-[75vh] overflow-hidden p-3 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
-          <DialogHeader>
-            <DialogTitle className="sr-only">Token Selection</DialogTitle>
-          </DialogHeader>
-          <DialogHeader className="pb-3">
-            <DialogTitle className="text-white text-base">
+        <DialogContent className="bg-gray-900 border-gray-700 w-[90vw] max-w-sm sm:max-w-md max-h-[75vh] overflow-hidden p-4 sm:p-6">
+          <DialogHeader className="pb-4">
+            <DialogTitle className="text-white text-lg font-semibold">
               Select a token
             </DialogTitle>
           </DialogHeader>
@@ -2024,15 +2021,15 @@ const SwapPage = () => {
 
       {/* Comprehensive Limits & Requirements Modal */}
       <Dialog open={showLimitsModal} onOpenChange={setShowLimitsModal}>
-        <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center space-x-2">
+        <DialogContent className="bg-gray-900 border-gray-700 w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+          <DialogHeader className="pb-4">
+            <DialogTitle className="text-white flex items-center space-x-2 text-lg font-semibold">
               <Info className="w-5 h-5 text-yellow-400" />
               <span>BAM Swap - Limits & Requirements</span>
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* BAM Purchase Limits */}
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
               <h3 className="text-yellow-400 font-semibold mb-3 flex items-center">
@@ -2163,11 +2160,11 @@ const SwapPage = () => {
               </div>
             )}
 
-            <div className="flex justify-end space-x-3">
+            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-700">
               <Button 
                 variant="outline" 
                 onClick={() => setShowLimitsModal(false)}
-                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                className="border-gray-600 text-gray-300 hover:bg-gray-700 w-full sm:w-auto order-2 sm:order-1"
               >
                 Close
               </Button>
@@ -2178,7 +2175,7 @@ const SwapPage = () => {
                   setToToken(TOKENS.BAM);
                   setShowLimitsModal(false);
                 }}
-                className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700"
+                className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 w-full sm:w-auto order-1 sm:order-2"
               >
                 Set Up BAM Purchase
               </Button>
