@@ -578,18 +578,6 @@ contract BAMSwapV2 is ReentrancyGuard, Pausable, Ownable {
     }
     
     /**
-     * @dev Update fallback BNB price (owner only)
-     */
-    function updateFallbackBNBPrice(uint256 newPrice) external onlyOwner {
-        require(newPrice > 0, "Price must be greater than 0");
-        require(newPrice < 10000e8, "Price too high (max $10,000)");
-        
-        uint256 oldPrice = fallbackBnbPrice;
-        fallbackBnbPrice = newPrice;
-        emit FallbackPriceUpdated(oldPrice, newPrice);
-    }
-    
-    /**
      * @dev Toggle emergency mode (owner only)
      */
     function toggleEmergencyMode(bool _emergencyMode) external onlyOwner {
