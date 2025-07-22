@@ -566,9 +566,9 @@ const SwapPage = () => {
       
       // Check for low BAM balance
       const bamBalance = parseFloat(newContractBalances.BAM || '0');
-      if (bamBalance < 10000000) { // Less than 10M BAM tokens left
+      if (bamBalance < 50000000 && bamBalance > 0) { // Less than 50M BAM tokens left (5 purchases)
         setShowBalanceWarning(true);
-        setTimeout(() => setShowBalanceWarning(false), 8000);
+        setTimeout(() => setShowBalanceWarning(false), 10000);
       }
       
       // Check BAM holder milestones
@@ -594,12 +594,12 @@ const SwapPage = () => {
       
       if (currentMilestone >= 100 && estimatedHolders % 100 < 5) { // Show for first 5 holders past milestone
         if (bamBalance <= 0) {
-          setMilestoneMessage(`🎉 Batch ${currentMilestone / 100} Complete! Next batch launching soon - secure your spot before public launch!`);
+          setMilestoneMessage(`🎉 Presale 1 Ends! Wait for Presale 2 @ higher price. Grab yours before Public Launch to Uniswap & PancakeSwap!`);
         } else {
-          setMilestoneMessage(`🎉 Milestone: ${currentMilestone}+ BAM Holders! Building the future together!`);
+          setMilestoneMessage(`🎉 Milestone: ${currentMilestone}+ BAM Holders! Presale 1 filling fast - secure before Presale 2 price increase!`);
         }
         setShowMilestoneNotification(true);
-        setTimeout(() => setShowMilestoneNotification(false), 6000);
+        setTimeout(() => setShowMilestoneNotification(false), 8000);
       }
 
       return estimatedHolders;
@@ -730,9 +730,10 @@ const SwapPage = () => {
     // Check contract balance first
     if (!checkSufficientContractBalance(fromToken.symbol, toToken.symbol, fromAmount)) {
       if (toToken.symbol === 'BAM') {
-        setError('Insufficient BAM tokens in contract. This batch is sold out!');
-        setShowBalanceWarning(true);
-        setTimeout(() => setShowBalanceWarning(false), 8000);
+        setError('Presale 1 Sold Out! Wait for Presale 2 announcement - higher price but still below DEX launch!');
+        setMilestoneMessage('🎉 Presale 1 Complete! Presale 2 launching soon @ higher price. Secure before Uniswap & PancakeSwap listing!');
+        setShowMilestoneNotification(true);
+        setTimeout(() => setShowMilestoneNotification(false), 10000);
       } else {
         setError(`Insufficient ${toToken.symbol} in contract for this swap`);
       }
@@ -1434,9 +1435,9 @@ const SwapPage = () => {
               <div className="flex items-start space-x-3 text-white">
                 <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <div className="text-sm">
-                  <div className="font-bold mb-1">Low Contract Balance!</div>
+                  <div className="font-bold mb-1">Presale 1 Ending Soon!</div>
                   <div className="text-xs opacity-90 leading-relaxed">
-                    This batch is running low. Secure your BAM tokens before the next batch launches at higher prices!
+                    Only a few spots left in Presale 1! Secure your BAM before Presale 2 @ higher price. Don't miss out before Uniswap & PancakeSwap launch!
                   </div>
                 </div>
               </div>
@@ -1460,6 +1461,29 @@ const SwapPage = () => {
             </div>
           </div>
         )}
+
+        {/* Presale Status Banner */}
+        <div className="mb-4 mx-auto max-w-sm sm:max-w-md lg:max-w-sm xl:max-w-md">
+          <Card className="bg-gradient-to-r from-yellow-900/50 to-orange-900/50 border-yellow-500/30 backdrop-blur-sm">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-yellow-400 font-bold text-sm">PRESALE 1 ACTIVE</div>
+                  <div className="text-yellow-200 text-xs leading-tight">
+                    {contractBalances.BAM ? (
+                      <>Current price: $0.0000001 • Next: Presale 2 @ higher price • Final: Uniswap & PancakeSwap</>
+                    ) : (
+                      <>Presale 1 Complete! • Wait for Presale 2 @ higher price • Before DEX listing</>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Main Swap Card - Compact desktop sizing */}
         <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
