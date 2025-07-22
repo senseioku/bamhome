@@ -2194,15 +2194,15 @@ function SwapMobileNavigation({
         variant="ghost" 
         size="icon"
         onClick={() => setIsOpen(true)}
-        className="relative z-50"
+        className="relative z-50 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 hover:text-yellow-300"
       >
-        <Menu className="h-6 w-6 text-gray-300" />
+        <Menu className="h-6 w-6" />
       </Button>
 
       {/* Professional Full-screen Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl"
+          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-xl"
           style={{ touchAction: 'none', overscrollBehavior: 'none' }}
           onTouchMove={(e) => e.preventDefault()}
           onWheel={(e) => e.preventDefault()}

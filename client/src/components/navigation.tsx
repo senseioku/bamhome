@@ -218,7 +218,7 @@ function MobileNavigation() {
       {/* Professional Full-screen Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl"
+          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-xl"
           style={{ touchAction: 'none', overscrollBehavior: 'none' }}
           onTouchMove={(e) => e.preventDefault()}
           onWheel={(e) => e.preventDefault()}
