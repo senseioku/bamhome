@@ -1591,7 +1591,7 @@ const SwapPage = () => {
                   <div className="text-yellow-400 font-bold text-sm">PRESALE 2 ACTIVE</div>
                   <div className="text-yellow-200 text-xs leading-tight">
                     {contractBalances.BAM ? (
-                      <>PRESALE 2 ACTIVE: $0.000001 per BAM • 2-5 USDT = 2M-5M BAM • Next: Presale 3 → Uniswap & PancakeSwap</>
+                      <>PRESALE 2 ACTIVE: $0.000001 per BAM • Exactly 2 USDT = 2M BAM • Next: Presale 3 → Uniswap & PancakeSwap</>
                     ) : (
                       <>Presale 2 Complete! • Next: Presale 3 → Final Uniswap & PancakeSwap Launch</>
                     )}
@@ -1667,14 +1667,32 @@ const SwapPage = () => {
             <div className="space-y-0.5 sm:space-y-2 mb-1.5 sm:mb-3">
               <div className="flex justify-between items-center">
                 <label className="text-xs sm:text-sm font-medium text-gray-300">From</label>
-                {balances[fromToken.symbol] && (
-                  <button
-                    onClick={() => setFromAmount(balances[fromToken.symbol])}
-                    className="text-xs sm:text-sm text-yellow-400 hover:text-yellow-300"
-                  >
-                    Max: {formatDisplayAmount(balances[fromToken.symbol], fromToken.symbol)}
-                  </button>
-                )}
+                <div className="flex items-center space-x-2">
+                  {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
+                    (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM' && priceInfo)) && (
+                    <button
+                      onClick={() => {
+                        if (fromToken.symbol === 'USDT') {
+                          setFromAmount('2');
+                        } else if (fromToken.symbol === 'BNB' && priceInfo) {
+                          const requiredBNB = (2 / priceInfo.bnbPrice).toFixed(6);
+                          setFromAmount(requiredBNB);
+                        }
+                      }}
+                      className="text-xs sm:text-sm bg-yellow-500/20 text-yellow-300 hover:text-yellow-200 px-2 py-1 rounded border border-yellow-500/30"
+                    >
+                      Set Exact Amount
+                    </button>
+                  )}
+                  {balances[fromToken.symbol] && (
+                    <button
+                      onClick={() => setFromAmount(balances[fromToken.symbol])}
+                      className="text-xs sm:text-sm text-yellow-400 hover:text-yellow-300"
+                    >
+                      Max: {formatDisplayAmount(balances[fromToken.symbol], fromToken.symbol)}
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="relative">
                 <Input
@@ -1824,12 +1842,12 @@ const SwapPage = () => {
                 Enter an amount
               </Button>
             ) : ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && 
-                  (parseFloat(fromAmount) < 2 || parseFloat(fromAmount) > 5)) ? (
+                  parseFloat(fromAmount) !== 2) ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
               >
-                ⚠️ BAM requires 2-5 USDT
+                ⚠️ BAM requires exactly 2 USDT
               </Button>
             ) : parseFloat(fromAmount) < 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && toToken.symbol !== 'BAM' ? (
               <Button
@@ -1846,12 +1864,12 @@ const SwapPage = () => {
                 🚫 Already Purchased - One Per Wallet
               </Button>
             ) : ((fromToken.symbol === 'BNB' && toToken.symbol === 'BAM') && 
-                  (!priceInfo || (priceInfo && (parseFloat(fromAmount) * priceInfo.bnbPrice < 2 || parseFloat(fromAmount) * priceInfo.bnbPrice > 5)))) ? (
+                  (!priceInfo || (priceInfo && Math.abs(parseFloat(fromAmount) * priceInfo.bnbPrice - 2) > 0.01))) ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
               >
-                {!priceInfo ? 'Loading price data...' : '⚠️ BAM requires $2-5 USD worth of BNB'}
+                {!priceInfo ? 'Loading price data...' : '⚠️ BAM requires exactly $2 USD worth of BNB'}
               </Button>
             ) : parseFloat(fromAmount) > 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && toToken.symbol !== 'BAM' ? (
               <Button
@@ -1999,7 +2017,7 @@ const SwapPage = () => {
               <div className="space-y-2 text-sm text-yellow-200">
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div><span className="font-medium">Purchase Range:</span> {contractData ? `${contractData.minPurchase}-${contractData.maxPurchase} USDT` : '2-5 USDT'} (or equivalent BNB)</div>
+                  <div><span className="font-medium">Exact Purchase:</span> {contractData ? `${contractData.minPurchase} USDT only` : 'Exactly 2 USDT'} (or equivalent BNB)</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
@@ -2007,11 +2025,22 @@ const SwapPage = () => {
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div><span className="font-medium">BAM Reward:</span> {contractData ? `${Number(contractData.bamPerUSDT).toLocaleString()} BAM per USDT` : '1,000,000 BAM per USDT (Presale 2 rate)'}</div>
+                  <div><span className="font-medium">BAM Reward:</span> {contractData ? `${Number(contractData.bamPerUSDT).toLocaleString()} BAM total` : '2,000,000 BAM total (2 USDT × 1M BAM/USDT)'}</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div><span className="font-medium">No Repeats:</span> Cannot buy BAM again with same wallet</div>
+                </div>
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mt-3">
+                  <div className="text-red-400 font-semibold text-sm flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    Why Transactions Fail
+                  </div>
+                  <div className="space-y-1 text-xs text-red-200 mt-2">
+                    <div>• Amount must be EXACTLY 2.000000 USDT (not 2.1, 1.9, or 5)</div>
+                    <div>• Contract rejects any amount that's not precisely 2 USDT</div>
+                    <div>• Use "Set Exact Amount" button for perfect precision</div>
+                  </div>
                 </div>
               </div>
             </div>
