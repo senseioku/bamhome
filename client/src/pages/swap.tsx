@@ -1297,41 +1297,54 @@ const SwapPage = () => {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        {/* Navigation Header */}
-        <nav className="fixed top-0 w-full z-40 glass-card backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo and Back to Home */}
-            <div className="flex items-center gap-4">
-              <a href="/" className="flex items-center gap-2 text-gray-300 hover:text-primary transition-colors">
-                <ArrowLeft className="w-5 h-5" />
-                <span className="hidden sm:inline">Back to Home</span>
-              </a>
-              <div className="flex items-center gap-3">
-                <img 
-                  src="/assets/bamToken_1753182165828.png" 
-                  alt="BAM Token" 
-                  className="h-8 w-8 rounded-full"
-                />
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl font-bold gradient-text">BAM Swap</span>
-                  <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
-                    Live
-                  </span>
+        {/* Navigation Header - Same as Landing Page */}
+        <nav className="fixed top-0 w-full z-50 glass-card backdrop-blur-xl">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 flex items-center gap-3">
+                  <img 
+                    src="/assets/bamToken_1753182165828.png" 
+                    alt="BAM Token" 
+                    className="h-10 w-10 rounded-full"
+                  />
+                  <div>
+                    <span className="text-2xl font-bold gradient-text">BAM</span>
+                    <span className="text-sm text-muted-foreground ml-2">Swap Interface</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Desktop Navigation Links */}
-            <div className="hidden md:flex items-center space-x-6">
-              <a href="/#home" className="text-gray-300 hover:text-primary transition-colors">Home</a>
-              <a href="/#ecosystem" className="text-gray-300 hover:text-primary transition-colors">Ecosystem</a>
-              <a href="/#tokenomics" className="text-gray-300 hover:text-primary transition-colors">Tokenomics</a>
-              <a href="/#projects" className="text-gray-300 hover:text-primary transition-colors">Projects</a>
-              <div className="w-px h-6 bg-gray-600"></div>
-              <span className="text-primary font-medium">Swap</span>
-              
-              {/* Wallet Connection Status */}
+              {/* Desktop Navigation */}
+              <div className="hidden md:block">
+                <div className="ml-10 flex items-baseline space-x-8">
+                  <a
+                    href="/"
+                    className="text-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    Home
+                  </a>
+                  <a
+                    href="/#ecosystem"
+                    className="text-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    Ecosystem
+                  </a>
+                  <a
+                    href="/#tokenomics"
+                    className="text-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    Tokenomics
+                  </a>
+                  <a
+                    href="/#projects"
+                    className="text-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    Projects
+                  </a>
+                  <span className="text-primary font-semibold">BAM Swap</span>
+                  
+                  {/* Wallet Connection for Desktop */}
               {walletAddress ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -1380,23 +1393,126 @@ const SwapPage = () => {
                   {isLoading ? 'Connecting...' : 'Connect Wallet'}
                 </Button>
               )}
-            </div>
+                </div>
+              </div>
 
-            {/* Mobile Navigation Button */}
-            <SwapMobileNavigation 
-              walletAddress={walletAddress}
-              balances={balances}
-              isLoading={isLoading}
-              connectWallet={connectWallet}
-              copyAddress={copyAddress}
-              addBAMTokenToWallet={addBAMTokenToWallet}
-              disconnectWallet={disconnectWallet}
-              formatAddress={formatAddress}
-              formatDisplayAmount={formatDisplayAmount}
-            />
+              {/* Mobile Navigation */}
+              <div className="md:hidden">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/10">
+                      <Menu className="h-6 w-6" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-80 bg-gray-900/95 backdrop-blur-xl border-gray-700">
+                    <div className="flex flex-col h-full">
+                      {/* Header */}
+                      <div className="flex items-center gap-3 pb-6 border-b border-gray-700">
+                        <img 
+                          src="/assets/bamToken_1753182165828.png" 
+                          alt="BAM Token" 
+                          className="h-10 w-10 rounded-full"
+                        />
+                        <div>
+                          <span className="text-xl font-bold text-yellow-400">BAM</span>
+                          <span className="text-sm text-gray-300 ml-2">Swap Interface</span>
+                        </div>
+                      </div>
+
+                      {/* Navigation Links */}
+                      <div className="flex-1 pt-6">
+                        <div className="space-y-4">
+                          <a
+                            href="/"
+                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-2"
+                          >
+                            <Home className="h-5 w-5" />
+                            Home
+                          </a>
+                          <a
+                            href="/#ecosystem"
+                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-2"
+                          >
+                            <Activity className="h-5 w-5" />
+                            Ecosystem
+                          </a>
+                          <a
+                            href="/#tokenomics"
+                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-2"
+                          >
+                            <Coins className="h-5 w-5" />
+                            Tokenomics
+                          </a>
+                          <a
+                            href="/#projects"
+                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-2"
+                          >
+                            <Trophy className="h-5 w-5" />
+                            Projects
+                          </a>
+                          <div className="flex items-center gap-3 text-yellow-400 font-semibold p-2">
+                            <ArrowUpDown className="h-5 w-5" />
+                            BAM Swap (Current)
+                          </div>
+                        </div>
+
+                        {/* Wallet Section */}
+                        <div className="mt-8 pt-6 border-t border-gray-700">
+                          <h3 className="text-yellow-400 font-semibold mb-4">Wallet Connection</h3>
+                          {walletAddress ? (
+                            <div className="space-y-4">
+                              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                                  <span className="text-green-400 font-medium">Connected</span>
+                                </div>
+                                <div className="text-sm text-gray-300 font-mono">{formatAddress(walletAddress)}</div>
+                                {balances.BNB && (
+                                  <div className="text-xs text-gray-400 mt-1">
+                                    Balance: {formatDisplayAmount(balances.BNB, 'BNB')} BNB
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex gap-2">
+                                <Button onClick={copyAddress} variant="outline" size="sm" className="flex-1 text-gray-300 border-gray-600">
+                                  <Copy className="w-4 h-4 mr-1" />
+                                  Copy
+                                </Button>
+                                <Button onClick={addBAMTokenToWallet} variant="outline" size="sm" className="flex-1 text-yellow-400 border-yellow-500/30">
+                                  <Star className="w-4 h-4 mr-1" />
+                                  Add BAM
+                                </Button>
+                              </div>
+                              <Button onClick={disconnectWallet} variant="outline" className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10">
+                                <LogOut className="w-4 h-4 mr-2" />
+                                Disconnect Wallet
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button 
+                              onClick={connectWallet}
+                              disabled={isLoading}
+                              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold"
+                            >
+                              <Wallet className="w-4 h-4 mr-2" />
+                              {isLoading ? 'Connecting...' : 'Connect Wallet'}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Footer */}
+                      <div className="pt-6 border-t border-gray-700 text-center">
+                        <div className="text-yellow-400 font-medium mb-1">BAM Professional DeFi</div>
+                        <div className="text-gray-400 text-xs">Secure • Transparent • Community-Driven</div>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
 
 
