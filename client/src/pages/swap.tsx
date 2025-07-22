@@ -1829,7 +1829,7 @@ const SwapPage = () => {
                     <div className="bg-yellow-500/10 border border-yellow-500/20 rounded p-1.5 mt-1">
                       <div className="text-yellow-400 text-xs font-medium">Fixed Price Swap</div>
                       <div className="text-yellow-300 text-xs">
-                        1 USDT = 10,000,000 BAM (Rate: $0.0000001)
+                        1 USDT = 1,000,000 BAM (Rate: $0.000001)
                       </div>
                     </div>
                   )}
@@ -1870,7 +1870,7 @@ const SwapPage = () => {
                 Enter an amount
               </Button>
             ) : ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && 
-                  parseFloat(fromAmount) !== 2) ? (
+                  (parseFloat(fromAmount) < 2 || parseFloat(fromAmount) > 5)) ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
@@ -1892,7 +1892,7 @@ const SwapPage = () => {
                 🚫 Already Purchased - One Per Wallet
               </Button>
             ) : ((fromToken.symbol === 'BNB' && toToken.symbol === 'BAM') && 
-                  (!priceInfo || (priceInfo && Math.abs(parseFloat(fromAmount) * priceInfo.bnbPrice - 2) > 0.01))) ? (
+                  (!priceInfo || (priceInfo && (parseFloat(fromAmount) * priceInfo.bnbPrice < 2 || parseFloat(fromAmount) * priceInfo.bnbPrice > 5)))) ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
