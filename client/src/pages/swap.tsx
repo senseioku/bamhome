@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowUpDown, Settings, RefreshCw, AlertCircle, CheckCircle, TrendingUp, TrendingDown, Activity, Info, Zap, BarChart3, Search, Star, Clock, AlertTriangle, Trophy } from 'lucide-react';
+import { ArrowUpDown, Settings, RefreshCw, AlertCircle, CheckCircle, TrendingUp, TrendingDown, Activity, Info, Zap, BarChart3, Search, Star, Clock, AlertTriangle, Trophy, Users, Heart, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -69,6 +69,8 @@ const SwapPage = () => {
   const [showBalanceWarning, setShowBalanceWarning] = useState<boolean>(false);
   const [showMilestoneNotification, setShowMilestoneNotification] = useState<boolean>(false);
   const [milestoneMessage, setMilestoneMessage] = useState<string>('');
+  const [showCelebration, setShowCelebration] = useState<boolean>(false);
+  const [showLoader, setShowLoader] = useState<boolean>(false);
 
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
@@ -1440,6 +1442,67 @@ const SwapPage = () => {
           </div>
         )}
 
+        {/* Animated BAM Loader */}
+        {showLoader && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="glassmorphism-golden rounded-2xl p-8 text-center max-w-sm mx-4">
+              <div className="relative flex items-center justify-center mb-6">
+                <img 
+                  src="/attached_assets/bamToken_1753039099296.png" 
+                  alt="BAM Token" 
+                  className="w-16 h-16 rounded-full animate-swap-rotate"
+                />
+                <div className="absolute -left-6 text-yellow-400 animate-money-fly">💰</div>
+                <div className="absolute -right-6 text-yellow-400 animate-money-fly" style={{animationDelay: '0.5s'}}>💎</div>
+              </div>
+              <h3 className="text-xl font-bold text-yellow-400 mb-2">Processing BAM Swap</h3>
+              <p className="text-yellow-200 text-sm">Building wealth together...</p>
+              <div className="mt-4 w-full bg-yellow-900/30 rounded-full h-2">
+                <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 h-2 rounded-full animate-pulse w-3/4"></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Success Celebration */}
+        {showCelebration && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="glassmorphism-golden rounded-2xl p-8 text-center max-w-md mx-4 animate-celebration">
+              <div className="relative flex items-center justify-center mb-6">
+                <img 
+                  src="/attached_assets/bamToken_1753039099296.png" 
+                  alt="BAM Token" 
+                  className="w-20 h-20 rounded-full animate-pulse-slow"
+                />
+                <div className="absolute -top-2 -right-2 text-3xl">🎉</div>
+                <div className="absolute -bottom-2 -left-2 text-3xl">🚀</div>
+              </div>
+              <h3 className="text-2xl font-bold text-yellow-400 mb-3">Congratulations!</h3>
+              <p className="text-yellow-200 mb-4">Welcome to the BAM community!</p>
+              <div className="space-y-3 text-sm text-yellow-300">
+                <div className="flex items-center justify-center space-x-2">
+                  <Users className="w-4 h-4" />
+                  <span>Together we stand, In BAM We Trust!</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <Heart className="w-4 h-4" />
+                  <span>Thank you for helping our community grow!</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <TrendingUp className="w-4 h-4" />
+                  <span>Share this opportunity with friends!</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowCelebration(false)}
+                className="mt-6 px-6 py-2 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 transition-colors"
+              >
+                Continue Building 🏗️
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Purchase Guide - Auto-dismiss */}
         {showPurchaseGuide && ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
           (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && (
@@ -1511,8 +1574,30 @@ const SwapPage = () => {
           </Card>
         </div>
 
+        {/* Welcome Banner */}
+        <div className="w-full max-w-lg mx-auto mb-4 sm:mb-6">
+          <div className="glassmorphism-golden rounded-lg p-3 sm:p-4 text-center">
+            <div className="flex items-center justify-center space-x-2 mb-2">
+              <div className="w-8 h-8 relative">
+                <img 
+                  src="/attached_assets/bamToken_1753039099296.png" 
+                  alt="BAM Token" 
+                  className="w-full h-full rounded-full object-cover animate-pulse-slow"
+                />
+              </div>
+              <h1 className="text-lg sm:text-xl font-bold text-yellow-400">BAM Ecosystem</h1>
+            </div>
+            <p className="text-sm sm:text-base text-yellow-200 font-medium">
+              BUILD AND MULTIPLY Wealth Together
+            </p>
+            <p className="text-xs text-yellow-300/80 mt-1">
+              Join the community-driven DeFi revolution
+            </p>
+          </div>
+        </div>
+
         {/* Main Swap Card - Compact desktop sizing */}
-        <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+        <Card className="glassmorphism border-amber-500/40">
           <CardContent className="p-4 sm:p-5 lg:p-4 xl:p-5">
             {/* Header with Trade Types */}
             <div className="flex justify-between items-center mb-1.5 sm:mb-3">
