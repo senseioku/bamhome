@@ -62,13 +62,9 @@ const SwapPage = () => {
   const [showLimitsModal, setShowLimitsModal] = useState(false);
   const [hasAlreadyPurchased, setHasAlreadyPurchased] = useState<boolean>(false);
   const [showPurchasedWarning, setShowPurchasedWarning] = useState<boolean>(false);
-  const [showPurchaseGuide, setShowPurchaseGuide] = useState<boolean>(false);
   const [isCheckingPurchaseHistory, setIsCheckingPurchaseHistory] = useState<boolean>(false);
   const [showAddTokenNotification, setShowAddTokenNotification] = useState<boolean>(false);
   const [contractBalances, setContractBalances] = useState<{[key: string]: string}>({});
-  const [showBalanceWarning, setShowBalanceWarning] = useState<boolean>(false);
-  const [showMilestoneNotification, setShowMilestoneNotification] = useState<boolean>(false);
-  const [milestoneMessage, setMilestoneMessage] = useState<string>('');
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
   const [showLoader, setShowLoader] = useState<boolean>(false);
   const [showPageLoader, setShowPageLoader] = useState<boolean>(true);
@@ -336,10 +332,6 @@ const SwapPage = () => {
       if (hasPurchased) {
         setShowPurchasedWarning(true);
         setTimeout(() => setShowPurchasedWarning(false), 5000);
-      } else {
-        // Show brief purchase guide for new users
-        setShowPurchaseGuide(true);
-        setTimeout(() => setShowPurchaseGuide(false), 3000);
       }
       
       console.log(`🔍 Purchase history result for ${address}:`, hasPurchased ? '🚫 Already purchased' : '✅ No previous purchase');
@@ -639,14 +631,7 @@ const SwapPage = () => {
       
       setContractBalances(newContractBalances);
       
-      // Check for low BAM balance
-      const bamBalance = parseFloat(newContractBalances.BAM || '0');
-      if (bamBalance < 50000000 && bamBalance > 0) { // Less than 50M BAM tokens left (5 purchases)
-        setShowBalanceWarning(true);
-        setTimeout(() => setShowBalanceWarning(false), 10000);
-      }
-      
-      // Check BAM holder milestones
+      // Check BAM holder milestones for internal tracking only
       await checkBAMHolderMilestones(newContractBalances);
       
       return newContractBalances;
@@ -664,18 +649,7 @@ const SwapPage = () => {
       const distributed = totalSupply - bamBalance;
       const estimatedHolders = Math.max(0, Math.floor(distributed / 1000000)); // 1M BAM per holder (Presale 2 rate)
 
-      // Check for milestone (every 100 holders)
-      const currentMilestone = Math.floor(estimatedHolders / 100) * 100;
-      
-      if (currentMilestone >= 100 && estimatedHolders % 100 < 5) { // Show for first 5 holders past milestone
-        if (bamBalance <= 0) {
-          setMilestoneMessage(`🎉 Presale 2 Complete! Get ready for Presale 3 → Final Uniswap & PancakeSwap launch!`);
-        } else {
-          setMilestoneMessage(`🎉 Milestone: ${currentMilestone}+ BAM Holders! Presale 2 active - secure before Presale 3 & DEX launch!`);
-        }
-        setShowMilestoneNotification(true);
-        setTimeout(() => setShowMilestoneNotification(false), 8000);
-      }
+      // Track milestones internally (removed notification display)
 
       return estimatedHolders;
     } catch (error) {
@@ -806,9 +780,7 @@ const SwapPage = () => {
     if (!checkSufficientContractBalance(fromToken.symbol, toToken.symbol, fromAmount)) {
       if (toToken.symbol === 'BAM') {
         setError('Presale 2 Sold Out! Get ready for Presale 3 announcement → Final Uniswap & PancakeSwap launch!');
-        setMilestoneMessage('🎉 Presale 2 Complete! Prepare for Presale 3 → Final DEX launch on Uniswap & PancakeSwap!');
-        setShowMilestoneNotification(true);
-        setTimeout(() => setShowMilestoneNotification(false), 10000);
+        // Presale 2 completion tracked internally
       } else {
         setError(`Insufficient ${toToken.symbol} in contract for this swap`);
       }
@@ -1603,54 +1575,6 @@ const SwapPage = () => {
               >
                 Continue Building 🏗️
               </button>
-            </div>
-          </div>
-        )}
-
-        {/* Purchase Guide - Auto-dismiss */}
-        {showPurchaseGuide && ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
-          (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && (
-          <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-40 pointer-events-none animate-fadeIn">
-            <div className="bg-yellow-500/90 border border-yellow-400 rounded-lg p-3 backdrop-blur-sm max-w-sm notification-compact">
-              <div className="flex items-start space-x-2 text-black">
-                <div className="text-xs">
-                  <div className="font-bold">BAM Purchase: 2-5 USDT = 2M-5M BAM</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Balance Warning Notification */}
-        {showBalanceWarning && (
-          <div className="fixed top-32 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
-            <div className="bg-orange-500/90 border border-orange-400 rounded-lg p-4 backdrop-blur-sm max-w-sm">
-              <div className="flex items-start space-x-3 text-white">
-                <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <div className="text-sm">
-                  <div className="font-bold mb-1">Presale 2 Ending Soon!</div>
-                  <div className="text-xs opacity-90 leading-relaxed">
-                    Limited spots left in Presale 2! Buy 2-5 USDT worth of BAM at $0.000001 before Presale 3 → Final Uniswap & PancakeSwap launch!
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Milestone Notification */}
-        {showMilestoneNotification && (
-          <div className="fixed top-44 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
-            <div className="bg-gradient-to-r from-yellow-500/90 to-orange-500/90 border border-yellow-400 rounded-lg p-4 backdrop-blur-sm max-w-sm">
-              <div className="flex items-start space-x-3 text-white">
-                <Trophy className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <div className="text-sm">
-                  <div className="font-bold mb-1">Community Milestone!</div>
-                  <div className="text-xs opacity-90 leading-relaxed">
-                    {milestoneMessage}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         )}
