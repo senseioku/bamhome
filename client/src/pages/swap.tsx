@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { web3Utils, ContractEncoder } from '@/lib/web3';
-import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI, BAM_SWAP_ABI } from '@/lib/contracts';
+import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI } from '@/lib/contracts';
+import { COMPLETE_BAM_SWAP_ABI as BAM_SWAP_ABI } from '@/lib/complete-bam-swap-abi';
 import Web3 from 'web3';
 import { BAMSwapV2Utils } from '@/lib/bamswap-v2-utils';
 import { Home, ArrowLeft, Menu, X, Wallet, Copy, LogOut, ChevronDown } from 'lucide-react';
@@ -93,28 +94,28 @@ const SwapPage = () => {
   // Fetch real-time contract data directly from deployed BAMSwapV2
   const fetchContractData = async () => {
     try {
-      console.log('📊 Fetching contract data from deployed BAMSwapV2...');
+      console.log('📊 Fetching contract data from deployed BAMSwapV3...');
       
       // Use Web3Utils for consistent contract interaction
       // Try individual calls since some might be paused
       let bamPriceInUSD, minPurchaseLimit, maxPurchaseLimit;
       
       try {
-        bamPriceInUSD = await web3Utils.callContractMethod(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'bamPriceInUSD', []);
+        bamPriceInUSD = await web3Utils.callContract(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'bamPriceInUSD', []);
       } catch (error) {
         console.log('bamPriceInUSD paused, using fallback');
         bamPriceInUSD = '1000000'; // $0.000001 default (1e6 with 12-decimal storage = 1e6/1e12)
       }
       
       try {
-        minPurchaseLimit = await web3Utils.callContractMethod(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'minPurchaseLimit', []);
+        minPurchaseLimit = await web3Utils.callContract(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'minPurchaseLimit', []);
       } catch (error) {
         console.log('minPurchaseLimit paused, using fallback');
         minPurchaseLimit = '2000000000000000000'; // 2 USDT
       }
       
       try {
-        maxPurchaseLimit = await web3Utils.callContractMethod(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'maxPurchaseLimit', []);
+        maxPurchaseLimit = await web3Utils.callContract(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'maxPurchaseLimit', []);
       } catch (error) {
         console.log('maxPurchaseLimit paused, using fallback');
         maxPurchaseLimit = '5000000000000000000'; // 5 USDT
@@ -312,7 +313,7 @@ const SwapPage = () => {
   const getContractInfo = async () => {
     try {
       const data = ContractEncoder.encodeFunctionCall('getContractInfo()');
-      const result = await web3Utils.callContract(BAM_SWAP_ADDRESS, data);
+      const result = await web3Utils.callContractRaw(BAM_SWAP_ADDRESS, data);
       return ContractEncoder.decodeResult(result, 'tuple');
     } catch (error) {
       console.error('Failed to get contract info:', error);
@@ -347,7 +348,7 @@ const SwapPage = () => {
       console.log(`📞 Calling contract.methods.walletPurchases(${address}).call()`);
       
       // Use Web3Utils for consistent contract interaction
-      const purchaseAmount = await web3Utils.callContractMethod(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'walletPurchases', [address]);
+      const purchaseAmount = await web3Utils.callContract(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'walletPurchases', [address]);
       console.log(`✅ Contract response - Purchase amount:`, purchaseAmount);
       
       // If purchase amount > 0, wallet has already purchased

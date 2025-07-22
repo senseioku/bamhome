@@ -98,7 +98,26 @@ export class Web3Utils {
     }
   }
 
-  async callContract(contractAddress: string, data: string): Promise<any> {
+  async callContract(contractAddress: string, abi: any, methodName: string, params: any[] = []): Promise<any> {
+    const provider = await this.getProvider();
+    if (!provider) throw new Error('No provider available');
+
+    try {
+      // Create contract instance using Web3
+      const Web3 = (await import('web3')).default;
+      const web3 = new Web3(provider);
+      const contract = new web3.eth.Contract(abi, contractAddress);
+      
+      // Call the contract method
+      const result = await contract.methods[methodName](...params).call();
+      return result;
+    } catch (error) {
+      console.error('Contract call failed:', error);
+      throw error;
+    }
+  }
+
+  async callContractRaw(contractAddress: string, data: string): Promise<any> {
     const provider = await this.getProvider();
     if (!provider) throw new Error('No provider available');
 
