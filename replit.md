@@ -148,8 +148,10 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Added DEX launch anticipation: "Grab yours before Public Launch to Uniswap & PancakeSwap"
 ✓ Created prominent presale status banner showing current phase and upcoming price increases
 ✓ Enhanced milestone notifications with presale urgency and DEX listing countdown messaging
-✓ CONTRACT UPDATED TO PRESALE 2: BAM price $0.0000002, 2 USDT purchases, 5M BAM per sale
-✓ Frontend updated with Presale 2 messaging and correct pricing display
+✓ CONTRACT UPDATED TO PRESALE 2: BAM price $0.000001, 2 USDT purchases, 2M BAM per sale (contract maximum)
+✓ Frontend updated with Presale 2 messaging and Presale 3 roadmap progression
+✓ Added Presale 3 → Final DEX launch messaging throughout notification system
+✓ Contract price set to maximum allowed (1e12) due to safety limits preventing exact $0.000002 target
 
 ## User Preferences
 
