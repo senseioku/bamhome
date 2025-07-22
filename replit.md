@@ -226,6 +226,10 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ PRESALE 2 PRICING CORRECTED: Fixed to exact user requirements - $0.000001 per BAM = 1M BAM per USDT
 ✓ FLEXIBLE PURCHASE RANGE: 2-5 USDT purchases giving 2M-5M BAM respectively as requested
 ✓ ALL TOKEN DECIMALS CONFIRMED: 18 decimals for USDT, USDB, BAM, BNB - calculations updated accordingly
+✓ CRITICAL CONTRACT BUG DISCOVERED: V3 bamPriceInUSD = 1e11 gave 50K BAM per 5 USDT instead of 5M BAM
+✓ CONTRACT BUG FIXED: Changed bamPriceInUSD from 1e11 to 1e6 for correct 1M BAM per USDT calculation
+✓ DEPLOYMENT SCRIPT CREATED: deploy-bamswap-v4-fixed.js ready for corrected contract deployment
+✓ MATH VERIFIED: (5 USDT * 1e12) / 1e6 = 5,000,000 BAM tokens as requested
 
 ## User Preferences
 
