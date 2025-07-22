@@ -1437,7 +1437,7 @@ const SwapPage = () => {
                 <div className="text-sm">
                   <div className="font-bold mb-1">Presale 2 Ending Soon!</div>
                   <div className="text-xs opacity-90 leading-relaxed">
-                    Limited spots left in Presale 2! Secure your BAM at $0.000001 before Presale 3 → Final Uniswap & PancakeSwap launch!
+                    Limited spots left in Presale 2! Buy 2-5 USDT worth of BAM at $0.000001 before Presale 3 → Final Uniswap & PancakeSwap launch!
                   </div>
                 </div>
               </div>
@@ -1474,7 +1474,7 @@ const SwapPage = () => {
                   <div className="text-yellow-400 font-bold text-sm">PRESALE 2 ACTIVE</div>
                   <div className="text-yellow-200 text-xs leading-tight">
                     {contractBalances.BAM ? (
-                      <>PRESALE 2 ACTIVE: $0.000001 per BAM • 2 USDT = 2M BAM • Next: Presale 3 → Uniswap & PancakeSwap</>
+                      <>PRESALE 2 ACTIVE: $0.000001 per BAM • 2-5 USDT = 2M-5M BAM • Next: Presale 3 → Uniswap & PancakeSwap</>
                     ) : (
                       <>Presale 2 Complete! • Next: Presale 3 → Final Uniswap & PancakeSwap Launch</>
                     )}
