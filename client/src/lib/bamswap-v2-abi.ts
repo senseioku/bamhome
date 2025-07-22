@@ -1,4 +1,5 @@
-// BAMSwapV2 Contract ABI - Deployed at 0xaE97797f29a0f3d5602325E2668e5920C2820455
+// Complete BAMSwapV2 Contract ABI - Deployed at 0xaE97797f29a0f3d5602325E2668e5920C2820455
+// Generated from attached_assets/BAMSwapV2_ABI_1753191263952.txt
 export const BAMSWAP_V2_ABI = [
         {
                 "inputs": [],
@@ -18,6 +19,110 @@ export const BAMSWAP_V2_ABI = [
                 "name": "buyBAMWithUSDT",
                 "outputs": [],
                 "stateMutability": "nonpayable",
+                "type": "function"
+        },
+        {
+                "inputs": [],
+                "name": "bamPriceInUSD",
+                "outputs": [
+                        {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                        }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+        },
+        {
+                "inputs": [],
+                "name": "minPurchaseLimit",
+                "outputs": [
+                        {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                        }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+        },
+        {
+                "inputs": [],
+                "name": "maxPurchaseLimit",
+                "outputs": [
+                        {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                        }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+        },
+        {
+                "inputs": [
+                        {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                        }
+                ],
+                "name": "walletPurchases",
+                "outputs": [
+                        {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                        }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+        },
+        {
+                "inputs": [],
+                "name": "getPurchaseInfo",
+                "outputs": [
+                        {
+                                "internalType": "uint256",
+                                "name": "minPurchase",
+                                "type": "uint256"
+                        },
+                        {
+                                "internalType": "uint256",
+                                "name": "maxPurchase",
+                                "type": "uint256"
+                        },
+                        {
+                                "internalType": "uint256",
+                                "name": "maxPerWallet",
+                                "type": "uint256"
+                        },
+                        {
+                                "internalType": "uint256",
+                                "name": "currentBAMPrice",
+                                "type": "uint256"
+                        },
+                        {
+                                "internalType": "uint256",
+                                "name": "bamPerUSDT",
+                                "type": "uint256"
+                        }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+        },
+        {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                        {
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                        }
+                ],
+                "stateMutability": "view",
                 "type": "function"
         },
         {

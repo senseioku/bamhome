@@ -90,41 +90,63 @@ const SwapPage = () => {
     lastUpdated: number;
   } | null>(null);
 
-  // Fetch real-time contract data from deployed BAMSwapV2
+  // Fetch real-time contract data directly from deployed BAMSwapV2
   const fetchContractData = async () => {
     try {
       console.log('📊 Fetching contract data from deployed BAMSwapV2...');
       
-      // Use BAMSwapV2Utils to get contract data
-      const [bamPrice, purchaseInfo] = await Promise.all([
-        BAMSwapV2Utils.getBAMPrice(),
-        BAMSwapV2Utils.getPurchaseInfo()
-      ]);
-
-      console.log('Contract BAM Price (wei):', bamPrice);
-      console.log('Purchase Info:', purchaseInfo);
-
-      // Format data for display
-      const formattedBamPrice = BAMSwapV2Utils.formatBAMPrice(bamPrice as string);
-      const minPurchase = Web3.utils.fromWei(purchaseInfo.minPurchase, 'ether');
-      const maxPurchase = Web3.utils.fromWei(purchaseInfo.maxPurchase, 'ether');
+      // Use Web3Utils for consistent contract interaction
+      // Try individual calls since some might be paused
+      let bamPriceInUSD, minPurchaseLimit, maxPurchaseLimit;
       
-      // Calculate BAM tokens per USDT (1 USDT = bamPerUSDT tokens)
-      const bamPerUSDT = Web3.utils.fromWei(purchaseInfo.bamPerUSDT, 'ether');
+      try {
+        bamPriceInUSD = await web3Utils.callContractMethod(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'bamPriceInUSD', []);
+      } catch (error) {
+        console.log('bamPriceInUSD paused, using fallback');
+        bamPriceInUSD = '1000000000000'; // $0.000001 default
+      }
+      
+      try {
+        minPurchaseLimit = await web3Utils.callContractMethod(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'minPurchaseLimit', []);
+      } catch (error) {
+        console.log('minPurchaseLimit paused, using fallback');
+        minPurchaseLimit = '2000000000000000000'; // 2 USDT
+      }
+      
+      try {
+        maxPurchaseLimit = await web3Utils.callContractMethod(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'maxPurchaseLimit', []);
+      } catch (error) {
+        console.log('maxPurchaseLimit paused, using fallback');
+        maxPurchaseLimit = '5000000000000000000'; // 5 USDT
+      }
+
+      console.log('✅ Raw contract data:', {
+        bamPriceInUSD,
+        minPurchaseLimit,
+        maxPurchaseLimit
+      });
+
+      // Format data for display (bamPriceInUSD is stored as integer, need to convert)
+      const bamPrice = (Number(bamPriceInUSD) / 1e12).toFixed(9); // Convert from wei to USD
+      const minPurchase = Web3.utils.fromWei(minPurchaseLimit.toString(), 'ether');
+      const maxPurchase = Web3.utils.fromWei(maxPurchaseLimit.toString(), 'ether');
+      
+      // Calculate BAM tokens per USDT (based on bamPriceInUSD)
+      const bamPerUSDT = (1 / (Number(bamPriceInUSD) / 1e12)).toString();
 
       setContractData({
-        bamPrice: formattedBamPrice,
+        bamPrice,
         minPurchase,
         maxPurchase,
-        bamPerUSDT,
+        bamPerUSDT: Math.round(Number(bamPerUSDT)).toString(),
         lastUpdated: Date.now()
       });
 
       console.log('✅ Contract data updated:', {
-        bamPrice: formattedBamPrice,
+        bamPrice,
         minPurchase,
         maxPurchase,
-        bamPerUSDT
+        bamPerUSDT: Math.round(Number(bamPerUSDT)).toString()
       });
 
     } catch (error) {
@@ -321,12 +343,11 @@ const SwapPage = () => {
       setIsCheckingPurchaseHistory(true);
       console.log(`🔍 Checking purchase history for wallet: ${address}`);
       
-      const web3 = new Web3((window as any).ethereum);
-      const contract = new web3.eth.Contract(BAM_SWAP_ABI, BAM_SWAP_ADDRESS);
-      
-      // Check if wallet has purchased BAM by calling walletPurchases mapping
+      // Check if wallet has purchased BAM by calling walletPurchases mapping  
       console.log(`📞 Calling contract.methods.walletPurchases(${address}).call()`);
-      const purchaseAmount = await contract.methods.walletPurchases(address).call();
+      
+      // Use Web3Utils for consistent contract interaction
+      const purchaseAmount = await web3Utils.callContractMethod(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'walletPurchases', [address]);
       console.log(`✅ Contract response - Purchase amount:`, purchaseAmount);
       
       // If purchase amount > 0, wallet has already purchased
