@@ -1165,12 +1165,22 @@ const SwapPage = () => {
                         <div className="text-lg flex-shrink-0">{tokenOption.icon}</div>
                       )}
                       <div className="flex-1 text-left min-w-0">
-                        <div className="flex items-center space-x-1.5">
+                        <div className="flex items-center space-x-1.5 relative">
                           <span className="font-semibold text-white text-sm">{tokenOption.symbol}</span>
                           {tokenOption.symbol === 'BAM' && (
-                            <Badge variant="secondary" className="text-xs bg-yellow-500/20 text-yellow-400 px-1 py-0">
-                              $0.0000001
-                            </Badge>
+                            <>
+                              <Badge variant="secondary" className="text-xs bg-yellow-500/20 text-yellow-400 px-1 py-0">
+                                $0.000001
+                              </Badge>
+                              {/* Tiny tooltip notification near BAM label */}
+                              {hasAlreadyPurchased && showPurchasedWarning && (
+                                <div className="absolute -top-7 left-12 z-50 animate-fadeIn">
+                                  <div className="bg-red-500/95 text-white text-xs px-2 py-1 rounded-md shadow-lg whitespace-nowrap border border-red-400/50">
+                                    Already purchased
+                                  </div>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                         <div className="text-xs text-gray-400 truncate">{tokenOption.name}</div>
@@ -1718,33 +1728,7 @@ const SwapPage = () => {
               </Button>
             </div>
 
-            {/* Purchase Limit Warning for BAM */}
-            {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
-              (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && (
-              <>
-                {hasAlreadyPurchased && showPurchasedWarning ? (
-                  <Alert className="border-red-500/30 bg-red-500/10 mb-3 animate-fadeIn">
-                    <AlertCircle className="h-4 w-4 text-red-400" />
-                    <AlertDescription className="text-red-200 text-sm">
-                      <div className="space-y-1">
-                        <div className="font-medium">🚫 Already Purchased:</div>
-                        <div className="text-xs">One purchase per wallet allowed.</div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                ) : isCheckingPurchaseHistory ? (
-                  <Alert className="border-blue-500/30 bg-blue-500/10 mb-3">
-                    <AlertCircle className="h-4 w-4 text-blue-400" />
-                    <AlertDescription className="text-blue-200 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span>Checking purchase history...</span>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                ) : null}
-              </>
-            )}
+
 
 
 
@@ -2102,20 +2086,7 @@ const SwapPage = () => {
               </>
             )}
 
-            {/* Insufficient Balance Warning */}
-            {balances[fromToken.symbol] && 
-             parseFloat(fromAmount) > parseFloat(balances[fromToken.symbol]) && (
-              <Alert className="border-red-500/50 bg-red-500/20 backdrop-blur-sm">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="text-red-200 text-sm">
-                  <div className="font-medium">💰 Insufficient Balance</div>
-                  <div className="text-xs mt-1">
-                    Need: {fromAmount} {fromToken.symbol} | 
-                    Available: {formatDisplayAmount(balances[fromToken.symbol], fromToken.symbol)} {fromToken.symbol}
-                  </div>
-                </AlertDescription>
-              </Alert>
-            )}
+
           </div>
         )}
         </div>

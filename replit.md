@@ -172,6 +172,11 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ FIXED: Extended page entry loader delay to 3 seconds for better user experience
 ✓ FIXED: Added missing CSS animation keyframes for smooth money-fly, swap-rotate, and celebration effects
 ✓ All loaders and animations now work perfectly with professional BAM branding
+✓ FIXED: Replaced large notification banners with tiny disappearing message near BAM token label
+✓ Removed intrusive "Already Purchased" and "Insufficient Balance" alert banners from below swap interface
+✓ Added subtle tooltip-style notification that appears near BAM price badge when wallet already purchased
+✓ Updated BAM price display from $0.0000001 to current Presale 2 rate of $0.000001
+✓ Streamlined user experience with minimal, non-intrusive notification system as requested
 
 ## User Preferences
 
