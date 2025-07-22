@@ -1823,7 +1823,15 @@ const SwapPage = () => {
               >
                 Enter an amount
               </Button>
-            ) : parseFloat(fromAmount) < 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') ? (
+            ) : ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && 
+                  (parseFloat(fromAmount) < 2 || parseFloat(fromAmount) > 5)) ? (
+              <Button
+                disabled
+                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
+              >
+                ⚠️ BAM requires 2-5 USDT
+              </Button>
+            ) : parseFloat(fromAmount) < 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && toToken.symbol !== 'BAM' ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-red-700 text-red-200 rounded-lg cursor-not-allowed"
@@ -1837,20 +1845,13 @@ const SwapPage = () => {
               >
                 🚫 Already Purchased - One Per Wallet
               </Button>
-            ) : ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && 
-                  (parseFloat(fromAmount) < 2 || parseFloat(fromAmount) > 5)) ? (
+            ) : ((fromToken.symbol === 'BNB' && toToken.symbol === 'BAM') && 
+                  (!priceInfo || (priceInfo && (parseFloat(fromAmount) * priceInfo.bnbPrice < 2 || parseFloat(fromAmount) * priceInfo.bnbPrice > 5)))) ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
               >
-                ⚠️ BAM requires 2-5 USDT
-              </Button>
-            ) : ((fromToken.symbol === 'BNB' && toToken.symbol === 'BAM') && !priceInfo) ? (
-              <Button
-                disabled
-                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gray-700 text-gray-400 rounded-lg cursor-not-allowed"
-              >
-                Loading price data...
+                {!priceInfo ? 'Loading price data...' : '⚠️ BAM requires $2-5 USD worth of BNB'}
               </Button>
             ) : parseFloat(fromAmount) > 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && toToken.symbol !== 'BAM' ? (
               <Button
