@@ -433,7 +433,7 @@ contract BAMSwapV2 is ReentrancyGuard, Pausable, Ownable {
         
         (currentBNBPrice, priceIsValid) = getBNBPriceWithValidation();
         currentBAMPrice = bamPriceInUSD;
-        isUsingFallback = !useChainlinkPriceFeed || emergencyMode;
+        isUsingFallback = useFallbackPrice || emergencyMode;
         isEmergencyMode = emergencyMode;
         isPaused = paused();
     }
@@ -584,8 +584,8 @@ contract BAMSwapV2 is ReentrancyGuard, Pausable, Ownable {
         require(newPrice > 0, "Price must be greater than 0");
         require(newPrice < 10000e8, "Price too high (max $10,000)");
         
-        uint256 oldPrice = fallbackBNBPrice;
-        fallbackBNBPrice = newPrice;
+        uint256 oldPrice = fallbackBnbPrice;
+        fallbackBnbPrice = newPrice;
         emit FallbackPriceUpdated(oldPrice, newPrice);
     }
     
