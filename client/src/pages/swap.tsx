@@ -10,9 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { web3Utils, ContractEncoder } from '@/lib/web3';
-import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI } from '@/lib/contracts';
+import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI, BAM_SWAP_ABI } from '@/lib/contracts';
 import Web3 from 'web3';
-import { COMPLETE_BAM_SWAP_ABI } from '@/lib/complete-bam-swap-abi';
+import { BAMSwapV2Utils } from '@/lib/bamswap-v2-utils';
 import { Home, ArrowLeft, Menu, X, Wallet, Copy, LogOut, ChevronDown } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -90,37 +90,41 @@ const SwapPage = () => {
     lastUpdated: number;
   } | null>(null);
 
-  // Fetch real-time contract data
+  // Fetch real-time contract data from deployed BAMSwapV2
   const fetchContractData = async () => {
     try {
-      if (!(window as any).web3 || !walletAddress) return;
+      console.log('📊 Fetching contract data from deployed BAMSwapV2...');
       
-      const contract = new (window as any).web3.eth.Contract(
-        COMPLETE_BAM_SWAP_ABI,
-        BAM_SWAP_ADDRESS
-      );
-
-      // Fetch current contract parameters
-      const [bamPriceInUSD, minPurchaseLimit, maxPurchaseLimit] = await Promise.all([
-        contract.methods.bamPriceInUSD().call(),
-        contract.methods.minPurchaseLimit().call(),
-        contract.methods.maxPurchaseLimit().call()
+      // Use BAMSwapV2Utils to get contract data
+      const [bamPrice, purchaseInfo] = await Promise.all([
+        BAMSwapV2Utils.getBAMPrice(),
+        BAMSwapV2Utils.getPurchaseInfo()
       ]);
 
-      // Convert bamPriceInUSD to actual price (contract stores as integer, divide by 1e11 for current price)
-      const bamPrice = (Number(bamPriceInUSD) / 1e11).toFixed(9); 
-      const minPurchase = (window as any).web3.utils.fromWei(minPurchaseLimit.toString(), 'ether');
-      const maxPurchase = (window as any).web3.utils.fromWei(maxPurchaseLimit.toString(), 'ether');
+      console.log('Contract BAM Price (wei):', bamPrice);
+      console.log('Purchase Info:', purchaseInfo);
+
+      // Format data for display
+      const formattedBamPrice = BAMSwapV2Utils.formatBAMPrice(bamPrice as string);
+      const minPurchase = Web3.utils.fromWei(purchaseInfo.minPurchase, 'ether');
+      const maxPurchase = Web3.utils.fromWei(purchaseInfo.maxPurchase, 'ether');
       
-      // Calculate BAM tokens per USDT (based on contract's bamPriceInUSD value)
-      const bamPerUSDT = Number(bamPriceInUSD).toLocaleString();
+      // Calculate BAM tokens per USDT (1 USDT = bamPerUSDT tokens)
+      const bamPerUSDT = Web3.utils.fromWei(purchaseInfo.bamPerUSDT, 'ether');
 
       setContractData({
-        bamPrice,
+        bamPrice: formattedBamPrice,
         minPurchase,
         maxPurchase,
         bamPerUSDT,
         lastUpdated: Date.now()
+      });
+
+      console.log('✅ Contract data updated:', {
+        bamPrice: formattedBamPrice,
+        minPurchase,
+        maxPurchase,
+        bamPerUSDT
       });
 
     } catch (error) {
@@ -216,9 +220,10 @@ const SwapPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch contract data when wallet connects
+  // Fetch contract data when wallet connects or on page load
   useEffect(() => {
-    if (walletAddress && (window as any).web3) {
+    // Always try to fetch contract data, even without wallet connection
+    if (walletAddress || !contractData) {
       fetchContractData();
       // Refresh every 2 minutes
       const interval = setInterval(fetchContractData, 120000);
@@ -317,7 +322,7 @@ const SwapPage = () => {
       console.log(`🔍 Checking purchase history for wallet: ${address}`);
       
       const web3 = new Web3((window as any).ethereum);
-      const contract = new web3.eth.Contract(COMPLETE_BAM_SWAP_ABI, BAM_SWAP_ADDRESS);
+      const contract = new web3.eth.Contract(BAM_SWAP_ABI, BAM_SWAP_ADDRESS);
       
       // Check if wallet has purchased BAM by calling walletPurchases mapping
       console.log(`📞 Calling contract.methods.walletPurchases(${address}).call()`);
@@ -394,7 +399,9 @@ const SwapPage = () => {
     checkContractBalances();
     
     // Hide page loader after 3 seconds (with delay)
-    setTimeout(() => setShowPageLoader(false), 3000);
+    // Initialize contract data and reduce loading time
+    fetchContractData();
+    setTimeout(() => setShowPageLoader(false), 1500);
     
     // Check contract balances every 30 seconds
     const balanceInterval = setInterval(checkContractBalances, 30000);

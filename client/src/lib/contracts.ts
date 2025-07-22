@@ -1,5 +1,5 @@
-// BAM Swap Contract Configuration - NEW DEPLOYMENT
-export const BAM_SWAP_ADDRESS = "0x2D2F3bD3D6C5a1cCE37211F4385D92F6F1DF0F86";
+// BAM Swap Contract Configuration - V2 DEPLOYED CONTRACT  
+export const BAM_SWAP_ADDRESS = "0xaE97797f29a0f3d5602325E2668e5920C2820455";
 
 // BSC Mainnet Configuration
 export const BSC_CHAIN_ID = 56;
@@ -50,12 +50,12 @@ export const CHAINLINK_ABI = [
   }
 ] as const;
 
-// Import the complete BAM Swap ABI from the deployed contract
-import { COMPLETE_BAM_SWAP_ABI } from './complete-bam-swap-abi';
+// Use the V2 ABI we defined  
+import { BAMSWAP_V2_ABI } from './bamswap-v2-abi';
 
-// Export both the original and the alias for compatibility
-export { COMPLETE_BAM_SWAP_ABI };
-export const BAM_SWAP_ABI = COMPLETE_BAM_SWAP_ABI;
+// Export the ABI with proper typing
+export const BAM_SWAP_ABI = BAMSWAP_V2_ABI;
+export const COMPLETE_BAM_SWAP_ABI = BAMSWAP_V2_ABI;
 
 // ERC20 Token ABI (Essential functions)
 export const ERC20_ABI = [
