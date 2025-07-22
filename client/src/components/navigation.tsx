@@ -199,98 +199,101 @@ function MobileNavigation() {
         <Menu className="h-6 w-6" />
       </Button>
 
-      {/* Full-screen Overlay */}
+      {/* Professional Full-screen Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-md">
-          <div className="flex flex-col h-full p-4">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl">
+          <div className="flex flex-col h-full">
+            {/* Clean Header */}
+            <div className="flex items-center justify-between p-6 border-b border-white/10">
               <div className="flex items-center gap-3">
                 <img 
                   src="/assets/bamToken_1753182165828.png" 
                   alt="BAM Token" 
-                  className="h-8 w-8 rounded-full"
+                  className="h-10 w-10 rounded-full"
                 />
                 <div>
-                  <span className="text-xl font-bold gradient-text">BAM</span>
-                  <span className="text-sm text-muted-foreground ml-2">Ecosystem</span>
+                  <span className="text-2xl font-bold text-yellow-400">BAM</span>
+                  <span className="text-base text-gray-300 ml-2">Ecosystem</span>
                 </div>
               </div>
               <Button 
                 variant="ghost" 
                 size="icon"
                 onClick={() => setIsOpen(false)}
+                className="text-white hover:bg-white/10"
               >
-                <X className="h-6 w-6" />
+                <X className="h-8 w-8" />
               </Button>
             </div>
 
-            {/* Navigation Items */}
-            <div className="space-y-2 mb-8">
-              {navItems.map((item) => (
-                <button
-                  key={item.href}
-                  onClick={() => scrollToSection(item.href)}
-                  className="flex items-center gap-4 p-4 rounded-lg text-left text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 w-full text-lg"
-                >
-                  <span className="text-2xl">{item.icon}</span>
-                  <span>{item.label}</span>
-                </button>
-              ))}
-            </div>
+            {/* Professional Navigation Grid */}
+            <div className="flex-1 p-6">
+              <div className="space-y-1 mb-8">
+                {navItems.map((item) => (
+                  <button
+                    key={item.href}
+                    onClick={() => scrollToSection(item.href)}
+                    className="flex items-center gap-4 p-4 rounded-xl text-left text-white hover:bg-white/10 transition-all duration-200 w-full text-xl border border-white/5 hover:border-yellow-400/30"
+                  >
+                    <span className="text-2xl">{item.icon}</span>
+                    <span className="font-medium">{item.label}</span>
+                  </button>
+                ))}
+              </div>
 
-            {/* Platforms Section */}
-            <div className="border-t border-border pt-6">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-4 px-4">Platforms</h3>
-              <div className="space-y-2">
-                {platformItems.map((item, index) => {
-                  const content = (
-                    <div className="flex items-center justify-between p-4 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 w-full text-lg">
-                      <div className="flex items-center gap-4">
-                        <span className="text-2xl">{item.icon}</span>
-                        <span>{item.label}</span>
+              {/* Clean Platforms Section */}
+              <div className="border-t border-white/10 pt-6">
+                <h3 className="text-yellow-400 font-semibold mb-4 text-lg">Platform Access</h3>
+                <div className="space-y-2">
+                  {platformItems.map((item, index) => {
+                    const content = (
+                      <div className="flex items-center justify-between p-4 rounded-xl text-white hover:bg-white/10 transition-all duration-200 w-full text-lg border border-white/5 hover:border-yellow-400/30">
+                        <div className="flex items-center gap-4">
+                          <span className="text-2xl">{item.icon}</span>
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                        {item.status && (
+                          <span className={`text-xs px-3 py-1 rounded-full font-medium ${item.statusColor}`}>
+                            {item.status}
+                          </span>
+                        )}
                       </div>
-                      {item.status && (
-                        <span className={`text-xs px-2 py-1 rounded ${item.statusColor}`}>
-                          {item.status}
-                        </span>
-                      )}
-                    </div>
-                  );
+                    );
 
-                  if (item.href) {
-                    return (
-                      <a
-                        key={index}
-                        href={item.href}
-                        target={item.external ? "_blank" : undefined}
-                        rel={item.external ? "noopener noreferrer" : undefined}
-                        onClick={() => !item.external && setIsOpen(false)}
-                      >
-                        {content}
-                      </a>
-                    );
-                  } else if (item.onClick) {
-                    return (
-                      <button
-                        key={index}
-                        onClick={item.onClick}
-                        className="text-left w-full"
-                      >
-                        {content}
-                      </button>
-                    );
-                  }
-                  return null;
-                })}
+                    if (item.href) {
+                      return (
+                        <a
+                          key={index}
+                          href={item.href}
+                          target={item.external ? "_blank" : undefined}
+                          rel={item.external ? "noopener noreferrer" : undefined}
+                          onClick={() => !item.external && setIsOpen(false)}
+                        >
+                          {content}
+                        </a>
+                      );
+                    } else if (item.onClick) {
+                      return (
+                        <button
+                          key={index}
+                          onClick={item.onClick}
+                          className="text-left w-full"
+                        >
+                          {content}
+                        </button>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Current Page Info */}
-            <div className="mt-auto pt-6 border-t border-border">
-              <div className="text-sm text-muted-foreground mb-2">Current: Swap</div>
-              <div className="text-xs text-muted-foreground">
-                Wallet connection status will appear here
+            {/* Footer */}
+            <div className="p-6 border-t border-white/10">
+              <div className="text-yellow-400 font-medium mb-1">BAM Swap Interface</div>
+              <div className="text-gray-400 text-sm">
+                Professional DeFi Platform • BSC Mainnet
               </div>
             </div>
           </div>
