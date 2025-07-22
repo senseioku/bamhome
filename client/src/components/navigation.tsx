@@ -131,93 +131,171 @@ export default function Navigation() {
 
           {/* Mobile Navigation */}
           <div className="md:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="glass-card border-border w-80 p-4 max-h-screen overflow-y-auto">
-                <div className="flex flex-col space-y-4">
-                  {/* Compact Header */}
-                  <div className="flex items-center gap-2 pb-3 border-b border-border">
-                    <img 
-                      src="/assets/bamToken_1753182165828.png" 
-                      alt="BAM Token" 
-                      className="h-6 w-6 rounded-full"
-                    />
-                    <span className="text-base font-bold gradient-text">BAM</span>
-                    <span className="text-xs text-muted-foreground">Ecosystem</span>
-                  </div>
-
-                  {/* Compact Navigation Items */}
-                  <div className="space-y-1">
-                    {navItems.map((item) => (
-                      <button
-                        key={item.href}
-                        onClick={() => scrollToSection(item.href)}
-                        className="flex items-center gap-2 p-2 rounded-md text-left text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 w-full text-sm"
-                      >
-                        <span className="text-sm">
-                          {item.label === "Home" ? "🏠" : 
-                           item.label === "Ecosystem" ? "🌐" :
-                           item.label === "Tokenomics" ? "💰" : "🚀"}
-                        </span>
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Compact Platforms Section */}
-                  <div className="border-t border-border pt-3">
-                    <div className="text-xs font-semibold text-muted-foreground mb-2 px-2">Platforms</div>
-                    <div className="space-y-1">
-                      <a
-                        href="/swap"
-                        className="flex items-center justify-between p-2 rounded-md text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 text-sm"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">🔄</span>
-                          <span>BAM Swap</span>
-                        </div>
-                        <span className="text-xs bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded">Live</span>
-                      </a>
-                      <button
-                        onClick={() => scrollToSection("projects")}
-                        className="flex items-center justify-between p-2 rounded-md text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 w-full text-left text-sm"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">🎁</span>
-                          <span>BAM Drops</span>
-                        </div>
-                        <span className="text-xs bg-secondary/20 text-secondary px-1.5 py-0.5 rounded">Soon</span>
-                      </button>
-                      <a
-                        href="https://apex.bam-ecosystem.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 p-2 rounded-md text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 text-sm"
-                      >
-                        <span className="text-sm">⛏️</span>
-                        <span>ApexMiner</span>
-                      </a>
-                      <a
-                        href="https://vip.bam-ecosystem.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 p-2 rounded-md text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 text-sm"
-                      >
-                        <span className="text-sm">👑</span>
-                        <span>VIP Access</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
+            <MobileNavigation />
           </div>
         </div>
       </div>
     </nav>
+  );
+}
+
+// Full-screen mobile navigation component
+function MobileNavigation() {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    setIsOpen(false); // Close sidebar after navigation
+  };
+
+  const navItems = [
+    { label: "Home", href: "home", icon: "🏠" },
+    { label: "Ecosystem", href: "ecosystem", icon: "🌐" },
+    { label: "Tokenomics", href: "tokenomics", icon: "💰" },
+    { label: "Projects", href: "projects", icon: "🚀" },
+  ];
+
+  const platformItems = [
+    { 
+      label: "BAM Swap", 
+      href: "/swap", 
+      icon: "🔄", 
+      status: "Live", 
+      statusColor: "bg-green-500/20 text-green-400" 
+    },
+    { 
+      label: "BAM Drops", 
+      onClick: () => scrollToSection("projects"), 
+      icon: "🎁", 
+      status: "Soon", 
+      statusColor: "bg-yellow-500/20 text-yellow-400" 
+    },
+    { 
+      label: "ApexMiner", 
+      href: "https://apex.bam-ecosystem.com", 
+      icon: "⛏️", 
+      external: true 
+    },
+    { 
+      label: "VIP Access", 
+      href: "https://vip.bam-ecosystem.com", 
+      icon: "👑", 
+      external: true 
+    },
+  ];
+
+  return (
+    <>
+      {/* Menu Button */}
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={() => setIsOpen(true)}
+        className="relative z-50"
+      >
+        <Menu className="h-6 w-6" />
+      </Button>
+
+      {/* Full-screen Overlay */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-md">
+          <div className="flex flex-col h-full p-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/assets/bamToken_1753182165828.png" 
+                  alt="BAM Token" 
+                  className="h-8 w-8 rounded-full"
+                />
+                <div>
+                  <span className="text-xl font-bold gradient-text">BAM</span>
+                  <span className="text-sm text-muted-foreground ml-2">Ecosystem</span>
+                </div>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsOpen(false)}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+
+            {/* Navigation Items */}
+            <div className="space-y-2 mb-8">
+              {navItems.map((item) => (
+                <button
+                  key={item.href}
+                  onClick={() => scrollToSection(item.href)}
+                  className="flex items-center gap-4 p-4 rounded-lg text-left text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 w-full text-lg"
+                >
+                  <span className="text-2xl">{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Platforms Section */}
+            <div className="border-t border-border pt-6">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-4 px-4">Platforms</h3>
+              <div className="space-y-2">
+                {platformItems.map((item, index) => {
+                  const content = (
+                    <div className="flex items-center justify-between p-4 rounded-lg text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 w-full text-lg">
+                      <div className="flex items-center gap-4">
+                        <span className="text-2xl">{item.icon}</span>
+                        <span>{item.label}</span>
+                      </div>
+                      {item.status && (
+                        <span className={`text-xs px-2 py-1 rounded ${item.statusColor}`}>
+                          {item.status}
+                        </span>
+                      )}
+                    </div>
+                  );
+
+                  if (item.href) {
+                    return (
+                      <a
+                        key={index}
+                        href={item.href}
+                        target={item.external ? "_blank" : undefined}
+                        rel={item.external ? "noopener noreferrer" : undefined}
+                        onClick={() => !item.external && setIsOpen(false)}
+                      >
+                        {content}
+                      </a>
+                    );
+                  } else if (item.onClick) {
+                    return (
+                      <button
+                        key={index}
+                        onClick={item.onClick}
+                        className="text-left w-full"
+                      >
+                        {content}
+                      </button>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+            </div>
+
+            {/* Current Page Info */}
+            <div className="mt-auto pt-6 border-t border-border">
+              <div className="text-sm text-muted-foreground mb-2">Current: Swap</div>
+              <div className="text-xs text-muted-foreground">
+                Wallet connection status will appear here
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
