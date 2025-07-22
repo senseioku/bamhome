@@ -1342,7 +1342,44 @@ const SwapPage = () => {
                   >
                     Projects
                   </a>
-                  <span className="text-primary font-semibold">BAM Swap</span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="text-foreground hover:text-primary">
+                        Platforms <ChevronDown className="ml-1 h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="glass-card border-border">
+                      <DropdownMenuItem>
+                        <div className="flex items-center w-full">
+                          <span className="mr-2">🔄</span>
+                          <span className="text-primary font-semibold">BAM Swap</span>
+                          <span className="ml-auto text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Live</span>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <a
+                          href="https://apex.bam-ecosystem.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center w-full"
+                        >
+                          <span className="mr-2">⛏️</span>
+                          BAM ApexMiner
+                        </a>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <a
+                          href="https://vip.bam-ecosystem.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center w-full"
+                        >
+                          <span className="mr-2">👑</span>
+                          BAM VIP Access
+                        </a>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   
                   {/* Wallet Connection for Desktop */}
               {walletAddress ? (
