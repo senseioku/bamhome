@@ -53,7 +53,8 @@ export const CHAINLINK_ABI = [
 // Import the complete BAM Swap ABI from the deployed contract
 import { COMPLETE_BAM_SWAP_ABI } from './complete-bam-swap-abi';
 
-// Use the complete ABI from deployed contract
+// Export both the original and the alias for compatibility
+export { COMPLETE_BAM_SWAP_ABI };
 export const BAM_SWAP_ABI = COMPLETE_BAM_SWAP_ABI;
 
 // ERC20 Token ABI (Essential functions)
@@ -151,3 +152,4 @@ export const FEES = {
   LOW_FEE: 0.5, // 0.5% for USDT→USDB, USDT→BAM, BNB→BAM
   HIGH_FEE: 1.5, // 1.5% for USDB→USDT, BAM→USDT, BAM→BNB
 } as const;
+

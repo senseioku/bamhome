@@ -1,5 +1,8 @@
+// Clean version - removing all notifications outside swap interface
+// Will copy back to swap.tsx once verified working
+
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowDownUp, AlertCircle, CheckCircle, Info, Wallet } from 'lucide-react';
+import { Search, ArrowDownUp, Settings, AlertCircle, CheckCircle, Info, Zap, TrendingUp, Activity, AlertTriangle, Wallet, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,9 +11,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { TOKENS, BAM_SWAP_ADDRESS, COMPLETE_BAM_SWAP_ABI } from '@/lib/contracts';
-import { Web3Utils } from '@/lib/web3';
-// Remove price service import for now to simplify
+import { TOKENS, web3Utils, BAM_SWAP_ADDRESS, COMPLETE_BAM_SWAP_ABI } from '@/lib/contracts';
+import { priceService } from '@/lib/price-service';
 
 // Import token images
 import bamTokenImg from '@assets/bamToken_1753182165828.png';
@@ -66,9 +68,6 @@ interface ContractStatus {
 type TransactionStatus = 'idle' | 'pending' | 'success' | 'error';
 
 export default function BamSwap() {
-  // Initialize Web3Utils
-  const web3Utils = new Web3Utils();
-  
   // State management
   const [fromToken, setFromToken] = useState<TokenInfo>(TOKENS.USDT);
   const [toToken, setToToken] = useState<TokenInfo>(TOKENS.BAM);

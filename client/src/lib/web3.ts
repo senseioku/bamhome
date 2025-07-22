@@ -1,4 +1,6 @@
-import { BSC_RPC_URL, BSC_CHAIN_ID } from './contracts';
+// Constants to avoid circular dependency
+const BSC_RPC_URL = "https://rpc.ankr.com/bsc";
+const BSC_CHAIN_ID = 56;
 
 // Browser-based Web3 utilities (no external dependencies)
 export class Web3Utils {
