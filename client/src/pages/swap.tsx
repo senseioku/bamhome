@@ -2140,6 +2140,22 @@ function SwapMobileNavigation({
   formatDisplayAmount,
 }: SwapMobileNavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Prevent body scroll when mobile nav is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, [isOpen]);
 
   const navItems = [
     { label: "Home", href: "/", icon: "🏠" },
@@ -2185,8 +2201,13 @@ function SwapMobileNavigation({
 
       {/* Professional Full-screen Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl">
-          <div className="flex flex-col h-full">
+        <div 
+          className="fixed inset-0 z-[100] bg-black backdrop-blur-xl"
+          style={{ touchAction: 'none', overscrollBehavior: 'none' }}
+          onTouchMove={(e) => e.preventDefault()}
+          onWheel={(e) => e.preventDefault()}
+        >
+          <div className="flex flex-col h-full overflow-hidden">
             {/* Clean Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <div className="flex items-center gap-3">
