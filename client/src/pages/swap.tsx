@@ -71,6 +71,7 @@ const SwapPage = () => {
   const [milestoneMessage, setMilestoneMessage] = useState<string>('');
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
   const [showLoader, setShowLoader] = useState<boolean>(false);
+  const [showPageLoader, setShowPageLoader] = useState<boolean>(true);
 
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
@@ -342,6 +343,9 @@ const SwapPage = () => {
     
     // Check contract balances on page load
     checkContractBalances();
+    
+    // Hide page loader after 2.5 seconds
+    setTimeout(() => setShowPageLoader(false), 2500);
     
     // Check contract balances every 30 seconds
     const balanceInterval = setInterval(checkContractBalances, 30000);
@@ -1407,6 +1411,36 @@ const SwapPage = () => {
 
 
 
+      {/* Page Entry Loader */}
+      {showPageLoader && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50">
+          <div className="glassmorphism-golden rounded-3xl p-12 text-center max-w-md mx-4">
+            <div className="relative flex items-center justify-center mb-8">
+              <img 
+                src="/attached_assets/bamToken_1753039099296.png" 
+                alt="BAM Token" 
+                className="w-24 h-24 rounded-full animate-swap-rotate"
+              />
+              <div className="absolute -top-4 -left-8 text-3xl animate-money-fly">💰</div>
+              <div className="absolute -top-4 -right-8 text-3xl animate-money-fly" style={{animationDelay: '0.3s'}}>💎</div>
+              <div className="absolute -bottom-4 -left-8 text-3xl animate-money-fly" style={{animationDelay: '0.6s'}}>🚀</div>
+              <div className="absolute -bottom-4 -right-8 text-3xl animate-money-fly" style={{animationDelay: '0.9s'}}>⚡</div>
+            </div>
+            <h1 className="text-3xl font-bold text-yellow-400 mb-4">BAM Ecosystem</h1>
+            <p className="text-xl text-yellow-200 font-bold mb-2">
+              BUILD AND MULTIPLY Wealth Together
+            </p>
+            <p className="text-sm text-yellow-300/90 mb-6">
+              Welcome to the community-driven DeFi revolution
+            </p>
+            <div className="w-full bg-yellow-900/30 rounded-full h-3">
+              <div className="bg-gradient-to-r from-yellow-500 to-yellow-400 h-3 rounded-full animate-pulse w-full"></div>
+            </div>
+            <p className="text-xs text-yellow-300 mt-3">Initializing swap interface...</p>
+          </div>
+        </div>
+      )}
+
       {/* Main Content - Properly sized and centered for desktop */}
       <div className="p-2 sm:p-4 pt-20 sm:pt-24 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-sm sm:max-w-md lg:max-w-sm xl:max-w-md mx-auto">
@@ -1477,12 +1511,12 @@ const SwapPage = () => {
                 <div className="absolute -top-2 -right-2 text-3xl">🎉</div>
                 <div className="absolute -bottom-2 -left-2 text-3xl">🚀</div>
               </div>
-              <h3 className="text-2xl font-bold text-yellow-400 mb-3">Congratulations!</h3>
-              <p className="text-yellow-200 mb-4">Welcome to the BAM community!</p>
+              <h3 className="text-2xl font-bold text-yellow-400 mb-3">🎉 Congratulations!</h3>
+              <p className="text-yellow-200 mb-4">Welcome to the BAM community family!</p>
               <div className="space-y-3 text-sm text-yellow-300">
                 <div className="flex items-center justify-center space-x-2">
                   <Users className="w-4 h-4" />
-                  <span>Together we stand, In BAM We Trust!</span>
+                  <span className="font-bold">Together we stand, In BAM We Trust!</span>
                 </div>
                 <div className="flex items-center justify-center space-x-2">
                   <Heart className="w-4 h-4" />
@@ -1490,7 +1524,10 @@ const SwapPage = () => {
                 </div>
                 <div className="flex items-center justify-center space-x-2">
                   <TrendingUp className="w-4 h-4" />
-                  <span>Share this opportunity with friends!</span>
+                  <span className="font-semibold">Share this to all your friends!</span>
+                </div>
+                <div className="text-center text-yellow-200 text-xs mt-2 italic">
+                  Don't keep this opportunity to yourself!
                 </div>
               </div>
               <button 
