@@ -8,9 +8,14 @@ async function main() {
   const USDB_ADDRESS = "0x4050334836d59C1276068e496aB239DC80247675";
   const BAM_ADDRESS = "0xA779f03b752fa2442e6A23f145b007f2160F9a7D";
   
-  // Recipients (update with your addresses)
-  const FEE_RECIPIENT = "0x742d35Cc4Bc34C7e59BD82D7e5e2c2B47e0A05c2"; // Replace with your fee recipient
-  const PAYMENT_RECIPIENT = "0x742d35Cc4Bc34C7e59BD82D7e5e2c2B47e0A05c2"; // Replace with your payment recipient
+  // Recipients - YOU MUST UPDATE THESE ADDRESSES
+  const FEE_RECIPIENT = "YOUR_FEE_RECIPIENT_ADDRESS_HERE"; // Update with your fee recipient wallet
+  const PAYMENT_RECIPIENT = "YOUR_PAYMENT_RECIPIENT_ADDRESS_HERE"; // Update with your payment recipient wallet
+
+  // Validate addresses are set
+  if (FEE_RECIPIENT === "YOUR_FEE_RECIPIENT_ADDRESS_HERE" || PAYMENT_RECIPIENT === "YOUR_PAYMENT_RECIPIENT_ADDRESS_HERE") {
+    throw new Error("❌ PLEASE UPDATE FEE_RECIPIENT and PAYMENT_RECIPIENT addresses before deploying!");
+  }
 
   // Get deployer
   const [deployer] = await hre.ethers.getSigners();
