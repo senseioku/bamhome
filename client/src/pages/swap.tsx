@@ -1382,92 +1382,19 @@ const SwapPage = () => {
               )}
             </div>
 
-            {/* Mobile Navigation */}
+            {/* Professional Mobile Navigation */}
             <div className="md:hidden">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-6 w-6 text-gray-300" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="glass-card border-border">
-                  <div className="flex flex-col space-y-4 mt-8">
-                    <a href="/" className="flex items-center gap-2 text-gray-300 hover:text-primary transition-colors">
-                      <Home className="w-4 h-4" />
-                      Home
-                    </a>
-                    <a href="/#ecosystem" className="text-gray-300 hover:text-primary transition-colors">Ecosystem</a>
-                    <a href="/#tokenomics" className="text-gray-300 hover:text-primary transition-colors">Tokenomics</a>
-                    <a href="/#projects" className="text-gray-300 hover:text-primary transition-colors">Projects</a>
-                    <a 
-                      href="https://apex.bam-ecosystem.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-gray-300 hover:text-purple-400 transition-colors flex items-center"
-                    >
-                      <span className="mr-2">⛏️</span>
-                      BAM ApexMiner
-                    </a>
-                    <a 
-                      href="https://vip.bam-ecosystem.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-gray-300 hover:text-yellow-400 transition-colors flex items-center"
-                    >
-                      <span className="mr-2">👑</span>
-                      BAM VIP Access
-                    </a>
-                    <div className="border-t border-gray-600 pt-4">
-                      <span className="text-primary font-medium">Current: Swap</span>
-                    </div>
-                    
-                    {/* Mobile Wallet Info */}
-                    <div className="border-t border-gray-600 pt-4">
-                      {walletAddress ? (
-                        <div className="space-y-3">
-                          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                              <span className="text-sm font-medium text-green-400">Connected</span>
-                            </div>
-                            <div className="text-xs text-gray-400 mb-1">Address:</div>
-                            <div className="text-sm text-white font-mono">{formatAddress(walletAddress)}</div>
-                            {balances.BNB && (
-                              <div className="text-xs text-gray-400 mt-1">
-                                Balance: {formatDisplayAmount(balances.BNB, 'BNB')} BNB
-                              </div>
-                            )}
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Button onClick={copyAddress} variant="outline" className="text-gray-300 border-gray-600 text-xs">
-                              <Copy className="w-3 h-3 mr-1" />
-                              Copy
-                            </Button>
-                            <Button onClick={addBAMTokenToWallet} variant="outline" className="text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/10 text-xs">
-                              <Star className="w-3 h-3 mr-1" />
-                              Add BAM
-                            </Button>
-                          </div>
-                          <Button onClick={disconnectWallet} variant="outline" className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10 text-xs">
-                            <LogOut className="w-3 h-3 mr-1" />
-                            Disconnect
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button 
-                          onClick={connectWallet}
-                          disabled={isLoading}
-                          variant="outline" 
-                          className="w-full border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
-                        >
-                          <Wallet className="w-4 h-4 mr-2" />
-                          {isLoading ? 'Connecting...' : 'Connect Wallet'}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
+              <SwapMobileNavigation 
+                walletAddress={walletAddress}
+                balances={balances}
+                isLoading={isLoading}
+                connectWallet={connectWallet}
+                copyAddress={copyAddress}
+                addBAMTokenToWallet={addBAMTokenToWallet}
+                disconnectWallet={disconnectWallet}
+                formatAddress={formatAddress}
+                formatDisplayAmount={formatDisplayAmount}
+              />
             </div>
           </div>
         </div>
@@ -2187,5 +2114,228 @@ const SwapPage = () => {
     </TooltipProvider>
   );
 };
+
+// Professional Mobile Navigation Component for Swap Page
+interface SwapMobileNavigationProps {
+  walletAddress: string;
+  balances: Record<string, string>;
+  isLoading: boolean;
+  connectWallet: () => void;
+  copyAddress: () => void;
+  addBAMTokenToWallet: () => void;
+  disconnectWallet: () => void;
+  formatAddress: (address: string) => string;
+  formatDisplayAmount: (amount: string, symbol: string) => string;
+}
+
+function SwapMobileNavigation({
+  walletAddress,
+  balances,
+  isLoading,
+  connectWallet,
+  copyAddress,
+  addBAMTokenToWallet,
+  disconnectWallet,
+  formatAddress,
+  formatDisplayAmount,
+}: SwapMobileNavigationProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const navItems = [
+    { label: "Home", href: "/", icon: "🏠" },
+    { label: "Ecosystem", href: "/#ecosystem", icon: "🌐" },
+    { label: "Tokenomics", href: "/#tokenomics", icon: "💰" },
+    { label: "Projects", href: "/#projects", icon: "🚀" },
+  ];
+
+  const platformItems = [
+    { 
+      label: "BAM Swap", 
+      href: "/swap", 
+      icon: "🔄", 
+      status: "Live", 
+      statusColor: "bg-green-500/20 text-green-400",
+      current: true
+    },
+    { 
+      label: "ApexMiner", 
+      href: "https://apex.bam-ecosystem.com", 
+      icon: "⛏️", 
+      external: true 
+    },
+    { 
+      label: "VIP Access", 
+      href: "https://vip.bam-ecosystem.com", 
+      icon: "👑", 
+      external: true 
+    },
+  ];
+
+  return (
+    <>
+      {/* Menu Button */}
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={() => setIsOpen(true)}
+        className="relative z-50"
+      >
+        <Menu className="h-6 w-6 text-gray-300" />
+      </Button>
+
+      {/* Professional Full-screen Overlay */}
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl">
+          <div className="flex flex-col h-full">
+            {/* Clean Header */}
+            <div className="flex items-center justify-between p-6 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/assets/bamToken_1753182165828.png" 
+                  alt="BAM Token" 
+                  className="h-10 w-10 rounded-full"
+                />
+                <div>
+                  <span className="text-2xl font-bold text-yellow-400">BAM</span>
+                  <span className="text-base text-gray-300 ml-2">Swap Interface</span>
+                </div>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsOpen(false)}
+                className="text-white hover:bg-white/10"
+              >
+                <X className="h-8 w-8" />
+              </Button>
+            </div>
+
+            {/* Navigation Grid */}
+            <div className="flex-1 p-6">
+              <div className="space-y-1 mb-8">
+                {navItems.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-4 p-4 rounded-xl text-left text-white hover:bg-white/10 transition-all duration-200 w-full text-xl border border-white/5 hover:border-yellow-400/30"
+                  >
+                    <span className="text-2xl">{item.icon}</span>
+                    <span className="font-medium">{item.label}</span>
+                  </a>
+                ))}
+              </div>
+
+              {/* Platform Access */}
+              <div className="border-t border-white/10 pt-6 mb-8">
+                <h3 className="text-yellow-400 font-semibold mb-4 text-lg">Platform Access</h3>
+                <div className="space-y-2">
+                  {platformItems.map((item, index) => {
+                    const content = (
+                      <div className="flex items-center justify-between p-4 rounded-xl text-white hover:bg-white/10 transition-all duration-200 w-full text-lg border border-white/5 hover:border-yellow-400/30">
+                        <div className="flex items-center gap-4">
+                          <span className="text-2xl">{item.icon}</span>
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {item.current && <span className="text-yellow-400 text-xs">●</span>}
+                          {item.status && (
+                            <span className={`text-xs px-3 py-1 rounded-full font-medium ${item.statusColor}`}>
+                              {item.status}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+
+                    if (item.href) {
+                      return (
+                        <a
+                          key={index}
+                          href={item.href}
+                          target={item.external ? "_blank" : undefined}
+                          rel={item.external ? "noopener noreferrer" : undefined}
+                          onClick={() => !item.external && setIsOpen(false)}
+                        >
+                          {content}
+                        </a>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              </div>
+
+              {/* Wallet Section */}
+              <div className="border-t border-white/10 pt-6">
+                <h3 className="text-yellow-400 font-semibold mb-4 text-lg">Wallet Connection</h3>
+                {walletAddress ? (
+                  <div className="space-y-4">
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
+                      <div className="flex items-center space-x-2 mb-3">
+                        <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                        <span className="text-lg font-medium text-green-400">Connected</span>
+                      </div>
+                      <div className="text-sm text-gray-400 mb-2">Address:</div>
+                      <div className="text-lg text-white font-mono mb-3">{formatAddress(walletAddress)}</div>
+                      {balances.BNB && (
+                        <div className="text-sm text-gray-400">
+                          Balance: {formatDisplayAmount(balances.BNB, 'BNB')} BNB
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button 
+                        onClick={() => { copyAddress(); setIsOpen(false); }} 
+                        variant="outline" 
+                        className="text-white border-white/20 hover:bg-white/10 text-sm"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy
+                      </Button>
+                      <Button 
+                        onClick={() => { addBAMTokenToWallet(); setIsOpen(false); }} 
+                        variant="outline" 
+                        className="text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/10 text-sm"
+                      >
+                        <Star className="w-4 h-4 mr-2" />
+                        Add BAM
+                      </Button>
+                    </div>
+                    <Button 
+                      onClick={() => { disconnectWallet(); setIsOpen(false); }} 
+                      variant="outline" 
+                      className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Disconnect Wallet
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    onClick={() => { connectWallet(); setIsOpen(false); }}
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold text-lg p-4 rounded-xl"
+                  >
+                    <Wallet className="w-5 h-5 mr-3" />
+                    {isLoading ? 'Connecting...' : 'Connect Wallet'}
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-white/10">
+              <div className="text-yellow-400 font-medium mb-1">BAM Professional DeFi</div>
+              <div className="text-gray-400 text-sm">
+                Secure • Transparent • Community-Driven
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 export default SwapPage;

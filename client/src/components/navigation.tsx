@@ -201,7 +201,7 @@ function MobileNavigation() {
 
       {/* Professional Full-screen Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl">
+        <div className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl">
           <div className="flex flex-col h-full">
             {/* Clean Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
