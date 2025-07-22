@@ -1421,80 +1421,123 @@ const SwapPage = () => {
 
                       {/* Navigation Links */}
                       <div className="flex-1 pt-6">
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                           <a
                             href="/"
-                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-2"
+                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-3 rounded-lg hover:bg-gray-800/50"
                           >
                             <Home className="h-5 w-5" />
-                            Home
+                            <span className="text-lg font-medium">Home</span>
                           </a>
                           <a
                             href="/#ecosystem"
-                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-2"
+                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-3 rounded-lg hover:bg-gray-800/50"
                           >
                             <Activity className="h-5 w-5" />
-                            Ecosystem
+                            <span className="text-lg font-medium">Ecosystem</span>
                           </a>
                           <a
                             href="/#tokenomics"
-                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-2"
+                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-3 rounded-lg hover:bg-gray-800/50"
                           >
                             <Coins className="h-5 w-5" />
-                            Tokenomics
+                            <span className="text-lg font-medium">Tokenomics</span>
                           </a>
                           <a
                             href="/#projects"
-                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-2"
+                            className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors p-3 rounded-lg hover:bg-gray-800/50"
                           >
                             <Trophy className="h-5 w-5" />
-                            Projects
+                            <span className="text-lg font-medium">Projects</span>
                           </a>
-                          <div className="flex items-center gap-3 text-yellow-400 font-semibold p-2">
-                            <ArrowUpDown className="h-5 w-5" />
-                            BAM Swap (Current)
+                        </div>
+
+                        {/* Platform Features */}
+                        <div className="mt-8">
+                          <div className="space-y-3">
+                            <a
+                              href="https://apex.bam-ecosystem.com"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-800/50 transition-all group"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-2xl">⛏️</span>
+                                <span className="text-lg font-medium text-gray-300 group-hover:text-yellow-400">BAM ApexMiner</span>
+                              </div>
+                            </a>
+                            <a
+                              href="https://vip.bam-ecosystem.com"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-800/50 transition-all group"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-2xl">👑</span>
+                                <span className="text-lg font-medium text-gray-300 group-hover:text-yellow-400">BAM VIP Access</span>
+                              </div>
+                            </a>
+                            <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                              <div className="flex items-center gap-3">
+                                <ArrowUpDown className="h-5 w-5 text-yellow-400" />
+                                <span className="text-lg font-medium text-yellow-400">Current: Swap</span>
+                              </div>
+                              <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">Live</span>
+                            </div>
                           </div>
                         </div>
 
                         {/* Wallet Section */}
-                        <div className="mt-8 pt-6 border-t border-gray-700">
-                          <h3 className="text-yellow-400 font-semibold mb-4">Wallet Connection</h3>
+                        <div className="mt-8 pt-6 border-t border-white/10">
                           {walletAddress ? (
                             <div className="space-y-4">
-                              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                  <span className="text-green-400 font-medium">Connected</span>
+                              <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
+                                <div className="flex items-center space-x-2 mb-3">
+                                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                                  <span className="text-lg font-medium text-green-400">Connected</span>
                                 </div>
-                                <div className="text-sm text-gray-300 font-mono">{formatAddress(walletAddress)}</div>
+                                <div className="text-sm text-gray-400 mb-2">Address:</div>
+                                <div className="text-lg text-white font-mono mb-3">{formatAddress(walletAddress)}</div>
                                 {balances.BNB && (
-                                  <div className="text-xs text-gray-400 mt-1">
+                                  <div className="text-sm text-gray-400">
                                     Balance: {formatDisplayAmount(balances.BNB, 'BNB')} BNB
                                   </div>
                                 )}
                               </div>
-                              <div className="flex gap-2">
-                                <Button onClick={copyAddress} variant="outline" size="sm" className="flex-1 text-gray-300 border-gray-600">
-                                  <Copy className="w-4 h-4 mr-1" />
+                              <div className="grid grid-cols-2 gap-3">
+                                <Button 
+                                  onClick={copyAddress} 
+                                  variant="outline" 
+                                  className="text-white border-white/20 hover:bg-white/10 text-sm"
+                                >
+                                  <Copy className="w-4 h-4 mr-2" />
                                   Copy
                                 </Button>
-                                <Button onClick={addBAMTokenToWallet} variant="outline" size="sm" className="flex-1 text-yellow-400 border-yellow-500/30">
-                                  <Star className="w-4 h-4 mr-1" />
+                                <Button 
+                                  onClick={addBAMTokenToWallet} 
+                                  variant="outline" 
+                                  className="text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/10 text-sm"
+                                >
+                                  <Star className="w-4 h-4 mr-2" />
                                   Add BAM
                                 </Button>
                               </div>
-                              <Button onClick={disconnectWallet} variant="outline" className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10">
+                              <Button 
+                                onClick={disconnectWallet} 
+                                variant="outline" 
+                                className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10"
+                              >
                                 <LogOut className="w-4 h-4 mr-2" />
-                                Disconnect Wallet
+                                Disconnect
                               </Button>
                             </div>
                           ) : (
                             <Button 
                               onClick={connectWallet}
                               disabled={isLoading}
-                              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold"
+                              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold text-lg p-4 rounded-xl"
                             >
-                              <Wallet className="w-4 h-4 mr-2" />
+                              <Wallet className="w-5 h-5 mr-3" />
                               {isLoading ? 'Connecting...' : 'Connect Wallet'}
                             </Button>
                           )}
