@@ -233,6 +233,9 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ V3 FIXED CONTRACT DEPLOYED: 0x6fCbbc0834E9c0E3AFc4A96F47a19E29b6261934 with correct bamPriceInUSD = 1e6
 ✓ FRONTEND UPDATED: Contract address updated to use fixed deployment with proper 1M BAM per USDT calculation
 ✓ PRODUCTION READY: All purchase calculations now mathematically correct (2-5 USDT → 2M-5M BAM)
+✓ TOKENOMICS UPDATED: New allocation with 25% initial burn, verified BSCScan burn address integration
+✓ BURN VERIFICATION: Professional burn verification section with direct BSCScan link for transparency
+✓ COMMUNITY ALLOCATION: Updated to 40% (Public Sale 20% + Presale 15% + Marketing/CEX 5%)
 
 ## User Preferences
 

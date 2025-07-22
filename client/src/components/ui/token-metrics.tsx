@@ -7,8 +7,8 @@ export default function TokenMetrics() {
     {
       icon: <TrendingUp className="h-6 w-6" />,
       title: "Deflationary",
-      value: "Mechanism in Place",
-      description: "Ecosystem-driven deflationary mechanisms through platform usage",
+      value: "25% Burned",
+      description: "25B tokens permanently burned, reducing circulating supply",
       color: "text-primary"
     },
     {
@@ -21,8 +21,8 @@ export default function TokenMetrics() {
     {
       icon: <Users className="h-6 w-6" />,
       title: "Community",
-      value: "45% Allocation",
-      description: "Public sale + presale + community incentives + CEX listings combined",
+      value: "40% Allocation",
+      description: "Public sale (20%) + presale (15%) + marketing/CEX (5%) combined",
       color: "text-accent"
     },
     {

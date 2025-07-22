@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Lock, TrendingUp } from "lucide-react";
+import { Clock, Lock, TrendingUp, Flame, ExternalLink } from "lucide-react";
 import PieChart from "@/components/ui/pie-chart";
 import VestingTimeline from "@/components/ui/vesting-timeline";
 import TokenMetrics from "@/components/ui/token-metrics";
@@ -23,6 +23,43 @@ export default function TokenomicsSection() {
         <div className="mb-16">
           <TokenMetrics />
         </div>
+
+        {/* Burn Verification Section */}
+        <div className="mb-16">
+          <Card className="glass-card border-red-500/30 bg-gradient-to-r from-red-950/20 to-orange-950/20">
+            <CardContent className="p-8 text-center">
+              <div className="flex items-center justify-center mb-4">
+                <Flame className="h-8 w-8 text-red-400 mr-3" />
+                <h3 className="text-2xl font-bold text-red-400">25% Supply Burned Forever</h3>
+              </div>
+              <p className="text-lg text-red-200 mb-6">
+                25 Billion BAM tokens permanently removed from circulation to increase scarcity and value
+              </p>
+              <div className="bg-black/40 rounded-lg p-6 border border-red-500/20">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-muted-foreground">Burn Address:</span>
+                  <span className="text-xs font-mono text-red-300">0x000...dead</span>
+                </div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm text-muted-foreground">Burned Amount:</span>
+                  <span className="text-lg font-bold text-red-400">25,000,000,000 BAM</span>
+                </div>
+                <a
+                  href="https://bscscan.com/token/0xa779f03b752fa2442e6a23f145b007f2160f9a7d?a=0x000000000000000000000000000000000000dead"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Verify Burn on BSCScan
+                </a>
+              </div>
+              <p className="text-sm text-red-200/70 mt-4">
+                This permanent burn makes BAM deflationary by design, creating long-term value appreciation
+              </p>
+            </CardContent>
+          </Card>
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Tokenomics Chart */}
@@ -31,9 +68,11 @@ export default function TokenomicsSection() {
               <CardContent className="p-8">
                 <h3 className="text-2xl font-bold mb-8 text-center">Token Distribution</h3>
                 <PieChart data={tokenomicsData} />
-                <div className="text-center mt-6">
+                <div className="text-center mt-6 space-y-2">
                   <div className="text-3xl font-bold text-primary">100B</div>
                   <div className="text-sm text-muted-foreground">Total Supply (Fixed)</div>
+                  <div className="text-xl font-semibold text-secondary">75B</div>
+                  <div className="text-xs text-muted-foreground">Circulating Supply (25B Burned)</div>
                 </div>
               </CardContent>
             </Card>
