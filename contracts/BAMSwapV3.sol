@@ -70,7 +70,7 @@ contract BAMSwapV3 is Ownable, ReentrancyGuard, Pausable {
         address _bam,
         address _feeRecipient,
         address _paymentRecipient
-    ) {
+    ) Ownable(msg.sender) {
         require(_usdt != address(0), "Invalid USDT address");
         require(_usdb != address(0), "Invalid USDB address");
         require(_bam != address(0), "Invalid BAM address");

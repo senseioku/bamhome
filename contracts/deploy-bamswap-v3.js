@@ -15,7 +15,7 @@ async function main() {
   
   const [deployer] = await ethers.getSigners();
   console.log("Deploying from account:", deployer.address);
-  console.log("Account balance:", ethers.utils.formatEther(await deployer.getBalance()), "BNB");
+  console.log("Account balance:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "BNB");
   
   // Get contract factory
   const BAMSwapV3 = await ethers.getContractFactory("BAMSwapV3");
@@ -36,15 +36,16 @@ async function main() {
     PAYMENT_RECIPIENT
   );
   
-  await bamSwapV3.deployed();
+  await bamSwapV3.waitForDeployment();
   
   console.log("\n✅ BAMSwapV3 deployed successfully!");
-  console.log("Contract Address:", bamSwapV3.address);
-  console.log("Transaction Hash:", bamSwapV3.deployTransaction.hash);
+  const contractAddress = await bamSwapV3.getAddress();
+  console.log("Contract Address:", contractAddress);
+  console.log("Transaction Hash:", bamSwapV3.deploymentTransaction().hash);
   
   // Wait for confirmations
   console.log("\n⏳ Waiting for confirmations...");
-  await bamSwapV3.deployTransaction.wait(3);
+  await bamSwapV3.deploymentTransaction().wait(3);
   
   // Verify deployment
   console.log("\n🔍 Verifying deployment...");
@@ -61,19 +62,19 @@ async function main() {
     const maxLimit = await bamSwapV3.maxPurchaseLimit();
     const owner = await bamSwapV3.owner();
     
-    console.log("BAM Price:", ethers.utils.formatUnits(bamPrice, 12), "USD");
-    console.log("Min Purchase:", ethers.utils.formatEther(minLimit), "USDT");
-    console.log("Max Purchase:", ethers.utils.formatEther(maxLimit), "USDT");
+    console.log("BAM Price:", ethers.formatUnits(bamPrice, 12), "USD");
+    console.log("Min Purchase:", ethers.formatEther(minLimit), "USDT");
+    console.log("Max Purchase:", ethers.formatEther(maxLimit), "USDT");
     console.log("Contract Owner:", owner);
     
     // Test purchase info function
     const purchaseInfo = await bamSwapV3.getPurchaseInfo();
     console.log("Purchase Info:");
-    console.log("  Min:", ethers.utils.formatEther(purchaseInfo[0]), "USDT");
-    console.log("  Max:", ethers.utils.formatEther(purchaseInfo[1]), "USDT");
-    console.log("  Max Per Wallet:", ethers.utils.formatEther(purchaseInfo[2]), "USDT");
-    console.log("  BAM Price:", ethers.utils.formatUnits(purchaseInfo[3], 12), "USD");
-    console.log("  BAM per USDT:", ethers.utils.formatEther(purchaseInfo[4]));
+    console.log("  Min:", ethers.formatEther(purchaseInfo[0]), "USDT");
+    console.log("  Max:", ethers.formatEther(purchaseInfo[1]), "USDT");
+    console.log("  Max Per Wallet:", ethers.formatEther(purchaseInfo[2]), "USDT");
+    console.log("  BAM Price:", ethers.formatUnits(purchaseInfo[3], 12), "USD");
+    console.log("  BAM per USDT:", ethers.formatEther(purchaseInfo[4]));
     
   } catch (error) {
     console.error("❌ Error testing functions:", error.message);
@@ -103,12 +104,12 @@ async function main() {
   // Save deployment info
   const deploymentInfo = {
     contractName: "BAMSwapV3",
-    address: bamSwapV3.address,
+    address: contractAddress,
     deployer: deployer.address,
     network: "BSC Mainnet",
     deploymentTime: new Date().toISOString(),
-    transactionHash: bamSwapV3.deployTransaction.hash,
-    gasUsed: bamSwapV3.deployTransaction.gasLimit?.toString(),
+    transactionHash: bamSwapV3.deploymentTransaction().hash,
+    gasUsed: bamSwapV3.deploymentTransaction().gasLimit?.toString(),
     constructorArgs: [
       USDT_ADDRESS,
       USDB_ADDRESS,
