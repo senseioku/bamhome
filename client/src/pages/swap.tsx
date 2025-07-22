@@ -1013,8 +1013,8 @@ const SwapPage = () => {
             errorMessage = 'Token approval required';
           } else if (error.message.includes('Already purchased')) {
             errorMessage = 'You have already purchased BAM tokens with this wallet';
-          } else if (error.message.includes('Exact amount required')) {
-            errorMessage = 'BAM purchases require exactly 1 USDT';
+          } else if (error.message.includes('Must purchase exactly')) {
+            errorMessage = 'BAM purchases require 2-5 USDT range';
           } else {
             errorMessage = 'Contract execution failed - check requirements';
           }
@@ -1913,12 +1913,13 @@ const SwapPage = () => {
               >
                 🚫 Already Purchased - One Per Wallet
               </Button>
-            ) : ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && parseFloat(fromAmount) !== 1) ? (
+            ) : ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && 
+                  (parseFloat(fromAmount) < 2 || parseFloat(fromAmount) > 5)) ? (
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
               >
-                ⚠️ BAM requires exactly 1 USDT
+                ⚠️ BAM requires 2-5 USDT
               </Button>
             ) : ((fromToken.symbol === 'BNB' && toToken.symbol === 'BAM') && !priceInfo) ? (
               <Button
@@ -2064,12 +2065,13 @@ const SwapPage = () => {
 
             {/* BAM Purchase Invalid Amount */}
             {!contractStatus.isPaused && 
-             ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && parseFloat(fromAmount) !== 1) && (
+             ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') && 
+              (parseFloat(fromAmount) < 2 || parseFloat(fromAmount) > 5)) && (
               <Alert className="border-orange-500/50 bg-orange-500/20 backdrop-blur-sm">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-orange-200 text-sm">
-                  <div className="font-medium">⚠️ Invalid BAM Purchase Amount</div>
-                  <div className="text-xs mt-1">BAM purchases require exactly 1 USDT. Current: {fromAmount} USDT</div>
+                  <div className="font-medium">⚠️ Amount Outside Purchase Range</div>
+                  <div className="text-xs mt-1">BAM purchases require 2-5 USDT. Current: {fromAmount} USDT</div>
                 </AlertDescription>
               </Alert>
             )}
