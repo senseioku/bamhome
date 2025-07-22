@@ -732,31 +732,27 @@ const SwapPage = () => {
         const fee = parseFloat(amount) * (feePercentage / 100);
         outputAmount = (parseFloat(amount) - fee).toString();
       } else if (from.symbol === 'USDT' && to.symbol === 'BAM') {
-        // USDT to BAM: Current Presale 2 price $0.000001 = 1M BAM per USDT
+        // USDT to BAM: Fixed calculation - 1 USDT = 1,000,000 BAM (contract has bug)
         feePercentage = FEES.LOW_FEE;
-        const bamPrice = 0.000001; // Presale 2 rate
-        outputAmount = (parseFloat(amount) / bamPrice).toString();
+        outputAmount = (parseFloat(amount) * 1000000).toString(); // Fixed: 1M BAM per USDT
       } else if (from.symbol === 'BNB' && to.symbol === 'BAM') {
-        // BNB to BAM: Using live BNB price
+        // BNB to BAM: Fixed calculation - 1M BAM per USD equivalent
         feePercentage = FEES.LOW_FEE;
         if (priceInfo) {
           const usdValue = parseFloat(amount) * priceInfo.bnbPrice;
-          const bamPrice = 0.000001; // Presale 2 rate
-          outputAmount = (usdValue / bamPrice).toString();
+          outputAmount = (usdValue * 1000000).toString(); // Fixed: 1M BAM per USD
         }
       } else if (from.symbol === 'BAM' && to.symbol === 'USDT') {
-        // BAM to USDT: 1.5% fee
+        // BAM to USDT: Fixed calculation - 1M BAM = 1 USDT
         feePercentage = FEES.HIGH_FEE;
-        const bamPrice = 0.000001; // Presale 2 rate
-        const usdtValue = parseFloat(amount) * bamPrice;
+        const usdtValue = parseFloat(amount) / 1000000; // Fixed: 1M BAM = 1 USDT
         const fee = usdtValue * (feePercentage / 100);
         outputAmount = (usdtValue - fee).toString();
       } else if (from.symbol === 'BAM' && to.symbol === 'BNB') {
-        // BAM to BNB: 1.5% fee
+        // BAM to BNB: Fixed calculation - 1M BAM = 1 USD equivalent
         feePercentage = FEES.HIGH_FEE;
         if (priceInfo) {
-          const bamPrice = 0.000001; // Presale 2 rate
-          const usdValue = parseFloat(amount) * bamPrice;
+          const usdValue = parseFloat(amount) / 1000000; // Fixed: 1M BAM = 1 USD
           const fee = usdValue * (feePercentage / 100);
           const bnbValue = (usdValue - fee) / priceInfo.bnbPrice;
           outputAmount = bnbValue.toString();
