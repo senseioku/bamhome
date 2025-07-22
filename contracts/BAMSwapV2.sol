@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interfaces/AggregatorV3Interface.sol";
 
 /**
  * @title BAM Swap Contract V2 - Enhanced with Flexible Range Purchases
@@ -51,13 +52,19 @@ contract BAMSwapV2 is ReentrancyGuard, Pausable, Ownable {
     // Wallet purchase tracking for BAM purchases
     mapping(address => uint256) public walletPurchases;
     
-    // Chainlink price feed for BNB/USD (BSC Mainnet)
-    address public constant BNB_USD_PRICE_FEED = 0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE;
+    // Chainlink Price Feeds on BSC Mainnet (same as V1)
+    AggregatorV3Interface internal bnbPriceFeed;
     
-    // Emergency price system
-    uint256 public fallbackBNBPrice = 600e8; // $600 fallback price
+    // Price feed configuration (same as V1)
+    uint256 public constant CHAINLINK_DECIMALS = 8;
+    uint256 public constant MAX_PRICE_AGE = 3600; // 1 hour
+    uint256 public constant MIN_PRICE = 1e18; // $1 minimum BNB price
+    uint256 public constant MAX_PRICE = 10000e18; // $10,000 maximum BNB price
+    
+    // Fallback and emergency settings (same as V1)
+    uint256 public fallbackBnbPrice = 600e18; // $600 fallback price
+    bool public useFallbackPrice = false;
     bool public emergencyMode = false;
-    bool public useChainlinkPriceFeed = true;
     
     // Events
     event SwapUSDTToUSDB(address indexed user, uint256 amount, uint256 fee);
@@ -78,6 +85,9 @@ contract BAMSwapV2 is ReentrancyGuard, Pausable, Ownable {
     event WalletPurchaseReset(address indexed wallet);
     event MinimumPurchaseEnforced(address indexed user, uint256 amount, string tokenType);
     event MinimumSwapEnforced(address indexed user, uint256 amount, string swapType);
+    event PriceFeedUpdated(address oldFeed, address newFeed);
+    event FeeRecipientUpdated(address oldRecipient, address newRecipient);
+    event PaymentRecipientUpdated(address oldRecipient, address newRecipient);
 
     constructor(
         address _usdt,
@@ -100,6 +110,9 @@ contract BAMSwapV2 is ReentrancyGuard, Pausable, Ownable {
         
         // Initialize BAM price at default: $0.000001 per BAM (1M BAM per USDT)
         bamPriceInUSD = 1e12; // $0.000001 per BAM
+        
+        // BSC Mainnet BNB/USD Price Feed (same as V1)
+        bnbPriceFeed = AggregatorV3Interface(0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE);
     }
     
     /**
@@ -246,30 +259,119 @@ contract BAMSwapV2 is ReentrancyGuard, Pausable, Ownable {
     }
     
     /**
-     * @dev Get BNB price with validation from Chainlink or fallback
+     * @dev Get current BNB price with validation (EXACT V1 LOGIC)
+     * @return price Current BNB price in USD (18 decimals)
+     * @return isValid Whether the price is from a valid source
      */
     function getBNBPriceWithValidation() public view returns (uint256 price, bool isValid) {
-        if (useChainlinkPriceFeed && !emergencyMode) {
-            try this.getChainlinkBNBPrice() returns (uint256 chainlinkPrice) {
-                if (chainlinkPrice > 0 && chainlinkPrice < 10000e8) { // Sanity check: $0 < price < $10,000
-                    return (chainlinkPrice, true);
-                }
-            } catch {}
+        if (useFallbackPrice || emergencyMode) {
+            return (fallbackBnbPrice, true);
         }
+
+        try bnbPriceFeed.latestRoundData() returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 /* startedAt */,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        ) {
+            // Validate price data
+            if (answer <= 0 || 
+                updatedAt == 0 || 
+                block.timestamp - updatedAt > MAX_PRICE_AGE ||
+                answeredInRound < roundId) {
+                return (fallbackBnbPrice, false);
+            }
+            
+            // Convert to 18 decimals and validate range
+            uint256 priceInUSD = uint256(answer) * 1e10;
+            if (priceInUSD < MIN_PRICE || priceInUSD > MAX_PRICE) {
+                return (fallbackBnbPrice, false);
+            }
+            
+            return (priceInUSD, true);
+            
+        } catch {
+            return (fallbackBnbPrice, false);
+        }
+    }
+
+    /**
+     * @dev Get quotes for swaps including fees (same as V1)
+     */
+    function getQuotes(uint256 usdtAmount, uint256 bnbAmount) 
+        external 
+        view 
+        returns (
+            uint256 bamFromUSDT,
+            uint256 bamFromBNB,
+            uint256 currentBNBPrice,
+            bool priceIsValid,
+            uint256 swapFeeUSDT,
+            uint256 swapFeeUSDB,
+            uint256 paymentToRecipientUSDT,
+            uint256 paymentToRecipientBNB
+        ) 
+    {
+        bamFromUSDT = calculateBAMFromUSDT(usdtAmount);
         
-        // Fallback to stored price
-        return (fallbackBNBPrice, fallbackBNBPrice > 0);
+        (uint256 bnbPrice, bool isValid) = getBNBPriceWithValidation();
+        bamFromBNB = calculateBAMFromBNB(bnbAmount, bnbPrice);
+        currentBNBPrice = bnbPrice;
+        priceIsValid = isValid;
+        
+        // Calculate fees for swaps (0.5% for USDT→USDB, 1.5% for USDB→USDT)
+        swapFeeUSDT = (usdtAmount * LOW_FEE_RATE) / FEE_DENOMINATOR; // USDT→USDB: 0.5%
+        swapFeeUSDB = (usdtAmount * HIGH_FEE_RATE) / FEE_DENOMINATOR; // USDB→USDT: 1.5%
+        
+        // Calculate payment distributions for purchases (90% to recipient)
+        paymentToRecipientUSDT = (usdtAmount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
+        paymentToRecipientBNB = (bnbAmount * PAYMENT_DISTRIBUTION_RATE) / FEE_DENOMINATOR;
+    }
+
+    /**
+     * @dev Calculate swap amounts after fees for USDT→USDB (0.5%)
+     */
+    function calculateUSDTToUSDBSwapAmounts(uint256 amount) 
+        external 
+        pure 
+        returns (uint256 fee, uint256 amountAfterFee) 
+    {
+        fee = (amount * LOW_FEE_RATE) / FEE_DENOMINATOR;
+        amountAfterFee = amount - fee;
     }
     
     /**
-     * @dev Get BNB price from Chainlink (external call for try/catch)
+     * @dev Calculate swap amounts after fees for USDB→USDT (1.5%)
      */
-    function getChainlinkBNBPrice() external view returns (uint256) {
-        // This would implement Chainlink price feed logic
-        // For now, return fallback price
-        return fallbackBNBPrice;
+    function calculateUSDBToUSDTSwapAmounts(uint256 amount) 
+        external 
+        pure 
+        returns (uint256 fee, uint256 amountAfterFee) 
+    {
+        fee = (amount * HIGH_FEE_RATE) / FEE_DENOMINATOR;
+        amountAfterFee = amount - fee;
     }
-    
+
+    /**
+     * @dev Update price feed address (owner only)
+     */
+    function updatePriceFeed(address newFeed) external onlyOwner {
+        require(newFeed != address(0), "Invalid feed address");
+        address oldFeed = address(bnbPriceFeed);
+        bnbPriceFeed = AggregatorV3Interface(newFeed);
+        emit PriceFeedUpdated(oldFeed, newFeed);
+    }
+
+    /**
+     * @dev Set fallback price usage (owner only)
+     */
+    function setUseFallbackPrice(bool _useFallback) external onlyOwner {
+        useFallbackPrice = _useFallback;
+        (uint256 currentPrice,) = getBNBPriceWithValidation();
+        emit PriceSourceChanged(_useFallback, currentPrice);
+    }
+
     /**
      * @dev Reset wallet purchase tracking for specific address (owner only)
      */
@@ -490,9 +592,9 @@ contract BAMSwapV2 is ReentrancyGuard, Pausable, Ownable {
     /**
      * @dev Toggle emergency mode (owner only)
      */
-    function toggleEmergencyMode() external onlyOwner {
-        emergencyMode = !emergencyMode;
-        emit EmergencyModeToggled(emergencyMode);
+    function toggleEmergencyMode(bool _emergencyMode) external onlyOwner {
+        emergencyMode = _emergencyMode;
+        emit EmergencyModeToggled(_emergencyMode);
     }
     
     /**
@@ -531,4 +633,68 @@ contract BAMSwapV2 is ReentrancyGuard, Pausable, Ownable {
         
         emit SwapFunctionPaused(functionName, paused);
     }
+
+    /**
+     * @dev Update fee recipient (owner only)
+     */
+    function updateFeeRecipient(address newRecipient) external onlyOwner {
+        require(newRecipient != address(0), "Invalid recipient");
+        address oldRecipient = feeRecipient;
+        feeRecipient = newRecipient;
+        emit FeeRecipientUpdated(oldRecipient, newRecipient);
+    }
+
+    /**
+     * @dev Update payment recipient (owner only)
+     */
+    function updatePaymentRecipient(address newRecipient) external onlyOwner {
+        require(newRecipient != address(0), "Invalid recipient");
+        address oldRecipient = paymentRecipient;
+        paymentRecipient = newRecipient;
+        emit PaymentRecipientUpdated(oldRecipient, newRecipient);
+    }
+
+    /**
+     * @dev Update fallback BNB price (owner only)
+     */
+    function updateFallbackBNBPrice(uint256 newPrice) external onlyOwner {
+        require(newPrice > 0, "Price must be greater than 0");
+        require(newPrice < 10000e18, "Price too high (max $10,000)");
+        
+        uint256 oldPrice = fallbackBnbPrice;
+        fallbackBnbPrice = newPrice;
+        emit FallbackPriceUpdated(oldPrice, newPrice);
+    }
+
+    /**
+     * @dev Get contract status including balance and pricing info (same as V1)
+     */
+    function getContractStatus() external view returns (
+        uint256 usdtBalance,
+        uint256 usdbBalance,
+        uint256 bamBalance,
+        uint256 bnbBalance,
+        uint256 currentBNBPrice,
+        uint256 currentBAMPrice,
+        bool priceIsValid,
+        bool isUsingFallback,
+        bool isEmergencyMode,
+        bool isPaused
+    ) {
+        usdtBalance = USDT.balanceOf(address(this));
+        usdbBalance = USDB.balanceOf(address(this));
+        bamBalance = BAM.balanceOf(address(this));
+        bnbBalance = address(this).balance;
+        
+        (currentBNBPrice, priceIsValid) = getBNBPriceWithValidation();
+        currentBAMPrice = bamPriceInUSD;
+        isUsingFallback = useFallbackPrice;
+        isEmergencyMode = emergencyMode;
+        isPaused = paused();
+    }
+
+    /**
+     * @dev Receive BNB (same as V1)
+     */
+    receive() external payable {}
 }
