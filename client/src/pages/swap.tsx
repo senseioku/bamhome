@@ -1298,7 +1298,7 @@ const SwapPage = () => {
     <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         {/* Navigation Header */}
-        <nav className="fixed top-0 w-full z-50 glass-card backdrop-blur-xl border-b border-gray-800">
+        <nav className="fixed top-0 w-full z-40 glass-card backdrop-blur-xl border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo and Back to Home */}
@@ -2210,8 +2210,12 @@ function SwapMobileNavigation({
       {/* Professional Full-screen Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-[9999] bg-gray-800/60 backdrop-blur-xl"
-          style={{ touchAction: 'none', overscrollBehavior: 'none' }}
+          className="fixed inset-0 bg-gray-800/60 backdrop-blur-xl"
+          style={{ 
+            zIndex: 999999,
+            touchAction: 'none', 
+            overscrollBehavior: 'none' 
+          }}
           onTouchMove={(e) => e.preventDefault()}
           onWheel={(e) => e.preventDefault()}
         >
