@@ -223,6 +223,9 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ ACCESSIBILITY FIXED: Added proper DialogTitle components for screen reader compliance
 ✓ PRODUCTION READY: All contract functions operational with flexible 2-5 USDT purchase range
 ✓ DEPLOYMENT SUGGESTED: Platform ready for live production deployment
+✓ PRESALE 2 PRICING CORRECTED: Fixed to exact user requirements - $0.000001 per BAM = 1M BAM per USDT
+✓ FLEXIBLE PURCHASE RANGE: 2-5 USDT purchases giving 2M-5M BAM respectively as requested
+✓ ALL TOKEN DECIMALS CONFIRMED: 18 decimals for USDT, USDB, BAM, BNB - calculations updated accordingly
 
 ## User Preferences
 
