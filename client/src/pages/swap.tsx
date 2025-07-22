@@ -1390,39 +1390,56 @@ const SwapPage = () => {
                     <Menu className="h-6 w-6 text-gray-300" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="glass-card border-border">
-                  <div className="flex flex-col space-y-4 mt-8">
-                    <a href="/" className="flex items-center gap-2 text-gray-300 hover:text-primary transition-colors">
-                      <Home className="w-4 h-4" />
-                      Home
-                    </a>
-                    <a href="/#ecosystem" className="text-gray-300 hover:text-primary transition-colors">Ecosystem</a>
-                    <a href="/#tokenomics" className="text-gray-300 hover:text-primary transition-colors">Tokenomics</a>
-                    <a href="/#projects" className="text-gray-300 hover:text-primary transition-colors">Projects</a>
-                    <a 
-                      href="https://apex.bam-ecosystem.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-gray-300 hover:text-purple-400 transition-colors flex items-center"
-                    >
-                      <span className="mr-2">⛏️</span>
-                      BAM ApexMiner
-                    </a>
-                    <a 
-                      href="https://vip.bam-ecosystem.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-gray-300 hover:text-yellow-400 transition-colors flex items-center"
-                    >
-                      <span className="mr-2">👑</span>
-                      BAM VIP Access
-                    </a>
-                    <div className="border-t border-gray-600 pt-4">
-                      <span className="text-primary font-medium">Current: Swap</span>
+                <SheetContent side="right" className="glass-card border-border w-72 p-0 bg-gray-900/95 backdrop-blur-xl">
+                  <div className="flex flex-col h-full">
+                    {/* Header */}
+                    <div className="flex items-center justify-between p-4 border-b border-gray-800">
+                      <div className="flex items-center gap-3">
+                        <img 
+                          src="/assets/bamToken_1753182165828.png" 
+                          alt="BAM Token" 
+                          className="h-6 w-6 rounded-full"
+                        />
+                        <div>
+                          <span className="text-base font-bold gradient-text">BAM</span>
+                          <span className="text-xs text-gray-400 ml-1">Swap</span>
+                        </div>
+                      </div>
+                      <button className="text-gray-400 hover:text-white p-1">
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                    
-                    {/* Mobile Wallet Info */}
-                    <div className="border-t border-gray-600 pt-4">
+
+                    {/* Navigation Items */}
+                    <div className="flex-1 py-2">
+                      <a href="/" className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors">
+                        <span className="text-base">🏠</span>
+                        <span className="text-sm">Home</span>
+                      </a>
+                      <a href="/#ecosystem" className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors">
+                        <span className="text-base">🌐</span>
+                        <span className="text-sm">Ecosystem</span>
+                      </a>
+                      <a href="/#tokenomics" className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors">
+                        <span className="text-base">💰</span>
+                        <span className="text-sm">Tokenomics</span>
+                      </a>
+                      <a href="/#projects" className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors">
+                        <span className="text-base">🚀</span>
+                        <span className="text-sm">Projects</span>
+                      </a>
+                    </div>
+
+                    {/* Current Page Indicator */}
+                    <div className="px-4 py-2 border-t border-gray-800">
+                      <div className="flex items-center gap-3 text-yellow-400">
+                        <span className="text-base">🔄</span>
+                        <span className="text-sm font-medium">BAM Swap (Current)</span>
+                      </div>
+                    </div>
+
+                    {/* Wallet Section */}
+                    <div className="border-t border-gray-800 p-4">
                       {walletAddress ? (
                         <div className="space-y-3">
                           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
