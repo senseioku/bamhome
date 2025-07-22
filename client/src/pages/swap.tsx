@@ -1455,7 +1455,7 @@ const SwapPage = () => {
               </Badge>
               <Badge variant="outline" className="text-yellow-400 border-yellow-400 px-1.5 py-0.5">
                 <Activity className="w-2 h-2 mr-0.5" />
-                BAM $0.0000001
+                BAM $0.000001
               </Badge>
             </div>
           )}
