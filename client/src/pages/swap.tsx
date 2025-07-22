@@ -1382,7 +1382,7 @@ const SwapPage = () => {
               )}
             </div>
 
-            {/* Professional Mobile Navigation */}
+            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <SwapMobileNavigation 
                 walletAddress={walletAddress}
@@ -2202,7 +2202,7 @@ function SwapMobileNavigation({
       {/* Professional Full-screen Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-xl"
+          className="fixed inset-0 z-[100] bg-gray-900/75 backdrop-blur-xl"
           style={{ touchAction: 'none', overscrollBehavior: 'none' }}
           onTouchMove={(e) => e.preventDefault()}
           onWheel={(e) => e.preventDefault()}
