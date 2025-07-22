@@ -157,6 +157,8 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Implemented auto-dismissing notifications: purchase warnings (5s), balance errors (4s), general errors (5s)
 ✓ Added mobile optimization for screens under 620px with compact layouts and responsive sizing
 ✓ Enhanced user experience with fadeIn animations and automatic notification cleanup
+✓ Removed static BAM Purchase Guide alert - replaced with compact auto-dismissing notification (3s)
+✓ Streamlined interface by eliminating persistent warning boxes for cleaner mobile experience
 
 ## User Preferences
 

@@ -62,6 +62,7 @@ const SwapPage = () => {
   const [showLimitsModal, setShowLimitsModal] = useState(false);
   const [hasAlreadyPurchased, setHasAlreadyPurchased] = useState<boolean>(false);
   const [showPurchasedWarning, setShowPurchasedWarning] = useState<boolean>(false);
+  const [showPurchaseGuide, setShowPurchaseGuide] = useState<boolean>(false);
   const [isCheckingPurchaseHistory, setIsCheckingPurchaseHistory] = useState<boolean>(false);
   const [showAddTokenNotification, setShowAddTokenNotification] = useState<boolean>(false);
   const [contractBalances, setContractBalances] = useState<{[key: string]: string}>({});
@@ -275,6 +276,10 @@ const SwapPage = () => {
       if (hasPurchased) {
         setShowPurchasedWarning(true);
         setTimeout(() => setShowPurchasedWarning(false), 5000);
+      } else {
+        // Show brief purchase guide for new users
+        setShowPurchaseGuide(true);
+        setTimeout(() => setShowPurchaseGuide(false), 3000);
       }
       
       console.log(`🔍 Purchase history result for ${address}:`, hasPurchased ? '🚫 Already purchased' : '✅ No previous purchase');
@@ -1435,6 +1440,20 @@ const SwapPage = () => {
           </div>
         )}
 
+        {/* Purchase Guide - Auto-dismiss */}
+        {showPurchaseGuide && ((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
+          (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM')) && (
+          <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-40 pointer-events-none animate-fadeIn">
+            <div className="bg-yellow-500/90 border border-yellow-400 rounded-lg p-3 backdrop-blur-sm max-w-sm notification-compact">
+              <div className="flex items-start space-x-2 text-black">
+                <div className="text-xs">
+                  <div className="font-bold">BAM Purchase: 2-5 USDT = 2M-5M BAM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Balance Warning Notification */}
         {showBalanceWarning && (
           <div className="fixed top-32 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
@@ -1621,27 +1640,7 @@ const SwapPage = () => {
                       </div>
                     </AlertDescription>
                   </Alert>
-                ) : (
-                  <Alert className="border-yellow-500/30 bg-yellow-500/10 mb-3">
-                    <AlertCircle className="h-4 w-4 text-yellow-400" />
-                    <AlertDescription className="text-yellow-200 text-sm">
-                      <div className="space-y-1">
-                        <div className="font-medium">⚠️ BAM Purchase Guide:</div>
-                        <div className="text-xs">
-                          {fromToken.symbol === 'BNB' ? (
-                            <>
-                              <div>Exact Amount: <span className="font-mono font-bold text-white">{calculateBNBForBAM()} BNB</span> (≈ $1.00 USD)</div>
-                              <div>Auto-filled based on BNB price: ${priceInfo?.bnbPrice.toFixed(2)}</div>
-                            </>
-                          ) : (
-                            '• Exactly 1 USDT per wallet • One-time purchase only'
-                          )}
-                          <div>→ Receive 10,000,000 BAM tokens</div>
-                        </div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
+                ) : null}
               </>
             )}
 
