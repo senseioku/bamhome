@@ -97,11 +97,11 @@ const SwapPage = () => {
   // Fetch real-time contract data
   const fetchContractData = async () => {
     try {
-      if (!window.web3 || !walletAddress) return;
+      if (!(window as any).web3 || !walletAddress) return;
       
-      const contract = new window.web3.eth.Contract(
+      const contract = new (window as any).web3.eth.Contract(
         COMPLETE_BAM_SWAP_ABI,
-        CONTRACT_ADDRESS
+        BAM_SWAP_ADDRESS
       );
 
       // Fetch current contract parameters
@@ -113,8 +113,8 @@ const SwapPage = () => {
 
       // Convert bamPriceInUSD to actual price (contract stores as integer, divide by 1e11 for current price)
       const bamPrice = (Number(bamPriceInUSD) / 1e11).toFixed(9); 
-      const minPurchase = window.web3.utils.fromWei(minPurchaseLimit.toString(), 'ether');
-      const maxPurchase = window.web3.utils.fromWei(maxPurchaseLimit.toString(), 'ether');
+      const minPurchase = (window as any).web3.utils.fromWei(minPurchaseLimit.toString(), 'ether');
+      const maxPurchase = (window as any).web3.utils.fromWei(maxPurchaseLimit.toString(), 'ether');
       
       // Calculate BAM tokens per USDT (based on contract's bamPriceInUSD value)
       const bamPerUSDT = Number(bamPriceInUSD).toLocaleString();
@@ -194,7 +194,7 @@ const SwapPage = () => {
         
         setPriceInfo({
           bnbPrice,
-          bamPrice: 0.0000001, // Fixed BAM price from contract
+          bamPrice: 0.000001, // Current Presale 2 BAM price
           isValidPrice: priceSource !== 'Static Fallback',
           lastUpdated: Date.now()
         });
@@ -205,7 +205,7 @@ const SwapPage = () => {
         // Preserve last known good price or use fallback
         setPriceInfo(prev => prev || {
           bnbPrice: 725,
-          bamPrice: 0.0000001,
+          bamPrice: 0.000001, // Current Presale 2 BAM price
           isValidPrice: false,
           lastUpdated: Date.now()
         });
@@ -222,7 +222,7 @@ const SwapPage = () => {
 
   // Fetch contract data when wallet connects
   useEffect(() => {
-    if (walletAddress && window.web3) {
+    if (walletAddress && (window as any).web3) {
       fetchContractData();
       // Refresh every 2 minutes
       const interval = setInterval(fetchContractData, 120000);
@@ -662,7 +662,7 @@ const SwapPage = () => {
       const bamBalance = parseFloat(balances.BAM || '0');
       const totalSupply = 1000000000; // 1B BAM initially in contract
       const distributed = totalSupply - bamBalance;
-      const estimatedHolders = Math.max(0, Math.floor(distributed / 10000000)); // 10M BAM per holder
+      const estimatedHolders = Math.max(0, Math.floor(distributed / 2000000)); // 2M BAM per holder (Presale 2 rate)
 
       // Check for milestone (every 100 holders)
       const currentMilestone = Math.floor(estimatedHolders / 100) * 100;
@@ -689,8 +689,8 @@ const SwapPage = () => {
     const requiredAmount = parseFloat(amount || '0');
     
     if (toSymbol === 'BAM') {
-      // For BAM purchases, need 10M BAM per 1 USDT
-      const requiredBAM = requiredAmount * 10000000;
+      // For BAM purchases, need 2M BAM per 1 USDT (Presale 2 rate)
+      const requiredBAM = requiredAmount * 2000000;
       const availableBAM = parseFloat(contractBalances.BAM || '0');
       return availableBAM >= requiredBAM;
     } else if (toSymbol === 'USDT') {
@@ -729,22 +729,22 @@ const SwapPage = () => {
         const fee = parseFloat(amount) * (feePercentage / 100);
         outputAmount = (parseFloat(amount) - fee).toString();
       } else if (from.symbol === 'USDT' && to.symbol === 'BAM') {
-        // USDT to BAM: Fixed price $0.0000001
+        // USDT to BAM: Current Presale 2 price $0.000001 = 2M BAM per USDT
         feePercentage = FEES.LOW_FEE;
-        const bamPrice = 0.0000001;
+        const bamPrice = 0.000001; // Presale 2 rate
         outputAmount = (parseFloat(amount) / bamPrice).toString();
       } else if (from.symbol === 'BNB' && to.symbol === 'BAM') {
         // BNB to BAM: Using live BNB price
         feePercentage = FEES.LOW_FEE;
         if (priceInfo) {
           const usdValue = parseFloat(amount) * priceInfo.bnbPrice;
-          const bamPrice = 0.0000001;
+          const bamPrice = 0.000001; // Presale 2 rate
           outputAmount = (usdValue / bamPrice).toString();
         }
       } else if (from.symbol === 'BAM' && to.symbol === 'USDT') {
         // BAM to USDT: 1.5% fee
         feePercentage = FEES.HIGH_FEE;
-        const bamPrice = 0.0000001;
+        const bamPrice = 0.000001; // Presale 2 rate
         const usdtValue = parseFloat(amount) * bamPrice;
         const fee = usdtValue * (feePercentage / 100);
         outputAmount = (usdtValue - fee).toString();
@@ -752,7 +752,7 @@ const SwapPage = () => {
         // BAM to BNB: 1.5% fee
         feePercentage = FEES.HIGH_FEE;
         if (priceInfo) {
-          const bamPrice = 0.0000001;
+          const bamPrice = 0.000001; // Presale 2 rate
           const usdValue = parseFloat(amount) * bamPrice;
           const fee = usdValue * (feePercentage / 100);
           const bnbValue = (usdValue - fee) / priceInfo.bnbPrice;
@@ -2180,7 +2180,7 @@ const SwapPage = () => {
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div><span className="font-medium">BAM Reward:</span> {contractData ? `${Number(contractData.bamPerUSDT).toLocaleString()} BAM per USDT` : '2M-5M BAM tokens based on amount'}</div>
+                  <div><span className="font-medium">BAM Reward:</span> {contractData ? `${Number(contractData.bamPerUSDT).toLocaleString()} BAM per USDT` : '2,000,000 BAM per USDT (Presale 2 rate)'}</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>

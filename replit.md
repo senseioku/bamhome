@@ -184,6 +184,11 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Added automatic refresh every 2 minutes for real-time accuracy
 ✓ Enhanced "Set Up BAM Purchase" button to use dynamic minimum purchase amount
 ✓ All purchase limit data now reflects actual contract state on BSC mainnet
+✓ FIXED: Updated all BAM price calculations from Presale 1 ($0.0000001) to Presale 2 ($0.000001)
+✓ Corrected BAM reward calculations: 1 USDT = 2,000,000 BAM tokens (not 10,000,000)
+✓ Fixed quote calculations, balance checking, and milestone tracking for Presale 2 rates
+✓ Updated all fallback values in modal and interface to show current Presale 2 parameters
+✓ Interface now accurately reflects 2M-5M BAM reward range for 2-5 USDT purchases
 
 ## User Preferences
 
