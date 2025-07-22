@@ -1390,18 +1390,18 @@ const SwapPage = () => {
                     <Menu className="h-6 w-6 text-gray-300" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="glass-card border-border w-72 p-0 bg-gray-900/95 backdrop-blur-xl">
+                <SheetContent side="right" className="glass-card border-border w-64 p-0 bg-gray-900/95 backdrop-blur-xl">
                   <div className="flex flex-col h-full">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-gray-800">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between p-3 border-b border-gray-800">
+                      <div className="flex items-center gap-2">
                         <img 
                           src="/assets/bamToken_1753182165828.png" 
                           alt="BAM Token" 
-                          className="h-6 w-6 rounded-full"
+                          className="h-5 w-5 rounded-full"
                         />
                         <div>
-                          <span className="text-base font-bold gradient-text">BAM</span>
+                          <span className="text-sm font-bold gradient-text">BAM</span>
                           <span className="text-xs text-gray-400 ml-1">Swap</span>
                         </div>
                       </div>
@@ -1411,61 +1411,69 @@ const SwapPage = () => {
                     </div>
 
                     {/* Navigation Items */}
-                    <div className="flex-1 py-2">
-                      <a href="/" className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors">
-                        <span className="text-base">🏠</span>
+                    <div className="flex-1 py-1">
+                      <a href="/" className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
+                        <span className="text-sm">🏠</span>
                         <span className="text-sm">Home</span>
                       </a>
-                      <a href="/#ecosystem" className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors">
-                        <span className="text-base">🌐</span>
+                      <a href="/#ecosystem" className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
+                        <span className="text-sm">🌐</span>
                         <span className="text-sm">Ecosystem</span>
                       </a>
-                      <a href="/#tokenomics" className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors">
-                        <span className="text-base">💰</span>
+                      <a href="/#tokenomics" className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
+                        <span className="text-sm">💰</span>
                         <span className="text-sm">Tokenomics</span>
                       </a>
-                      <a href="/#projects" className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors">
-                        <span className="text-base">🚀</span>
+                      <a href="/#projects" className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
+                        <span className="text-sm">🚀</span>
                         <span className="text-sm">Projects</span>
                       </a>
                     </div>
 
-                    {/* Current Page Indicator */}
-                    <div className="px-4 py-2 border-t border-gray-800">
-                      <div className="flex items-center gap-3 text-yellow-400">
-                        <span className="text-base">🔄</span>
-                        <span className="text-sm font-medium">BAM Swap (Current)</span>
+                    {/* Platform Access Section */}
+                    <div className="border-t border-gray-800">
+                      <div className="px-4 py-2">
+                        <div className="text-xs font-medium text-yellow-400">Platform Access</div>
+                      </div>
+                      <div className="pb-2">
+                        <div className="flex items-center justify-between w-full px-4 py-2 text-yellow-400 bg-gray-800/30">
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm">🔄</span>
+                            <span className="text-sm font-medium">BAM Swap</span>
+                          </div>
+                          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">Live</span>
+                        </div>
                       </div>
                     </div>
 
                     {/* Wallet Section */}
-                    <div className="border-t border-gray-800 p-4">
+                    <div className="border-t border-gray-800 p-3">
                       {walletAddress ? (
-                        <div className="space-y-3">
-                          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                              <span className="text-sm font-medium text-green-400">Connected</span>
+                        <div className="space-y-2">
+                          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-2">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                              <span className="text-xs font-medium text-green-400">Connected</span>
                             </div>
                             <div className="text-xs text-gray-400 mb-1">Address:</div>
-                            <div className="text-sm text-white font-mono">{formatAddress(walletAddress)}</div>
+                            <div className="text-xs text-white font-mono">{formatAddress(walletAddress)}</div>
                             {balances.BNB && (
                               <div className="text-xs text-gray-400 mt-1">
                                 Balance: {formatDisplayAmount(balances.BNB, 'BNB')} BNB
                               </div>
                             )}
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Button onClick={copyAddress} variant="outline" className="text-gray-300 border-gray-600 text-xs">
+                          <div className="grid grid-cols-2 gap-1">
+                            <Button onClick={copyAddress} variant="outline" className="text-gray-300 border-gray-600 text-xs h-7">
                               <Copy className="w-3 h-3 mr-1" />
                               Copy
                             </Button>
-                            <Button onClick={addBAMTokenToWallet} variant="outline" className="text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/10 text-xs">
+                            <Button onClick={addBAMTokenToWallet} variant="outline" className="text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/10 text-xs h-7">
                               <Star className="w-3 h-3 mr-1" />
                               Add BAM
                             </Button>
                           </div>
-                          <Button onClick={disconnectWallet} variant="outline" className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10 text-xs">
+                          <Button onClick={disconnectWallet} variant="outline" className="w-full text-red-400 border-red-500/30 hover:bg-red-500/10 text-xs h-7">
                             <LogOut className="w-3 h-3 mr-1" />
                             Disconnect
                           </Button>
@@ -1475,9 +1483,9 @@ const SwapPage = () => {
                           onClick={connectWallet}
                           disabled={isLoading}
                           variant="outline" 
-                          className="w-full border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+                          className="w-full border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 text-xs h-8"
                         >
-                          <Wallet className="w-4 h-4 mr-2" />
+                          <Wallet className="w-3 h-3 mr-1" />
                           {isLoading ? 'Connecting...' : 'Connect Wallet'}
                         </Button>
                       )}

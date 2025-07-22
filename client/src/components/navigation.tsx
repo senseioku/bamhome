@@ -137,18 +137,18 @@ export default function Navigation() {
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="glass-card border-border w-72 p-0 bg-gray-900/95 backdrop-blur-xl">
+              <SheetContent side="right" className="glass-card border-border w-64 p-0 bg-gray-900/95 backdrop-blur-xl">
                 <div className="flex flex-col h-full">
                   {/* Header */}
-                  <div className="flex items-center justify-between p-4 border-b border-gray-800">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between p-3 border-b border-gray-800">
+                    <div className="flex items-center gap-2">
                       <img 
                         src="/assets/bamToken_1753182165828.png" 
                         alt="BAM Token" 
-                        className="h-6 w-6 rounded-full"
+                        className="h-5 w-5 rounded-full"
                       />
                       <div>
-                        <span className="text-base font-bold gradient-text">BAM</span>
+                        <span className="text-sm font-bold gradient-text">BAM</span>
                         <span className="text-xs text-gray-400 ml-1">Ecosystem</span>
                       </div>
                     </div>
@@ -158,14 +158,14 @@ export default function Navigation() {
                   </div>
 
                   {/* Navigation Items */}
-                  <div className="flex-1 py-2">
+                  <div className="flex-1 py-1">
                     {navItems.map((item) => (
                       <button
                         key={item.href}
                         onClick={() => scrollToSection(item.href)}
-                        className="flex items-center gap-3 w-full px-4 py-3 text-left text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                        className="flex items-center gap-3 w-full px-4 py-2 text-left text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors border-b border-gray-800/30"
                       >
-                        <span className="text-base">
+                        <span className="text-sm">
                           {item.label === "Home" ? "🏠" : 
                            item.label === "Ecosystem" ? "🌐" :
                            item.label === "Tokenomics" ? "💰" : "🚀"}
@@ -178,29 +178,19 @@ export default function Navigation() {
                   {/* Platforms Section */}
                   <div className="border-t border-gray-800">
                     <div className="px-4 py-2">
-                      <div className="text-xs font-medium text-yellow-400 mb-2">Platform Access</div>
+                      <div className="text-xs font-medium text-yellow-400">Platform Access</div>
                     </div>
-                    <div className="pb-4">
+                    <div className="pb-2">
                       <a
                         href="/swap"
-                        className="flex items-center justify-between w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                        className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-base">🔄</span>
+                          <span className="text-sm">🔄</span>
                           <span className="text-sm">BAM Swap</span>
                         </div>
                         <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">Live</span>
                       </a>
-                      <button
-                        onClick={() => scrollToSection("projects")}
-                        className="flex items-center justify-between w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-base">🎁</span>
-                          <span className="text-sm">BAM Drops</span>
-                        </div>
-                        <span className="text-xs bg-gray-600/50 text-gray-400 px-2 py-0.5 rounded">Soon</span>
-                      </button>
                     </div>
                   </div>
                 </div>
