@@ -1245,7 +1245,7 @@ const SwapPage = () => {
               </a>
               <div className="flex items-center gap-3">
                 <img 
-                  src="/assets/bamToken_1752877645023.png" 
+                  src="/assets/bamToken_1753182165828.png" 
                   alt="BAM Token" 
                   className="h-8 w-8 rounded-full"
                 />
@@ -1416,9 +1416,11 @@ const SwapPage = () => {
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50">
           <div className="glassmorphism-golden rounded-3xl p-12 text-center max-w-md mx-4">
             <div className="relative flex items-center justify-center mb-8">
-              <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-2xl font-bold text-black animate-swap-rotate shadow-lg border-4 border-yellow-300">
-                BAM
-              </div>
+              <img 
+                src="/assets/bamToken_1753182165828.png" 
+                alt="BAM Token" 
+                className="w-24 h-24 rounded-full animate-swap-rotate"
+              />
               <div className="absolute -top-4 -left-8 text-3xl animate-money-fly">💰</div>
               <div className="absolute -top-4 -right-8 text-3xl animate-money-fly" style={{animationDelay: '0.3s'}}>💎</div>
               <div className="absolute -bottom-4 -left-8 text-3xl animate-money-fly" style={{animationDelay: '0.6s'}}>🚀</div>
@@ -1480,7 +1482,7 @@ const SwapPage = () => {
             <div className="glassmorphism-golden rounded-2xl p-8 text-center max-w-sm mx-4">
               <div className="relative flex items-center justify-center mb-6">
                 <img 
-                  src="/attached_assets/bamToken_1753182165828.png" 
+                  src="/assets/bamToken_1753182165828.png" 
                   alt="BAM Token" 
                   className="w-16 h-16 rounded-full animate-swap-rotate"
                 />
@@ -1502,7 +1504,7 @@ const SwapPage = () => {
             <div className="glassmorphism-golden rounded-2xl p-8 text-center max-w-md mx-4 animate-celebration">
               <div className="relative flex items-center justify-center mb-6">
                 <img 
-                  src="/attached_assets/bamToken_1753182165828.png" 
+                  src="/assets/bamToken_1753182165828.png" 
                   alt="BAM Token" 
                   className="w-20 h-20 rounded-full animate-pulse-slow"
                 />

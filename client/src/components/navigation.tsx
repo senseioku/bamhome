@@ -46,7 +46,7 @@ export default function Navigation() {
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center gap-3">
               <img 
-                src="/assets/bamToken_1752877645023.png" 
+                src="/assets/bamToken_1753182165828.png" 
                 alt="BAM Token" 
                 className="h-10 w-10 rounded-full"
               />
