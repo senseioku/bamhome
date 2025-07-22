@@ -15,7 +15,8 @@ import { COMPLETE_BAM_SWAP_ABI as BAM_SWAP_ABI } from '@/lib/complete-bam-swap-a
 import Web3 from 'web3';
 import { BAMSwapV2Utils } from '@/lib/bamswap-v2-utils';
 import { Home, ArrowLeft, Menu, X, Wallet, Copy, LogOut, ChevronDown } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface TokenInfo {
@@ -1390,8 +1391,8 @@ const SwapPage = () => {
                     <Menu className="h-6 w-6 text-gray-300" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-full h-full p-0 bg-gray-900 border-0 sm:w-80">
-                  <div className="flex flex-col h-full bg-gray-900">
+                <SheetContent side="right" className="!w-full !h-screen p-0 bg-gray-900 border-0 !max-w-none sm:!w-80">
+                  <div className="flex flex-col h-full bg-gray-900 relative z-50">
                     {/* Header */}
                     <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800/50">
                       <div className="flex items-center gap-2">
@@ -1405,9 +1406,9 @@ const SwapPage = () => {
                           <span className="text-xs text-gray-400 ml-1">Swap</span>
                         </div>
                       </div>
-                      <button className="text-gray-400 hover:text-white p-1">
+                      <SheetClose className="text-gray-400 hover:text-white p-1">
                         <X className="w-4 h-4" />
-                      </button>
+                      </SheetClose>
                     </div>
 
                     {/* Navigation Items */}

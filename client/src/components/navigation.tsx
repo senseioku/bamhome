@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -137,8 +138,8 @@ export default function Navigation() {
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full h-full p-0 bg-gray-900 border-0 sm:w-80">
-                <div className="flex flex-col h-full bg-gray-900">
+              <SheetContent side="right" className="!w-full !h-screen p-0 bg-gray-900 border-0 !max-w-none sm:!w-80">
+                <div className="flex flex-col h-full bg-gray-900 relative z-50">
                   {/* Header */}
                   <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800/50">
                     <div className="flex items-center gap-2">
@@ -152,9 +153,9 @@ export default function Navigation() {
                         <span className="text-xs text-gray-400 ml-1">Ecosystem</span>
                       </div>
                     </div>
-                    <button className="text-gray-400 hover:text-white p-1">
+                    <SheetClose className="text-gray-400 hover:text-white p-1">
                       <X className="w-4 h-4" />
-                    </button>
+                    </SheetClose>
                   </div>
 
                   {/* Navigation Items */}
