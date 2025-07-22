@@ -280,3 +280,19 @@ body {
 .animate-progress-fill {
   animation: progress-fill 2.5s ease-out;
 }
+
+/* Force mobile sheet to cover full screen */
+@media (max-width: 640px) {
+  [data-state="open"][data-side="right"] {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    position: fixed !important;
+    inset: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    z-index: 9999 !important;
+  }
+}
