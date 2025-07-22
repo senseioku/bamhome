@@ -1390,10 +1390,10 @@ const SwapPage = () => {
                     <Menu className="h-6 w-6 text-gray-300" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="glass-card border-border w-64 p-0 bg-gray-900/95 backdrop-blur-xl">
-                  <div className="flex flex-col h-full">
+                <SheetContent side="right" className="w-full h-full p-0 bg-gray-900 border-0 sm:w-80">
+                  <div className="flex flex-col h-full bg-gray-900">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-3 border-b border-gray-800">
+                    <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800/50">
                       <div className="flex items-center gap-2">
                         <img 
                           src="/assets/bamToken_1753182165828.png" 
@@ -1411,71 +1411,71 @@ const SwapPage = () => {
                     </div>
 
                     {/* Navigation Items */}
-                    <div className="flex-1 py-1">
-                      <a href="/" className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
-                        <span className="text-sm">🏠</span>
-                        <span className="text-sm">Home</span>
+                    <div className="flex-1 py-2">
+                      <a href="/" className="flex items-center gap-4 w-full px-6 py-4 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                        <span className="text-lg">🏠</span>
+                        <span className="text-base font-medium">Home</span>
                       </a>
-                      <a href="/#ecosystem" className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
-                        <span className="text-sm">🌐</span>
-                        <span className="text-sm">Ecosystem</span>
+                      <a href="/#ecosystem" className="flex items-center gap-4 w-full px-6 py-4 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                        <span className="text-lg">🌐</span>
+                        <span className="text-base font-medium">Ecosystem</span>
                       </a>
-                      <a href="/#tokenomics" className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
-                        <span className="text-sm">💰</span>
-                        <span className="text-sm">Tokenomics</span>
+                      <a href="/#tokenomics" className="flex items-center gap-4 w-full px-6 py-4 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                        <span className="text-lg">💰</span>
+                        <span className="text-base font-medium">Tokenomics</span>
                       </a>
-                      <a href="/#projects" className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors border-b border-gray-800/30">
-                        <span className="text-sm">🚀</span>
-                        <span className="text-sm">Projects</span>
+                      <a href="/#projects" className="flex items-center gap-4 w-full px-6 py-4 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                        <span className="text-lg">🚀</span>
+                        <span className="text-base font-medium">Projects</span>
                       </a>
                     </div>
 
                     {/* Platform Access Section */}
-                    <div className="border-t border-gray-800">
-                      <div className="px-4 py-2">
-                        <div className="text-xs font-medium text-yellow-400">Platform Access</div>
+                    <div className="border-t border-gray-700 bg-gray-800/30">
+                      <div className="px-6 py-3">
+                        <div className="text-sm font-semibold text-yellow-400">Platform Access</div>
                       </div>
-                      <div className="pb-2">
-                        <div className="flex items-center justify-between w-full px-4 py-2 text-yellow-400 bg-gray-800/30">
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm">🔄</span>
-                            <span className="text-sm font-medium">BAM Swap</span>
+                      <div className="pb-4">
+                        <div className="flex items-center justify-between w-full px-6 py-3 text-yellow-400 bg-gray-800/50">
+                          <div className="flex items-center gap-4">
+                            <span className="text-lg">🔄</span>
+                            <span className="text-base font-semibold">BAM Swap</span>
                           </div>
-                          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">Live</span>
+                          <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Live</span>
                         </div>
                         <a
                           href="/#projects"
-                          className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                          className="flex items-center justify-between w-full px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                         >
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm">🎁</span>
-                            <span className="text-sm">BAM Drops</span>
+                          <div className="flex items-center gap-4">
+                            <span className="text-lg">🎁</span>
+                            <span className="text-base font-medium">BAM Drops</span>
                           </div>
-                          <span className="text-xs bg-gray-600/50 text-gray-400 px-2 py-0.5 rounded">Soon</span>
+                          <span className="text-xs bg-gray-600/50 text-gray-400 px-3 py-1 rounded-full">Soon</span>
                         </a>
                         <a
                           href="https://apex.bam-ecosystem.com"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                          className="flex items-center gap-4 w-full px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                         >
-                          <span className="text-sm">⛏️</span>
-                          <span className="text-sm">BAM ApexMiner</span>
+                          <span className="text-lg">⛏️</span>
+                          <span className="text-base font-medium">BAM ApexMiner</span>
                         </a>
                         <a
                           href="https://vip.bam-ecosystem.com"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                          className="flex items-center gap-4 w-full px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                         >
-                          <span className="text-sm">👑</span>
-                          <span className="text-sm">BAM VIP Access</span>
+                          <span className="text-lg">👑</span>
+                          <span className="text-base font-medium">BAM VIP Access</span>
                         </a>
                       </div>
                     </div>
 
                     {/* Wallet Section */}
-                    <div className="border-t border-gray-800 p-3">
+                    <div className="border-t border-gray-700 p-6 bg-gray-800/20">
                       {walletAddress ? (
                         <div className="space-y-2">
                           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-2">
