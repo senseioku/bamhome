@@ -662,7 +662,7 @@ const SwapPage = () => {
       const bamBalance = parseFloat(balances.BAM || '0');
       const totalSupply = 1000000000; // 1B BAM initially in contract
       const distributed = totalSupply - bamBalance;
-      const estimatedHolders = Math.max(0, Math.floor(distributed / 2000000)); // 2M BAM per holder (Presale 2 rate)
+      const estimatedHolders = Math.max(0, Math.floor(distributed / 1000000)); // 1M BAM per holder (Presale 2 rate)
 
       // Check for milestone (every 100 holders)
       const currentMilestone = Math.floor(estimatedHolders / 100) * 100;
@@ -689,8 +689,8 @@ const SwapPage = () => {
     const requiredAmount = parseFloat(amount || '0');
     
     if (toSymbol === 'BAM') {
-      // For BAM purchases, need 2M BAM per 1 USDT (Presale 2 rate)
-      const requiredBAM = requiredAmount * 2000000;
+      // For BAM purchases, need 1M BAM per 1 USDT (Presale 2 rate)
+      const requiredBAM = requiredAmount * 1000000;
       const availableBAM = parseFloat(contractBalances.BAM || '0');
       return availableBAM >= requiredBAM;
     } else if (toSymbol === 'USDT') {
@@ -729,7 +729,7 @@ const SwapPage = () => {
         const fee = parseFloat(amount) * (feePercentage / 100);
         outputAmount = (parseFloat(amount) - fee).toString();
       } else if (from.symbol === 'USDT' && to.symbol === 'BAM') {
-        // USDT to BAM: Current Presale 2 price $0.000001 = 2M BAM per USDT
+        // USDT to BAM: Current Presale 2 price $0.000001 = 1M BAM per USDT
         feePercentage = FEES.LOW_FEE;
         const bamPrice = 0.000001; // Presale 2 rate
         outputAmount = (parseFloat(amount) / bamPrice).toString();
@@ -2180,7 +2180,7 @@ const SwapPage = () => {
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <div><span className="font-medium">BAM Reward:</span> {contractData ? `${Number(contractData.bamPerUSDT).toLocaleString()} BAM per USDT` : '2,000,000 BAM per USDT (Presale 2 rate)'}</div>
+                  <div><span className="font-medium">BAM Reward:</span> {contractData ? `${Number(contractData.bamPerUSDT).toLocaleString()} BAM per USDT` : '1,000,000 BAM per USDT (Presale 2 rate)'}</div>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
@@ -2273,7 +2273,7 @@ const SwapPage = () => {
                   </div>
                   <div>
                     <div className="text-gray-400">BAM per USDT</div>
-                    <div className="text-purple-400 font-medium">{contractData ? Number(contractData.bamPerUSDT).toLocaleString() : '2,000,000'}</div>
+                    <div className="text-purple-400 font-medium">{contractData ? Number(contractData.bamPerUSDT).toLocaleString() : '1,000,000'}</div>
                   </div>
                 </div>
               </div>
