@@ -103,7 +103,7 @@ const SwapPage = () => {
         bamPriceInUSD = await web3Utils.callContractMethod(BAM_SWAP_ADDRESS, BAM_SWAP_ABI, 'bamPriceInUSD', []);
       } catch (error) {
         console.log('bamPriceInUSD paused, using fallback');
-        bamPriceInUSD = '1000000000000'; // $0.000001 default
+        bamPriceInUSD = '1000000'; // $0.000001 default (1e6 with 12-decimal storage = 1e6/1e12)
       }
       
       try {
