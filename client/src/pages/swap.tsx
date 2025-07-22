@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowUpDown, Settings, RefreshCw, AlertCircle, CheckCircle, TrendingUp, TrendingDown, Activity, Info, Zap, BarChart3, Search, Star, Clock } from 'lucide-react';
+import { ArrowUpDown, Settings, RefreshCw, AlertCircle, CheckCircle, TrendingUp, TrendingDown, Activity, Info, Zap, BarChart3, Search, Star, Clock, AlertTriangle, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -63,6 +63,10 @@ const SwapPage = () => {
   const [hasAlreadyPurchased, setHasAlreadyPurchased] = useState<boolean>(false);
   const [isCheckingPurchaseHistory, setIsCheckingPurchaseHistory] = useState<boolean>(false);
   const [showAddTokenNotification, setShowAddTokenNotification] = useState<boolean>(false);
+  const [contractBalances, setContractBalances] = useState<{[key: string]: string}>({});
+  const [showBalanceWarning, setShowBalanceWarning] = useState<boolean>(false);
+  const [showMilestoneNotification, setShowMilestoneNotification] = useState<boolean>(false);
+  const [milestoneMessage, setMilestoneMessage] = useState<string>('');
 
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
@@ -321,6 +325,13 @@ const SwapPage = () => {
     };
 
     checkWalletConnection();
+    
+    // Check contract balances on page load
+    checkContractBalances();
+    
+    // Check contract balances every 30 seconds
+    const balanceInterval = setInterval(checkContractBalances, 30000);
+    return () => clearInterval(balanceInterval);
   }, []);
 
   // Check contract status when wallet connects and periodically
@@ -529,6 +540,95 @@ const SwapPage = () => {
     }
   };
 
+  // Check contract balances
+  const checkContractBalances = async () => {
+    try {
+      const newContractBalances: Record<string, string> = {};
+      
+      // Get BNB balance of contract
+      const bnbBalance = await web3Utils.getBalance(BAM_SWAP_ADDRESS);
+      newContractBalances.BNB = bnbBalance;
+
+      // Get token balances for each ERC20 token in contract
+      for (const [symbol, token] of Object.entries(TOKENS)) {
+        if (symbol !== 'BNB' && token.address) {
+          try {
+            const balance = await web3Utils.getBalance(BAM_SWAP_ADDRESS, token.address);
+            newContractBalances[symbol] = balance;
+          } catch (error) {
+            console.error(`Failed to get ${symbol} contract balance:`, error);
+            newContractBalances[symbol] = '0';
+          }
+        }
+      }
+      
+      setContractBalances(newContractBalances);
+      
+      // Check for low BAM balance
+      const bamBalance = parseFloat(newContractBalances.BAM || '0');
+      if (bamBalance < 10000000) { // Less than 10M BAM tokens left
+        setShowBalanceWarning(true);
+        setTimeout(() => setShowBalanceWarning(false), 8000);
+      }
+      
+      // Check BAM holder milestones
+      await checkBAMHolderMilestones(newContractBalances);
+      
+      return newContractBalances;
+    } catch (error) {
+      console.error('Failed to check contract balances:', error);
+      return {};
+    }
+  };
+
+  // Check BAM holder count and milestones
+  const checkBAMHolderMilestones = async (balances: Record<string, string>) => {
+    try {
+      const bamBalance = parseFloat(balances.BAM || '0');
+      const totalSupply = 1000000000; // 1B BAM initially in contract
+      const distributed = totalSupply - bamBalance;
+      const estimatedHolders = Math.max(0, Math.floor(distributed / 10000000)); // 10M BAM per holder
+
+      // Check for milestone (every 100 holders)
+      const currentMilestone = Math.floor(estimatedHolders / 100) * 100;
+      
+      if (currentMilestone >= 100 && estimatedHolders % 100 < 5) { // Show for first 5 holders past milestone
+        if (bamBalance <= 0) {
+          setMilestoneMessage(`🎉 Batch ${currentMilestone / 100} Complete! Next batch launching soon - secure your spot before public launch!`);
+        } else {
+          setMilestoneMessage(`🎉 Milestone: ${currentMilestone}+ BAM Holders! Building the future together!`);
+        }
+        setShowMilestoneNotification(true);
+        setTimeout(() => setShowMilestoneNotification(false), 6000);
+      }
+
+      return estimatedHolders;
+    } catch (error) {
+      console.error('Failed to check BAM holders:', error);
+      return 0;
+    }
+  };
+
+  // Check if contract has sufficient balance before swap
+  const checkSufficientContractBalance = (fromSymbol: string, toSymbol: string, amount: string): boolean => {
+    const requiredAmount = parseFloat(amount || '0');
+    
+    if (toSymbol === 'BAM') {
+      // For BAM purchases, need 10M BAM per 1 USDT
+      const requiredBAM = requiredAmount * 10000000;
+      const availableBAM = parseFloat(contractBalances.BAM || '0');
+      return availableBAM >= requiredBAM;
+    } else if (toSymbol === 'USDT') {
+      const availableUSDT = parseFloat(contractBalances.USDT || '0');
+      return availableUSDT >= requiredAmount;
+    } else if (toSymbol === 'USDB') {
+      const availableUSDB = parseFloat(contractBalances.USDB || '0');
+      return availableUSDB >= requiredAmount;
+    }
+    
+    return true; // Default to true for other swaps
+  };
+
   // Calculate swap quote
   const calculateQuote = useCallback(async (amount: string, from: TokenInfo, to: TokenInfo) => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -626,6 +726,18 @@ const SwapPage = () => {
   // Execute swap transaction
   const executeSwap = async () => {
     if (!walletAddress || !quote) return;
+
+    // Check contract balance first
+    if (!checkSufficientContractBalance(fromToken.symbol, toToken.symbol, fromAmount)) {
+      if (toToken.symbol === 'BAM') {
+        setError('Insufficient BAM tokens in contract. This batch is sold out!');
+        setShowBalanceWarning(true);
+        setTimeout(() => setShowBalanceWarning(false), 8000);
+      } else {
+        setError(`Insufficient ${toToken.symbol} in contract for this swap`);
+      }
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -792,7 +904,10 @@ const SwapPage = () => {
         }
         
         // Update balances after confirmed transaction
-        setTimeout(() => updateBalances(walletAddress), 2000);
+        setTimeout(() => {
+          updateBalances(walletAddress);
+          checkContractBalances(); // Also refresh contract balances
+        }, 2000);
       } catch (confirmError) {
         console.error('Transaction confirmation failed:', confirmError);
         setTxStatus('error');
@@ -1306,6 +1421,40 @@ const SwapPage = () => {
                 <div className="text-sm">
                   <div className="font-medium">BAM Token Added!</div>
                   <div className="text-xs opacity-90">Check your wallet assets</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Balance Warning Notification */}
+        {showBalanceWarning && (
+          <div className="fixed top-32 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
+            <div className="bg-orange-500/90 border border-orange-400 rounded-lg p-4 backdrop-blur-sm max-w-sm">
+              <div className="flex items-start space-x-3 text-white">
+                <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <div className="font-bold mb-1">Low Contract Balance!</div>
+                  <div className="text-xs opacity-90 leading-relaxed">
+                    This batch is running low. Secure your BAM tokens before the next batch launches at higher prices!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Milestone Notification */}
+        {showMilestoneNotification && (
+          <div className="fixed top-44 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
+            <div className="bg-gradient-to-r from-yellow-500/90 to-orange-500/90 border border-yellow-400 rounded-lg p-4 backdrop-blur-sm max-w-sm">
+              <div className="flex items-start space-x-3 text-white">
+                <Trophy className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <div className="font-bold mb-1">Community Milestone!</div>
+                  <div className="text-xs opacity-90 leading-relaxed">
+                    {milestoneMessage}
+                  </div>
                 </div>
               </div>
             </div>
