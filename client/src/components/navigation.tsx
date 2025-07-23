@@ -139,17 +139,17 @@ export default function Navigation() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="!w-screen !h-screen p-0 bg-gray-900 border-0 !max-w-none !inset-0 sm:!w-80">
-                <div className="flex flex-col h-full bg-gray-900 relative z-50">
-                  {/* Header */}
-                  <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800/50">
+                <div className="flex flex-col h-full bg-gray-900 relative z-[10000]">
+                  {/* Compact Header */}
+                  <div className="flex items-center justify-between p-3 border-b border-gray-700 bg-gray-800/50">
                     <div className="flex items-center gap-2">
                       <img 
                         src="/assets/bamToken_1753182165828.png" 
                         alt="BAM Token" 
-                        className="h-5 w-5 rounded-full"
+                        className="h-4 w-4 rounded-full"
                       />
                       <div>
-                        <span className="text-sm font-bold gradient-text">BAM</span>
+                        <span className="text-xs font-bold gradient-text">BAM</span>
                         <span className="text-xs text-gray-400 ml-1">Ecosystem</span>
                       </div>
                     </div>
@@ -158,67 +158,67 @@ export default function Navigation() {
                     </SheetClose>
                   </div>
 
-                  {/* Navigation Items */}
-                  <div className="flex-1 py-2">
+                  {/* Compact Navigation Items */}
+                  <div className="flex-1 py-1">
                     {navItems.map((item) => (
                       <button
                         key={item.href}
                         onClick={() => scrollToSection(item.href)}
-                        className="flex items-center gap-4 w-full px-6 py-4 text-left text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30"
+                        className="flex items-center gap-3 w-full px-4 py-2.5 text-left text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30"
                       >
-                        <span className="text-lg">
+                        <span className="text-sm">
                           {item.label === "Home" ? "🏠" : 
                            item.label === "Ecosystem" ? "🌐" :
                            item.label === "Tokenomics" ? "💰" : "🚀"}
                         </span>
-                        <span className="text-base font-medium">{item.label}</span>
+                        <span className="text-sm font-medium">{item.label}</span>
                       </button>
                     ))}
                   </div>
 
-                  {/* Platforms Section */}
+                  {/* Compact Platforms Section */}
                   <div className="border-t border-gray-700 bg-gray-800/30">
-                    <div className="px-6 py-3">
-                      <div className="text-sm font-semibold text-yellow-400">Platform Access</div>
+                    <div className="px-4 py-2">
+                      <div className="text-xs font-semibold text-yellow-400">Platform Access</div>
                     </div>
-                    <div className="pb-4">
+                    <div className="pb-2">
                       <a
                         href="/swap"
-                        className="flex items-center justify-between w-full px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                        className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                       >
-                        <div className="flex items-center gap-4">
-                          <span className="text-lg">🔄</span>
-                          <span className="text-base font-medium">BAM Swap</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm">🔄</span>
+                          <span className="text-sm font-medium">BAM Swap</span>
                         </div>
-                        <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Live</span>
+                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
                       </a>
                       <button
                         onClick={() => scrollToSection("projects")}
-                        className="flex items-center justify-between w-full px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                        className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                       >
-                        <div className="flex items-center gap-4">
-                          <span className="text-lg">🎁</span>
-                          <span className="text-base font-medium">BAM Drops</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm">🎁</span>
+                          <span className="text-sm font-medium">BAM Drops</span>
                         </div>
-                        <span className="text-xs bg-gray-600/50 text-gray-400 px-3 py-1 rounded-full">Soon</span>
+                        <span className="text-xs bg-gray-600/50 text-gray-400 px-2 py-0.5 rounded-full">Soon</span>
                       </button>
                       <a
                         href="https://apex.bam-ecosystem.com"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-4 w-full px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                        className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                       >
-                        <span className="text-lg">⛏️</span>
-                        <span className="text-base font-medium">BAM ApexMiner</span>
+                        <span className="text-sm">⛏️</span>
+                        <span className="text-sm font-medium">BAM ApexMiner</span>
                       </a>
                       <a
                         href="https://vip.bam-ecosystem.com"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-4 w-full px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                        className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                       >
-                        <span className="text-lg">👑</span>
-                        <span className="text-base font-medium">BAM VIP Access</span>
+                        <span className="text-sm">👑</span>
+                        <span className="text-sm font-medium">BAM VIP Access</span>
                       </a>
                     </div>
                   </div>
