@@ -1950,12 +1950,13 @@ const SwapPage = () => {
               >
                 {!priceInfo ? 'Loading price data...' : '⚠️ BAM requires $2-5 USD worth of BNB'}
               </Button>
-            ) : parseFloat(fromAmount) > 1 && (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') && toToken.symbol !== 'BAM' ? (
+            ) : false ? ( 
+              // This condition was incorrectly limiting USDB swaps - USDB has no wallet limits
               <Button
                 disabled
                 className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-orange-700 text-orange-200 rounded-lg cursor-not-allowed"
               >
-                ⚠️ Maximum: 1 {fromToken.symbol} per wallet
+                ⚠️ This condition should never trigger
               </Button>
             ) : balances[fromToken.symbol] && parseFloat(fromAmount) > parseFloat(balances[fromToken.symbol]) ? (
               <Button
