@@ -1391,8 +1391,8 @@ const SwapPage = () => {
                     <Menu className="h-6 w-6 text-gray-300" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="!w-screen !h-screen p-0 bg-gray-900 border-0 !max-w-none !inset-0 sm:!w-80 !z-[9999]">
-                  <div className="flex flex-col h-full bg-gray-900 relative z-[10000]">
+                <SheetContent side="right" className="!w-screen !h-screen p-0 bg-gray-900 border-0 !max-w-none !inset-0 !fixed !top-0 !left-0 !right-0 !bottom-0 sm:!w-80 !z-[9999]">
+                  <div className="flex flex-col h-screen w-screen bg-gray-900/98 backdrop-blur-sm relative z-[10000] !fixed !inset-0">
                     {/* Compact Header */}
                     <div className="flex items-center justify-between p-3 border-b border-gray-700 bg-gray-800/50">
                       <div className="flex items-center gap-2">
