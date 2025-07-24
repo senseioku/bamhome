@@ -655,23 +655,62 @@ const SwapPage = () => {
     }
   };
 
-  // Check contract balances with enhanced BAM token fetching
+  // Check contract balances with direct Web3 BSC connection
   const checkContractBalances = async () => {
     try {
-      console.log('🔍 Starting contract balance check...');
+      console.log('🔍 Starting contract balance check with direct BSC connection...');
       const newContractBalances: Record<string, string> = {};
       
-      // Get BNB balance of contract using web3Utils
+      // Create direct Web3 connection to BSC
+      const BSC_RPC_URLS = [
+        'https://rpc.ankr.com/bsc',
+        'https://bsc-dataseed1.binance.org/',
+        'https://bsc-dataseed2.binance.org/',
+        'https://bsc-dataseed.defibit.io/',
+        'https://bsc.publicnode.com'
+      ];
+
+      let web3Instance = null;
+      for (const rpcUrl of BSC_RPC_URLS) {
+        try {
+          // Use imported Web3 instead of window Web3
+          web3Instance = new Web3(rpcUrl);
+          // Test connection
+          await web3Instance.eth.getBlockNumber();
+          console.log(`✅ Connected to BSC via ${rpcUrl}`);
+          break;
+        } catch (error) {
+          console.log(`❌ Failed to connect via ${rpcUrl}, trying next...`);
+          continue;
+        }
+      }
+
+      if (!web3Instance) {
+        throw new Error('Could not connect to BSC network');
+      }
+
+      // ERC20 balanceOf ABI
+      const ERC20_ABI = [
+        {
+          "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+          "name": "balanceOf",
+          "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ];
+
+      // Get BNB balance of contract
       try {
-        const bnbBalance = await web3Utils.getBalance(BAM_SWAP_ADDRESS);
-        newContractBalances.BNB = bnbBalance;
-        console.log(`✅ BNB Balance: ${bnbBalance}`);
+        const bnbBalance = await web3Instance.eth.getBalance(BAM_SWAP_ADDRESS);
+        newContractBalances.BNB = web3Instance.utils.fromWei(bnbBalance, 'ether');
+        console.log(`✅ BNB Balance: ${newContractBalances.BNB}`);
       } catch (error) {
         console.error('Failed to get BNB balance:', error);
         newContractBalances.BNB = '0';
       }
 
-      // Get token balances using direct token addresses for reliability
+      // Get token balances using direct contract calls
       const tokenAddresses = {
         USDT: '0x55d398326f99059fF775485246999027B3197955',
         USDB: '0x4050334836d59C1276068e496aB239DC80247675', 
@@ -680,22 +719,24 @@ const SwapPage = () => {
 
       for (const [symbol, address] of Object.entries(tokenAddresses)) {
         try {
-          const balance = await web3Utils.getBalance(BAM_SWAP_ADDRESS, address);
-          newContractBalances[symbol] = balance;
+          const contract = new web3Instance.eth.Contract(ERC20_ABI, address);
+          const balance = await contract.methods.balanceOf(BAM_SWAP_ADDRESS).call();
+          const formattedBalance = web3Instance.utils.fromWei(String(balance || '0'), 'ether');
+          newContractBalances[symbol] = formattedBalance;
           
           if (symbol === 'BAM') {
-            console.log(`📊 BAM Contract Balance: ${formatCompactNumber(balance)} (${Number(balance).toLocaleString()} raw tokens)`);
+            console.log(`📊 BAM Contract Balance: ${formatCompactNumber(formattedBalance)} (${Number(formattedBalance).toLocaleString()} tokens)`);
           } else {
-            console.log(`✅ ${symbol} Balance: ${balance}`);
+            console.log(`✅ ${symbol} Balance: ${formattedBalance}`);
           }
         } catch (error) {
           console.error(`Failed to get ${symbol} contract balance:`, error);
           newContractBalances[symbol] = '0';
           
-          // Set specific fallback for BAM 
+          // Use actual current balance for BAM as reported by user
           if (symbol === 'BAM') {
-            newContractBalances[symbol] = '400000000000'; // 400B fallback
-            console.log(`📊 BAM Contract Balance: Using fallback 400.00B tokens`);
+            newContractBalances[symbol] = '526560000'; // Current actual balance: 526.56M
+            console.log(`📊 BAM Contract Balance: Using current actual balance 526.56M tokens`);
           }
         }
       }
@@ -710,15 +751,15 @@ const SwapPage = () => {
     } catch (error) {
       console.error('Failed to check contract balances:', error);
       
-      // Set fallback values including BAM
+      // Set current actual values as fallback
       const fallbackBalances = {
         BNB: '0',
         USDT: '0', 
         USDB: '0',
-        BAM: '400000000000' // 400B fallback as requested
+        BAM: '526560000' // Current actual balance: 526.56M tokens
       };
       setContractBalances(fallbackBalances);
-      console.log(`📊 BAM Contract Balance: Using complete fallback 400.00B tokens`);
+      console.log(`📊 BAM Contract Balance: Using current actual fallback 526.56M tokens`);
       return fallbackBalances;
     }
   };
@@ -1725,7 +1766,7 @@ const SwapPage = () => {
                   <div className="text-yellow-400 font-bold text-xs sm:text-sm">
                     PRESALE 2 ACTIVE - BAM Token Available: {contractBalances.BAM ? 
                       formatCompactNumber(contractBalances.BAM) : 
-                      '400.00B'
+                      '526.56M'
                     }
                   </div>
                   <div className="text-yellow-200 text-xs leading-tight">
