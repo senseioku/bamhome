@@ -637,7 +637,7 @@ const SwapPage = () => {
     }
   };
 
-  // Check contract balances
+  // Check contract balances with enhanced BAM token fetching
   const checkContractBalances = async () => {
     try {
       const newContractBalances: Record<string, string> = {};
@@ -652,9 +652,19 @@ const SwapPage = () => {
           try {
             const balance = await web3Utils.getBalance(BAM_SWAP_ADDRESS, token.address);
             newContractBalances[symbol] = balance;
+            
+            // Debug log for BAM balance specifically
+            if (symbol === 'BAM') {
+              console.log(`📊 BAM Contract Balance: ${Number(balance).toLocaleString()} tokens`);
+            }
           } catch (error) {
             console.error(`Failed to get ${symbol} contract balance:`, error);
             newContractBalances[symbol] = '0';
+            
+            // Fallback for BAM specifically
+            if (symbol === 'BAM') {
+              newContractBalances[symbol] = '400000000000'; // 400B fallback as requested
+            }
           }
         }
       }
@@ -667,7 +677,16 @@ const SwapPage = () => {
       return newContractBalances;
     } catch (error) {
       console.error('Failed to check contract balances:', error);
-      return {};
+      
+      // Set fallback values including BAM
+      const fallbackBalances = {
+        BNB: '0',
+        USDT: '0', 
+        USDB: '0',
+        BAM: '400000000000' // 400B fallback as requested
+      };
+      setContractBalances(fallbackBalances);
+      return fallbackBalances;
     }
   };
 
@@ -1670,13 +1689,15 @@ const SwapPage = () => {
                   <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-yellow-400 rounded-full animate-pulse"></div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-yellow-400 font-bold text-xs sm:text-sm">PRESALE 2 ACTIVE</div>
+                  <div className="text-yellow-400 font-bold text-xs sm:text-sm">
+                    PRESALE 2 ACTIVE - BAM Token Available: {contractBalances.BAM ? 
+                      Number(contractBalances.BAM).toLocaleString('en-US', { maximumFractionDigits: 0 }) : 
+                      '400,000,000,000'
+                    }
+                  </div>
                   <div className="text-yellow-200 text-xs leading-tight">
-                    {contractBalances.BAM ? (
-                      <>PRESALE 2 ACTIVE: $0.000001 per BAM • 2-5 USDT Range • 1M BAM per USDT • Next: Presale 3 → Uniswap & PancakeSwap</>
-                    ) : (
-                      <>Presale 2 Complete! • Next: Presale 3 → Final Uniswap & PancakeSwap Launch</>
-                    )}
+                    $0.000001 per BAM • 2-5 USDT Range • 1M BAM per USDT • 
+                    <span className="text-yellow-300 font-medium"> Grab yours before DEX launch!</span>
                   </div>
                 </div>
               </div>
