@@ -558,10 +558,10 @@ const SwapPage = () => {
     }
   };
 
-  // Calculate exact BNB amount needed for 1 USDT equivalent
+  // Calculate exact BNB amount needed for 5 USDT equivalent
   const calculateBNBForBAM = () => {
     if (priceInfo && priceInfo.bnbPrice > 0) {
-      return (1 / priceInfo.bnbPrice).toFixed(6); // 1 USDT worth of BNB
+      return (5 / priceInfo.bnbPrice).toFixed(6); // 5 USDT worth of BNB
     }
     return '';
   };
@@ -570,8 +570,8 @@ const SwapPage = () => {
   const autoPopulateBamAmount = () => {
     if (toToken.symbol === 'BAM') {
       if (fromToken.symbol === 'USDT' || fromToken.symbol === 'USDB') {
-        if (fromAmount !== '1') {
-          setFromAmount('1');
+        if (fromAmount !== '5') {
+          setFromAmount('5');
         }
       } else if (fromToken.symbol === 'BNB') {
         const exactBnbAmount = calculateBNBForBAM();
