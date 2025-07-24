@@ -1562,11 +1562,11 @@ const SwapPage = () => {
         </div>
       )}
 
-      {/* Main Content - Properly sized and centered for desktop */}
-      <div className="p-2 sm:p-4 pt-20 sm:pt-24 flex items-center justify-center min-h-screen">
+      {/* Main Content - Mobile Compact */}
+      <div className="p-2 sm:p-4 md:p-6 pt-20 sm:pt-24 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-sm sm:max-w-md lg:max-w-sm xl:max-w-md mx-auto">
         {/* Header */}
-        <div className="text-center mb-1 sm:mb-2 xl:mb-3">
+        <div className="text-center mb-1 sm:mb-2 md:mb-3 xl:mb-4">
           <p className="text-xs text-gray-400 mb-0.5 sm:mb-1 xl:mb-2">Pioneering Community Growth and Wealth</p>
           {priceInfo && (
             <div className="flex justify-center items-center space-x-2 mb-0.5 sm:mb-1 xl:mb-2 text-xs">
@@ -1661,13 +1661,13 @@ const SwapPage = () => {
           </div>
         )}
 
-        {/* Presale Status Banner - Compact */}
-        <div className="mb-2 mx-auto max-w-sm sm:max-w-md lg:max-w-sm xl:max-w-md">
+        {/* Presale Status Banner - Mobile Compact */}
+        <div className="mb-2 sm:mb-4 mx-auto max-w-sm sm:max-w-md lg:max-w-sm xl:max-w-md">
           <Card className="bg-gradient-to-r from-yellow-900/50 to-orange-900/50 border-yellow-500/30 backdrop-blur-sm">
-            <CardContent className="p-2 sm:p-2.5">
-              <div className="flex items-center space-x-2">
+            <CardContent className="p-2 sm:p-3 md:p-4">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 <div className="flex-shrink-0">
-                  <div className="w-2.5 h-2.5 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-yellow-400 rounded-full animate-pulse"></div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-yellow-400 font-bold text-xs sm:text-sm">PRESALE 2 ACTIVE</div>
@@ -1686,11 +1686,11 @@ const SwapPage = () => {
 
 
 
-        {/* Main Swap Card - More Compact */}
+        {/* Main Swap Card - Mobile Compact */}
         <Card className="glassmorphism border-amber-500/40">
-          <CardContent className="p-3 sm:p-4 lg:p-3 xl:p-4">
+          <CardContent className="p-3 sm:p-4 md:p-5 lg:p-4 xl:p-5">
             {/* Header with Trade Types */}
-            <div className="flex justify-between items-center mb-1 sm:mb-2">
+            <div className="flex justify-between items-center mb-1 sm:mb-2 md:mb-3">
               <div className="flex items-center space-x-1 sm:space-x-2">
                 <Button variant="default" className="bg-gray-800 text-white border-yellow-500 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 h-7 sm:h-8">
                   Swap
@@ -1746,7 +1746,7 @@ const SwapPage = () => {
             </div>
 
             {/* From Token */}
-            <div className="space-y-0.5 sm:space-y-1 mb-1 sm:mb-2">
+            <div className="space-y-0.5 sm:space-y-1 md:space-y-2 mb-1 sm:mb-2 md:mb-3">
               <div className="flex justify-between items-center">
                 <label className="text-xs sm:text-sm font-medium text-gray-300">From</label>
                 <div className="flex items-center space-x-2">
@@ -1798,19 +1798,19 @@ const SwapPage = () => {
             </div>
 
             {/* Swap Button */}
-            <div className="flex justify-center my-0.5">
+            <div className="flex justify-center my-0.5 sm:my-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={swapTokens}
-                className="p-1 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white border border-gray-600"
+                className="p-1 sm:p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white border border-gray-600"
               >
                 <ArrowUpDown className="w-3 h-3" />
               </Button>
             </div>
 
             {/* To Token */}
-            <div className="space-y-0.5 sm:space-y-1 mb-1 sm:mb-2">
+            <div className="space-y-0.5 sm:space-y-1 md:space-y-2 mb-1 sm:mb-2 md:mb-3">
               <label className="text-xs sm:text-sm font-medium text-gray-300">To</label>
               <div className="relative">
                 <Input
@@ -1833,7 +1833,7 @@ const SwapPage = () => {
 
             {/* Enhanced Quote Information */}
             {quote && (
-              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-lg p-1.5 sm:p-2 mb-1 sm:mb-1.5 border border-gray-600/50">
+              <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-lg p-1.5 sm:p-2 mb-1 sm:mb-1.5 md:mb-2 border border-gray-600/50">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-300 font-medium">Trade Details</span>
                   <Info className="w-3 h-3 text-gray-400" />
