@@ -496,7 +496,25 @@ const SwapPage = () => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  // Format numbers for clean display like Uniswap
+  // Format numbers for space-saving display with K, M, B notation
+  const formatCompactNumber = (amount: string | number): string => {
+    const num = typeof amount === 'string' ? parseFloat(amount || '0') : amount;
+    if (num === 0) return '0';
+    
+    if (num >= 1000000000) {
+      return `${(num / 1000000000).toFixed(2)}B`;
+    } else if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(2)}M`;
+    } else if (num >= 1000) {
+      return `${(num / 1000).toFixed(2)}K`;
+    } else if (num >= 1) {
+      return num.toFixed(0);
+    } else {
+      return num.toFixed(2);
+    }
+  };
+
+  // Format numbers for clean display with K, M, B notation
   const formatDisplayAmount = (amount: string, symbol: string): string => {
     const num = parseFloat(amount || '0');
     if (num === 0) return '0';
@@ -640,36 +658,50 @@ const SwapPage = () => {
   // Check contract balances with enhanced BAM token fetching
   const checkContractBalances = async () => {
     try {
+      console.log('🔍 Starting contract balance check...');
       const newContractBalances: Record<string, string> = {};
       
-      // Get BNB balance of contract
-      const bnbBalance = await web3Utils.getBalance(BAM_SWAP_ADDRESS);
-      newContractBalances.BNB = bnbBalance;
+      // Get BNB balance of contract using web3Utils
+      try {
+        const bnbBalance = await web3Utils.getBalance(BAM_SWAP_ADDRESS);
+        newContractBalances.BNB = bnbBalance;
+        console.log(`✅ BNB Balance: ${bnbBalance}`);
+      } catch (error) {
+        console.error('Failed to get BNB balance:', error);
+        newContractBalances.BNB = '0';
+      }
 
-      // Get token balances for each ERC20 token in contract
-      for (const [symbol, token] of Object.entries(TOKENS)) {
-        if (symbol !== 'BNB' && token.address) {
-          try {
-            const balance = await web3Utils.getBalance(BAM_SWAP_ADDRESS, token.address);
-            newContractBalances[symbol] = balance;
-            
-            // Debug log for BAM balance specifically
-            if (symbol === 'BAM') {
-              console.log(`📊 BAM Contract Balance: ${Number(balance).toLocaleString()} tokens`);
-            }
-          } catch (error) {
-            console.error(`Failed to get ${symbol} contract balance:`, error);
-            newContractBalances[symbol] = '0';
-            
-            // Fallback for BAM specifically
-            if (symbol === 'BAM') {
-              newContractBalances[symbol] = '400000000000'; // 400B fallback as requested
-            }
+      // Get token balances using direct token addresses for reliability
+      const tokenAddresses = {
+        USDT: '0x55d398326f99059fF775485246999027B3197955',
+        USDB: '0x4050334836d59C1276068e496aB239DC80247675', 
+        BAM: '0xA779f03b752fa2442e6A23f145b007f2160F9a7D'
+      };
+
+      for (const [symbol, address] of Object.entries(tokenAddresses)) {
+        try {
+          const balance = await web3Utils.getBalance(BAM_SWAP_ADDRESS, address);
+          newContractBalances[symbol] = balance;
+          
+          if (symbol === 'BAM') {
+            console.log(`📊 BAM Contract Balance: ${formatCompactNumber(balance)} (${Number(balance).toLocaleString()} raw tokens)`);
+          } else {
+            console.log(`✅ ${symbol} Balance: ${balance}`);
+          }
+        } catch (error) {
+          console.error(`Failed to get ${symbol} contract balance:`, error);
+          newContractBalances[symbol] = '0';
+          
+          // Set specific fallback for BAM 
+          if (symbol === 'BAM') {
+            newContractBalances[symbol] = '400000000000'; // 400B fallback
+            console.log(`📊 BAM Contract Balance: Using fallback 400.00B tokens`);
           }
         }
       }
       
       setContractBalances(newContractBalances);
+      console.log('✅ Final contract balances:', newContractBalances);
       
       // Check BAM holder milestones for internal tracking only
       await checkBAMHolderMilestones(newContractBalances);
@@ -686,6 +718,7 @@ const SwapPage = () => {
         BAM: '400000000000' // 400B fallback as requested
       };
       setContractBalances(fallbackBalances);
+      console.log(`📊 BAM Contract Balance: Using complete fallback 400.00B tokens`);
       return fallbackBalances;
     }
   };
@@ -1691,8 +1724,8 @@ const SwapPage = () => {
                 <div className="flex-1 min-w-0">
                   <div className="text-yellow-400 font-bold text-xs sm:text-sm">
                     PRESALE 2 ACTIVE - BAM Token Available: {contractBalances.BAM ? 
-                      Number(contractBalances.BAM).toLocaleString('en-US', { maximumFractionDigits: 0 }) : 
-                      '400,000,000,000'
+                      formatCompactNumber(contractBalances.BAM) : 
+                      '400.00B'
                     }
                   </div>
                   <div className="text-yellow-200 text-xs leading-tight">
