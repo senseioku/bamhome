@@ -50,7 +50,7 @@ const SwapPage = () => {
   // State Management
   const [fromToken, setFromToken] = useState<TokenInfo>(TOKENS.USDT);
   const [toToken, setToToken] = useState<TokenInfo>(TOKENS.BAM);
-  const [fromAmount, setFromAmount] = useState('');
+  const [fromAmount, setFromAmount] = useState('5');
   const [toAmount, setToAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
@@ -1755,9 +1755,9 @@ const SwapPage = () => {
                     <button
                       onClick={() => {
                         if (fromToken.symbol === 'USDT') {
-                          setFromAmount('2');
+                          setFromAmount('5');
                         } else if (fromToken.symbol === 'BNB' && priceInfo) {
-                          const requiredBNB = (2 / priceInfo.bnbPrice).toFixed(6);
+                          const requiredBNB = (5 / priceInfo.bnbPrice).toFixed(6);
                           setFromAmount(requiredBNB);
                         }
                       }}
