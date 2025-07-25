@@ -92,6 +92,49 @@ const SwapPage = () => {
     lastUpdated: number;
   } | null>(null);
 
+  // Animation states for token transitions
+  const [isSwapping, setIsSwapping] = useState(false);
+  const [fromTokenAnimating, setFromTokenAnimating] = useState(false);
+  const [toTokenAnimating, setToTokenAnimating] = useState(false);
+  const [swapButtonAnimating, setSwapButtonAnimating] = useState(false);
+
+  // Handle swap direction with animated transitions
+  const handleSwapTokens = async () => {
+    if (isSwapping) return; // Prevent multiple rapid swaps
+    
+    setIsSwapping(true);
+    setSwapButtonAnimating(true);
+    
+    // Start exit animations for both tokens
+    setFromTokenAnimating(true);
+    setToTokenAnimating(true);
+    
+    // Wait for exit animations to complete (600ms)
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Swap the token values
+    const tempToken = fromToken;
+    const tempAmount = fromAmount;
+    
+    setFromToken(toToken);
+    setToToken(tempToken);
+    setFromAmount(toAmount);
+    setToAmount(tempAmount);
+    
+    // Wait a bit for the swap to register
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Reset animation states to trigger enter animations
+    setFromTokenAnimating(false);
+    setToTokenAnimating(false);
+    
+    // Reset swap button animation after total duration
+    setTimeout(() => {
+      setSwapButtonAnimating(false);
+      setIsSwapping(false);
+    }, 200);
+  };
+
   // Fetch real-time contract data directly from deployed BAMSwapV2
   const fetchContractData = async () => {
     try {
@@ -1181,6 +1224,7 @@ const SwapPage = () => {
   const TokenSelector = ({ token, onSelect, label }: { token: TokenInfo; onSelect: (token: TokenInfo) => void; label: string }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [animatingTokenChange, setAnimatingTokenChange] = useState(false);
     const availableTokens = Object.values(TOKENS);
 
     // Filter tokens based on swap rules (exclude BNB↔USDT)
@@ -1214,12 +1258,18 @@ const SwapPage = () => {
     return (
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button variant="ghost" className="p-1.5 sm:p-2 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-700/50">
+          <Button variant="ghost" className={`p-1.5 sm:p-2 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-700/50 transition-all duration-300 ${
+            animatingTokenChange ? 'token-flip scale-105' : ''
+          }`}>
             <div className="flex items-center space-x-1.5 sm:space-x-2">
               {typeof token.icon === 'string' && (token.icon.includes('.png') || token.icon.includes('.jpg') || token.icon.includes('.jpeg') || token.icon.startsWith('/') || token.icon.startsWith('data:')) ? (
-                <img src={token.icon} alt={token.symbol} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full" />
+                <img src={token.icon} alt={token.symbol} className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full transition-transform duration-300 ${
+                  animatingTokenChange ? 'animate-pulse scale-110' : ''
+                }`} />
               ) : (
-                <div className="text-base sm:text-lg">{token.icon}</div>
+                <div className={`text-base sm:text-lg transition-transform duration-300 ${
+                  animatingTokenChange ? 'animate-pulse scale-110' : ''
+                }`}>{token.icon}</div>
               )}
               <span className="font-semibold text-white text-sm sm:text-base">{token.symbol}</span>
               <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
@@ -1300,9 +1350,14 @@ const SwapPage = () => {
                     }`}
                     onClick={() => {
                       if (!isInvalidPair) {
-                        onSelect(tokenOption);
-                        setIsOpen(false);
-                        setSearchQuery('');
+                        // Add brief animation effect on token selection
+                        setAnimatingTokenChange(true);
+                        setTimeout(() => {
+                          onSelect(tokenOption);
+                          setIsOpen(false);
+                          setSearchQuery('');
+                          setAnimatingTokenChange(false);
+                        }, 150);
                       }
                     }}
                   >
@@ -1881,7 +1936,9 @@ const SwapPage = () => {
                   step="any"
                   readOnly={toToken.symbol === 'BAM' && fromToken.symbol === 'BNB'}
                 />
-                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                <div className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition-all duration-600 ${
+                  fromTokenAnimating ? 'token-swap-out' : 'token-swap-in'
+                }`}>
                   <TokenSelector token={fromToken} onSelect={setFromToken} label="from" />
                 </div>
               </div>
@@ -1892,15 +1949,18 @@ const SwapPage = () => {
               )}
             </div>
 
-            {/* Swap Button */}
+            {/* Animated Swap Button */}
             <div className="flex justify-center my-0.5 sm:my-1">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={swapTokens}
-                className="p-1 sm:p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white border border-gray-600"
+                onClick={handleSwapTokens}
+                disabled={isSwapping}
+                className={`p-1 sm:p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white border border-gray-600 transition-all duration-300 ${
+                  swapButtonAnimating ? 'animate-swap-direction pulse-golden' : ''
+                }`}
               >
-                <ArrowUpDown className="w-3 h-3" />
+                <ArrowUpDown className={`w-3 h-3 transition-transform duration-500 ${isSwapping ? 'rotate-180 scale-110' : ''}`} />
               </Button>
             </div>
 
@@ -1915,7 +1975,9 @@ const SwapPage = () => {
                   placeholder="0"
                   className="text-xl sm:text-2xl lg:text-xl xl:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-14 lg:h-12 xl:h-14 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
                 />
-                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                <div className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition-all duration-600 ${
+                  toTokenAnimating ? 'token-swap-out' : 'token-swap-in'
+                }`}>
                   <TokenSelector token={toToken} onSelect={setToToken} label="to" />
                 </div>
               </div>
