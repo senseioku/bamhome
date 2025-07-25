@@ -1936,7 +1936,7 @@ const SwapPage = () => {
                       placeholder="0"
                       className="text-xl sm:text-2xl lg:text-xl xl:text-2xl font-bold bg-transparent border-none text-white h-auto focus:ring-0 focus:border-none p-0 flex-1 mr-4"
                       step="any"
-                      readOnly={toToken.symbol === 'BAM' && fromToken.symbol === 'BNB'}
+                      readOnly={false}
                     />
                     <div className={`transition-all duration-600 ${
                       fromTokenAnimating ? 'token-swap-out' : 'token-swap-in'
