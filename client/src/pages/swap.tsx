@@ -1927,19 +1927,23 @@ const SwapPage = () => {
                 </div>
               </div>
               <div className="relative">
-                <Input
-                  type="number"
-                  value={fromAmount}
-                  onChange={(e) => setFromAmount(e.target.value)}
-                  placeholder="0"
-                  className="text-xl sm:text-2xl lg:text-xl xl:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-14 lg:h-12 xl:h-14 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
-                  step="any"
-                  readOnly={toToken.symbol === 'BAM' && fromToken.symbol === 'BNB'}
-                />
-                <div className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition-all duration-600 ${
-                  fromTokenAnimating ? 'token-swap-out' : 'token-swap-in'
-                }`}>
-                  <TokenSelector token={fromToken} onSelect={setFromToken} label="from" />
+                <div className="bg-gray-800/30 rounded-lg border border-gray-700 px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <Input
+                      type="number"
+                      value={fromAmount}
+                      onChange={(e) => setFromAmount(e.target.value)}
+                      placeholder="0"
+                      className="text-xl sm:text-2xl lg:text-xl xl:text-2xl font-bold bg-transparent border-none text-white h-auto focus:ring-0 focus:border-none p-0 flex-1 mr-4"
+                      step="any"
+                      readOnly={toToken.symbol === 'BAM' && fromToken.symbol === 'BNB'}
+                    />
+                    <div className={`transition-all duration-600 ${
+                      fromTokenAnimating ? 'token-swap-out' : 'token-swap-in'
+                    }`}>
+                      <TokenSelector token={fromToken} onSelect={setFromToken} label="from" />
+                    </div>
+                  </div>
                 </div>
               </div>
               {fromAmount && parseFloat(fromAmount) > 0 && (
@@ -1968,17 +1972,21 @@ const SwapPage = () => {
             <div className="space-y-0.5 sm:space-y-1 md:space-y-2 mb-1 sm:mb-2 md:mb-3">
               <label className="text-xs sm:text-sm font-medium text-gray-300">To</label>
               <div className="relative">
-                <Input
-                  type="number"
-                  value={toAmount}
-                  readOnly
-                  placeholder="0"
-                  className="text-xl sm:text-2xl lg:text-xl xl:text-2xl font-bold bg-transparent border-none text-white h-10 sm:h-14 lg:h-12 xl:h-14 pr-24 sm:pr-32 focus:ring-0 focus:border-none"
-                />
-                <div className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition-all duration-600 ${
-                  toTokenAnimating ? 'token-swap-out' : 'token-swap-in'
-                }`}>
-                  <TokenSelector token={toToken} onSelect={setToToken} label="to" />
+                <div className="bg-gray-800/30 rounded-lg border border-gray-700 px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <Input
+                      type="number"
+                      value={toAmount}
+                      readOnly
+                      placeholder="0"
+                      className="text-xl sm:text-2xl lg:text-xl xl:text-2xl font-bold bg-transparent border-none text-white h-auto focus:ring-0 focus:border-none p-0 flex-1 mr-4"
+                    />
+                    <div className={`transition-all duration-600 ${
+                      toTokenAnimating ? 'token-swap-out' : 'token-swap-in'
+                    }`}>
+                      <TokenSelector token={toToken} onSelect={setToToken} label="to" />
+                    </div>
+                  </div>
                 </div>
               </div>
               {toAmount && parseFloat(toAmount) > 0 && (
