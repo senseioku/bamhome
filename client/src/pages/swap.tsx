@@ -1817,25 +1817,60 @@ const SwapPage = () => {
           </div>
         )}
 
-        {/* Presale Status Banner - Mobile Compact */}
+        {/* Presale Status Banner - Enhanced E-commerce Style */}
         <div className="mb-2 sm:mb-4 mx-auto max-w-sm sm:max-w-md lg:max-w-sm xl:max-w-md">
-          <Card className="bg-gradient-to-r from-yellow-900/50 to-orange-900/50 border-yellow-500/30 backdrop-blur-sm">
-            <CardContent className="p-2 sm:p-3 md:p-4">
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+          <Card className="bg-gradient-to-r from-yellow-900/60 via-orange-900/60 to-red-900/50 border-yellow-500/40 backdrop-blur-sm relative overflow-hidden">
+            {/* Animated background glow */}
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-orange-400/5 to-red-400/5 animate-pulse"></div>
+            
+            <CardContent className="p-2 sm:p-3 md:p-4 relative">
+              <div className="flex items-center justify-between space-x-2 sm:space-x-3">
+                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                  <div className="flex-shrink-0">
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-yellow-400 rounded-full animate-pulse shadow-lg shadow-yellow-400/50"></div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <span className="text-yellow-400 font-bold text-xs sm:text-sm">🔥 PRESALE 3 LIVE</span>
+                      <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold animate-pulse">
+                        FINAL
+                      </span>
+                    </div>
+                    <div className="text-yellow-200 text-xs leading-tight">
+                      <span className="font-semibold text-green-300">${contractBalances.BAM ? 
+                        formatCompactNumber(contractBalances.BAM) : 
+                        '2.00M'
+                      } Tokens Left</span> • $0.0000025/BAM
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-yellow-400 font-bold text-xs sm:text-sm">
-                    PRESALE 3 ACTIVE - BAM Token Available: {contractBalances.BAM ? 
-                      formatCompactNumber(contractBalances.BAM) : 
-                      '2.00M'
-                    }
-                  </div>
-                  <div className="text-yellow-200 text-xs leading-tight">
-                    $0.0000025 per BAM • 5-100 USDT Range • 400K BAM per USDT • 
-                    <span className="text-yellow-300 font-medium"> Final presale before DEX launch!</span>
-                  </div>
+                
+                {/* Call to Action Button */}
+                <div className="flex-shrink-0">
+                  <button
+                    onClick={() => {
+                      setFromAmount('50');
+                      setFromToken(TOKENS.USDT);
+                      setToToken(TOKENS.BAM);
+                    }}
+                    className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200 animate-bounce-slow"
+                  >
+                    BUY NOW
+                  </button>
+                </div>
+              </div>
+              
+              {/* Progress indicator */}
+              <div className="mt-1.5 sm:mt-2">
+                <div className="flex justify-between items-center text-xs text-yellow-300 mb-1">
+                  <span>Limited Supply</span>
+                  <span>Before DEX Launch 🚀</span>
+                </div>
+                <div className="w-full bg-gray-700/50 rounded-full h-1.5">
+                  <div 
+                    className="bg-gradient-to-r from-yellow-400 to-orange-400 h-1.5 rounded-full animate-pulse"
+                    style={{ width: '25%' }}
+                  ></div>
                 </div>
               </div>
             </CardContent>
