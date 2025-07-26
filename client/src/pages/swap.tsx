@@ -437,7 +437,7 @@ const SwapPage = () => {
       if (err.message?.includes('watch') || err.message?.includes('readonly') || err.message?.includes('Signature')) {
         setError(`🔒 Risk Acknowledgment Required: ${err.message}`);
       } else if (err.message?.includes('rejected') || err.code === 4001) {
-        setError('⚠️ You must sign the risk acknowledgment to access BAM ApexMiner');
+        setError('⚠️ You must sign the risk acknowledgment to access BAM Ecosystem');
       } else {
         setError(err.message || 'Failed to connect wallet');
       }

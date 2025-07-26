@@ -247,7 +247,7 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Updated connect wallet interface with security badge and verification status messaging
 ✓ Implemented protection against unauthorized data viewing and potential wallet address theft
 ✓ COMPREHENSIVE RISK ACKNOWLEDGMENT: Added detailed cryptocurrency investment risk disclosure in signature message
-✓ Updated signature to include "BAM ApexMiner - Wallet Verification & Risk Acknowledgment" with legal disclaimers
+✓ Updated signature to include "BAM Ecosystem - Wallet Verification & Risk Acknowledgment" with legal disclaimers
 ✓ Enhanced user protection with explicit risk warnings covering market volatility, potential losses, and DYOR requirements
 ✓ Added confirmation statements requiring users to acknowledge they understand all risks and invest only affordable amounts
 

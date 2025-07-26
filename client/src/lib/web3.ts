@@ -48,7 +48,7 @@ export class Web3Utils {
     try {
       // Create a comprehensive risk acknowledgment and verification message
       const timestamp = Date.now();
-      const message = `BAM ApexMiner - Wallet Verification & Risk Acknowledgment
+      const message = `BAM Ecosystem - Wallet Verification & Risk Acknowledgment
 
 IMPORTANT: CRYPTOCURRENCY INVESTMENT RISKS
 By signing this message, I acknowledge and accept:
@@ -58,7 +58,7 @@ By signing this message, I acknowledge and accept:
 • I must conduct my own research (DYOR) before making any investment decisions
 • I understand that I may lose some or all of my investment
 • I should only invest what I can afford to lose completely
-• BAM ApexMiner is not responsible for any market-related losses
+• BAM Ecosystem is not responsible for any market-related losses
 • Past performance does not guarantee future results
 • Market volatility can result in rapid and substantial losses
 
