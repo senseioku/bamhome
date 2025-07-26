@@ -50,7 +50,7 @@ const SwapPage = () => {
   // State Management
   const [fromToken, setFromToken] = useState<TokenInfo>(TOKENS.USDT);
   const [toToken, setToToken] = useState<TokenInfo>(TOKENS.BAM);
-  const [fromAmount, setFromAmount] = useState('100');
+  const [fromAmount, setFromAmount] = useState('25');
   const [toAmount, setToAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');

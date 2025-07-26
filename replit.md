@@ -263,7 +263,7 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Streamlined quote display section with reduced padding (p-1 vs p-2) and tighter spacing between elements
 ✓ Enhanced space efficiency: reduced mb-3/mb-4 to mb-1, compressed space-y-2/space-y-3 to space-y-0.5
 ✓ Corrected Presale 3 pricing display: 1 USDT = 400,000 BAM (Rate: $0.0000025) in quote details
-✓ UPDATED DEFAULT PURCHASE AMOUNT: Changed from 50 USDT to 100 USDT for better user experience
+✓ UPDATED DEFAULT PURCHASE AMOUNT: Changed from 50 USDT to 25 USDT for better user experience
 ✓ Added prominent "5-100 USDT Range" information badge to clearly show purchase limits
 ✓ Enhanced quote details to display purchase range info: "1 USDT = 400,000 BAM • Purchase Range: 5-100 USDT"
 ✓ Updated "Set Max Amount" button to automatically fill 100 USDT for quick maximum purchases
