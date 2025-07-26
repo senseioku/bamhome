@@ -435,7 +435,9 @@ const SwapPage = () => {
     } catch (err: any) {
       // Enhanced error handling for signature verification failures
       if (err.message?.includes('watch') || err.message?.includes('readonly') || err.message?.includes('Signature')) {
-        setError(`🔒 Security Verification Failed: ${err.message}`);
+        setError(`🔒 Risk Acknowledgment Required: ${err.message}`);
+      } else if (err.message?.includes('rejected') || err.code === 4001) {
+        setError('⚠️ You must sign the risk acknowledgment to access BAM ApexMiner');
       } else {
         setError(err.message || 'Failed to connect wallet');
       }
@@ -2092,7 +2094,7 @@ const SwapPage = () => {
                   )}
                 </Button>
                 <div className="text-xs text-center text-gray-400">
-                  🔒 Signature verification prevents watch-only wallet access
+                  🔒 Signature includes risk acknowledgment and wallet verification
                 </div>
               </div>
             ) : !fromAmount || parseFloat(fromAmount) <= 0 ? (

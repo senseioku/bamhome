@@ -46,9 +46,29 @@ export class Web3Utils {
     if (!provider) throw new Error('No provider available');
 
     try {
-      // Create a unique message for signature verification
+      // Create a comprehensive risk acknowledgment and verification message
       const timestamp = Date.now();
-      const message = `BAM Swap Security Verification\n\nAddress: ${address}\nTimestamp: ${timestamp}\n\nBy signing this message, you verify that you control this wallet and can authorize transactions.\n\nThis signature does not authorize any transactions or costs.`;
+      const message = `BAM ApexMiner - Wallet Verification & Risk Acknowledgment
+
+IMPORTANT: CRYPTOCURRENCY INVESTMENT RISKS
+By signing this message, I acknowledge and accept:
+
+• Cryptocurrency investments carry significant financial risk
+• All profits depend entirely on market conditions and community support
+• I must conduct my own research (DYOR) before making any investment decisions
+• I understand that I may lose some or all of my investment
+• I should only invest what I can afford to lose completely
+• BAM ApexMiner is not responsible for any market-related losses
+• Past performance does not guarantee future results
+• Market volatility can result in rapid and substantial losses
+
+I FULLY UNDERSTAND AND ACCEPT ALL RISKS INVOLVED.
+I CONFIRM THAT I AM INVESTING ONLY WHAT I CAN AFFORD TO LOSE.
+
+Address: ${address}
+Timestamp: ${timestamp}
+
+This signature verifies wallet ownership and does not authorize any transactions.`;
       
       // Request signature from wallet
       console.log('🔐 Requesting wallet signature for security verification...');
