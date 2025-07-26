@@ -50,7 +50,7 @@ const SwapPage = () => {
   // State Management
   const [fromToken, setFromToken] = useState<TokenInfo>(TOKENS.USDT);
   const [toToken, setToToken] = useState<TokenInfo>(TOKENS.BAM);
-  const [fromAmount, setFromAmount] = useState('50');
+  const [fromAmount, setFromAmount] = useState('100');
   const [toAmount, setToAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
@@ -1945,19 +1945,24 @@ const SwapPage = () => {
                 <div className="flex items-center space-x-2">
                   {((fromToken.symbol === 'USDT' && toToken.symbol === 'BAM') || 
                     (fromToken.symbol === 'BNB' && toToken.symbol === 'BAM' && priceInfo)) && (
-                    <button
-                      onClick={() => {
-                        if (fromToken.symbol === 'USDT') {
-                          setFromAmount('5');
-                        } else if (fromToken.symbol === 'BNB' && priceInfo) {
-                          const requiredBNB = (5 / priceInfo.bnbPrice).toFixed(6);
-                          setFromAmount(requiredBNB);
-                        }
-                      }}
-                      className="text-xs sm:text-sm bg-yellow-500/20 text-yellow-300 hover:text-yellow-200 px-2 py-1 rounded border border-yellow-500/30"
-                    >
-                      Set Exact Amount
-                    </button>
+                    <div className="flex items-center space-x-1">
+                      <div className="text-yellow-500 text-xs bg-yellow-500/10 px-1 py-0.5 rounded border border-yellow-500/30">
+                        5-100 USDT Range
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (fromToken.symbol === 'USDT') {
+                            setFromAmount('100');
+                          } else if (fromToken.symbol === 'BNB' && priceInfo) {
+                            const requiredBNB = (100 / priceInfo.bnbPrice).toFixed(6);
+                            setFromAmount(requiredBNB);
+                          }
+                        }}
+                        className="text-xs bg-yellow-500/20 text-yellow-300 hover:text-yellow-200 px-2 py-1 rounded border border-yellow-500/30"
+                      >
+                        Max
+                      </button>
+                    </div>
                   )}
                   {balances[fromToken.symbol] && (
                     <button
@@ -2087,7 +2092,7 @@ const SwapPage = () => {
                     <div className="bg-yellow-500/10 border border-yellow-500/20 rounded p-1 mt-0.5">
                       <div className="text-yellow-400 text-xs font-medium">Fixed Price Swap</div>
                       <div className="text-yellow-300 text-xs">
-                        1 USDT = 400,000 BAM (Rate: $0.0000025)
+                        1 USDT = 400,000 BAM • Purchase Range: 5-100 USDT
                       </div>
                     </div>
                   )}
