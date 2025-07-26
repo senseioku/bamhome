@@ -34,7 +34,10 @@ async function updatePresale3() {
     
     // Initialize Web3
     const web3 = new Web3(BSC_RPC);
-    const account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY);
+    
+    // Ensure private key has 0x prefix
+    const privateKeyFormatted = PRIVATE_KEY.startsWith('0x') ? PRIVATE_KEY : '0x' + PRIVATE_KEY;
+    const account = web3.eth.accounts.privateKeyToAccount(privateKeyFormatted);
     web3.eth.accounts.wallet.add(account);
     
     // Contract instance
@@ -63,6 +66,10 @@ async function updatePresale3() {
     
     // Update purchase limits
     console.log('\n2️⃣ Updating purchase limits...');
+    
+    // Get current nonce to avoid nonce conflicts
+    const currentNonce = await web3.eth.getTransactionCount(account.address, 'pending');
+    
     const limitsTx = await contract.methods.updatePurchaseLimits(
       minPurchase,
       maxPurchase, 
@@ -70,7 +77,8 @@ async function updatePresale3() {
     ).send({
       from: account.address,
       gas: 150000,
-      gasPrice: web3.utils.toWei('5', 'gwei')
+      gasPrice: web3.utils.toWei('5', 'gwei'),
+      nonce: currentNonce
     });
     console.log(`✅ Purchase limits updated! TX: ${limitsTx.transactionHash}`);
     
