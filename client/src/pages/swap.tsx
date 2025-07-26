@@ -840,14 +840,7 @@ const SwapPage = () => {
       // For BAM purchases, need 1M BAM per 1 USDT (Presale 2 rate)
       const requiredBAM = requiredAmount * 1000000;
       const availableBAM = parseFloat(contractBalances.BAM || '0');
-      
-      // Add small tolerance for floating point precision issues
-      const tolerance = 1; // 1 BAM token tolerance
-      const hasEnoughBalance = availableBAM >= (requiredBAM - tolerance);
-      
-      console.log(`💎 BAM Balance Check: Required=${requiredBAM}, Available=${availableBAM}, HasEnough=${hasEnoughBalance}`);
-      
-      return hasEnoughBalance;
+      return availableBAM >= requiredBAM;
     } else if (toSymbol === 'USDT') {
       const availableUSDT = parseFloat(contractBalances.USDT || '0');
       return availableUSDT >= requiredAmount;
