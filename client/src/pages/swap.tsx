@@ -18,6 +18,7 @@ import { Home, ArrowLeft, Menu, X, Wallet, Copy, LogOut, ChevronDown, Shield } f
 
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useContextualLearning } from '@/components/ContextualLearning';
 
 interface TokenInfo {
   symbol: string;
@@ -62,6 +63,9 @@ const SwapPage = () => {
   const [slippage, setSlippage] = useState(0.5);
   const [showSettings, setShowSettings] = useState(false);
   const [showLimitsModal, setShowLimitsModal] = useState(false);
+
+  // Contextual Learning System
+  const { activeTrigger, showTip, hideTip, ContextualLearningComponent } = useContextualLearning();
   const [hasAlreadyPurchased, setHasAlreadyPurchased] = useState<boolean>(false);
   const [showPurchasedWarning, setShowPurchasedWarning] = useState<boolean>(false);
   const [isCheckingPurchaseHistory, setIsCheckingPurchaseHistory] = useState<boolean>(false);
@@ -425,6 +429,9 @@ const SwapPage = () => {
     try {
       setIsLoading(true);
       setError('');
+      
+      // Show contextual tip about wallet security
+      showTip('wallet-connect');
       
       // This will now include signature verification to prevent watch-only wallets
       const address = await web3Utils.connectWallet();
@@ -946,11 +953,14 @@ const SwapPage = () => {
   const executeSwap = async () => {
     if (!walletAddress || !quote) return;
 
+    // Show gas fee education tip
+    showTip('gas-fees');
+
     // Check contract balance first
     if (!checkSufficientContractBalance(fromToken.symbol, toToken.symbol, fromAmount)) {
       if (toToken.symbol === 'BAM') {
-        setError('Presale 2 Sold Out! Get ready for Presale 3 announcement → Final Uniswap & PancakeSwap launch!');
-        // Presale 2 completion tracked internally
+        setError('Presale 3 Sold Out! Get ready for Public DEX Launch → Uniswap & PancakeSwap!');
+        // Presale 3 completion tracked internally
       } else {
         setError(`Insufficient ${toToken.symbol} in contract for this swap`);
       }
@@ -961,6 +971,9 @@ const SwapPage = () => {
       setIsLoading(true);
       setTxStatus('pending');
       setError('');
+
+      // Show transaction start tip
+      showTip('transaction-start');
 
       let txHash = '';
       const amountWei = web3Utils.toWei(fromAmount);
@@ -2462,6 +2475,9 @@ const SwapPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Contextual Learning Component */}
+      {ContextualLearningComponent}
     </div>
     </TooltipProvider>
   );
