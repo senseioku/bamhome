@@ -31,10 +31,47 @@ export class Web3Utils {
       // Check and switch to BSC network if needed
       await this.switchToBSC();
       
+      // Verify wallet can sign (prevents watch-only wallets)
+      await this.verifyWalletOwnership(accounts[0]);
+      
       return accounts[0];
     } catch (error) {
       console.error('Failed to connect wallet:', error);
       throw error;
+    }
+  }
+
+  async verifyWalletOwnership(address: string) {
+    const provider = await this.getProvider();
+    if (!provider) throw new Error('No provider available');
+
+    try {
+      // Create a unique message for signature verification
+      const timestamp = Date.now();
+      const message = `BAM Swap Security Verification\n\nAddress: ${address}\nTimestamp: ${timestamp}\n\nBy signing this message, you verify that you control this wallet and can authorize transactions.\n\nThis signature does not authorize any transactions or costs.`;
+      
+      // Request signature from wallet
+      console.log('🔐 Requesting wallet signature for security verification...');
+      const signature = await provider.request({
+        method: 'personal_sign',
+        params: [message, address],
+      });
+      
+      if (!signature) {
+        throw new Error('Signature verification failed. Watch-only wallets cannot access BAM Swap.');
+      }
+      
+      console.log('✅ Wallet ownership verified successfully');
+      return signature;
+      
+    } catch (error: any) {
+      if (error.code === 4001) {
+        throw new Error('Signature rejected. BAM Swap requires wallet signature verification for security.');
+      } else if (error.message?.includes('watch') || error.message?.includes('readonly')) {
+        throw new Error('Watch-only wallets cannot access BAM Swap. Please use a wallet with signing capabilities.');
+      } else {
+        throw new Error('Failed to verify wallet ownership. Please ensure you have a signing-capable wallet.');
+      }
     }
   }
 

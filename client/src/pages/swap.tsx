@@ -14,7 +14,7 @@ import { BAM_SWAP_ADDRESS, TOKENS, FEES, TOKEN_ADDRESSES, ERC20_ABI } from '@/li
 import { COMPLETE_BAM_SWAP_ABI as BAM_SWAP_ABI } from '@/lib/complete-bam-swap-abi';
 import Web3 from 'web3';
 import { BAMSwapV2Utils } from '@/lib/bamswap-v2-utils';
-import { Home, ArrowLeft, Menu, X, Wallet, Copy, LogOut, ChevronDown } from 'lucide-react';
+import { Home, ArrowLeft, Menu, X, Wallet, Copy, LogOut, ChevronDown, Shield } from 'lucide-react';
 
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -420,19 +420,25 @@ const SwapPage = () => {
     }
   }, []);
 
-  // Connect Wallet with purchase history check
+  // Connect Wallet with signature verification and purchase history check
   const connectWallet = async () => {
     try {
       setIsLoading(true);
       setError('');
       
+      // This will now include signature verification to prevent watch-only wallets
       const address = await web3Utils.connectWallet();
       setWalletAddress(address);
       await updateBalances(address);
       await checkPurchaseHistory(address);
       
     } catch (err: any) {
-      setError(err.message || 'Failed to connect wallet');
+      // Enhanced error handling for signature verification failures
+      if (err.message?.includes('watch') || err.message?.includes('readonly') || err.message?.includes('Signature')) {
+        setError(`🔒 Security Verification Failed: ${err.message}`);
+      } else {
+        setError(err.message || 'Failed to connect wallet');
+      }
       setWalletAddress('');
       setBalances({});
       setHasAlreadyPurchased(false);
@@ -2061,22 +2067,34 @@ const SwapPage = () => {
               </div>
             )}
 
-            {/* Enhanced Connect/Swap Button with Improved Validation */}
+            {/* Enhanced Connect/Swap Button with Security Verification */}
             {!walletAddress ? (
-              <Button
-                onClick={connectWallet}
-                disabled={isLoading}
-                className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-lg shadow-lg transition-all duration-200"
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Connecting...</span>
-                  </div>
-                ) : (
-                  'Connect Wallet'
-                )}
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  onClick={connectWallet}
+                  disabled={isLoading}
+                  className="w-full h-10 sm:h-12 text-sm sm:text-base font-bold bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-lg shadow-lg transition-all duration-200"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Verifying Wallet...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center space-x-2">
+                      <Wallet className="w-4 h-4" />
+                      <span>Connect Wallet</span>
+                      <div className="flex items-center space-x-1 bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                        <Shield className="w-3 h-3" />
+                        <span>Secure</span>
+                      </div>
+                    </div>
+                  )}
+                </Button>
+                <div className="text-xs text-center text-gray-400">
+                  🔒 Signature verification prevents watch-only wallet access
+                </div>
+              </div>
             ) : !fromAmount || parseFloat(fromAmount) <= 0 ? (
               <Button
                 disabled
