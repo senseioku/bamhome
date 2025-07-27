@@ -100,7 +100,7 @@ export default function Navigation() {
                     >
                       <span className="mr-2">🎁</span>
                       BAM Drops
-                      <span className="ml-auto text-xs bg-secondary/20 text-secondary px-2 py-1 rounded">Soon</span>
+                      <span className="ml-auto text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">Soon</span>
                     </button>
                   </DropdownMenuItem>
                   <DropdownMenuItem>

@@ -7,7 +7,8 @@ import {
   Palette, 
   Vote, 
   Key, 
-  PlusCircle 
+  PlusCircle,
+  Gift 
 } from "lucide-react";
 
 export default function ProjectsSection() {
@@ -31,10 +32,16 @@ export default function ProjectsSection() {
       color: "text-accent"
     },
     {
+      icon: <Gift className="h-10 w-10" />,
+      title: "BAM Drops",
+      description: "Regular token drops and airdrops for active community members and ecosystem participants.",
+      color: "text-purple-400"
+    },
+    {
       icon: <Gamepad2 className="h-10 w-10" />,
-      title: "Play 2 Earn",
-      description: "Gaming platform where players earn BAM tokens through gameplay and achievements.",
-      color: "text-[hsl(45,90%,55%)]"
+      title: "BAM Play 2 Earn",
+      description: "Gaming platform where players earn BAM tokens through gameplay, achievements, and community competitions.",
+      color: "text-purple-400"
     },
     {
       icon: <Palette className="h-10 w-10" />,

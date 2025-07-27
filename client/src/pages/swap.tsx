@@ -1623,7 +1623,7 @@ const SwapPage = () => {
                               <span className="text-sm">🎁</span>
                               <span className="text-sm font-medium">BAM Drops</span>
                             </div>
-                            <span className="text-xs bg-gray-600/50 text-gray-400 px-2 py-0.5 rounded-full">Soon</span>
+                            <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full">Soon</span>
                           </a>
                           <a
                             href="#"
