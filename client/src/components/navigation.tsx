@@ -212,7 +212,17 @@ export default function Navigation() {
                             <span className="text-sm">🎁</span>
                             <span className="text-sm font-medium">BAM Drops</span>
                           </div>
-                          <span className="text-xs bg-gray-600/50 text-gray-400 px-2 py-0.5 rounded-full">Soon</span>
+                          <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full">Soon</span>
+                        </button>
+                        <button
+                          onClick={() => scrollToSection("projects")}
+                          className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm">🎮</span>
+                            <span className="text-sm font-medium">BAM Play 2 Earn</span>
+                          </div>
+                          <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full">Soon</span>
                         </button>
                         <a
                           href="https://apex.bam-ecosystem.com"
