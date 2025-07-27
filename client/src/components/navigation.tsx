@@ -104,6 +104,16 @@ export default function Navigation() {
                     </button>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
+                    <button
+                      onClick={() => scrollToSection("projects")}
+                      className="flex items-center w-full text-left"
+                    >
+                      <span className="mr-2">🎮</span>
+                      BAM Play 2 Earn
+                      <span className="ml-auto text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">Soon</span>
+                    </button>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
                     <a
                       href="https://apex.bam-ecosystem.com"
                       target="_blank"
