@@ -1868,8 +1868,8 @@ const SwapPage = () => {
                     </div>
                     <div className="text-yellow-200 text-xs leading-tight">
                       <span className="font-semibold text-green-300">${contractBalances.BAM ? 
-                        Number(contractBalances.BAM).toLocaleString('en-US', { maximumFractionDigits: 3, minimumFractionDigits: 3 }) : 
-                        '2,000,000.000'
+                        Number(contractBalances.BAM).toLocaleString('en-US', { maximumFractionDigits: 0 }) : 
+                        '2,000,000'
                       } Tokens Left</span> • $0.0000025/BAM
                     </div>
                   </div>
