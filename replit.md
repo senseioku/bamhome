@@ -284,6 +284,11 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Applied purple color scheme to both BAM Drops and BAM Play 2 Earn for unified Soon badge styling
 ✓ Updated navigation components to use purple badges for consistent branding across platform
 ✓ Enhanced main page ecosystem showcase with comprehensive gaming and airdrop platform entries
+✓ TOKEN LEFT DISPLAY ENHANCED: Updated presale banner to show 3 decimal places for better movement visibility
+✓ Changed from whole numbers to detailed format: "2,000,000.000 Tokens Left" for precise tracking
+✓ LIVE BADGES ADDED: BAM ApexMiner and BAM VIP Access now show green "Live" badges across all navigation
+✓ Updated desktop dropdown menu, mobile hamburger menu, and swap page navigation for consistency
+✓ Complete navigation system now unified: BAM Swap (Live), BAM ApexMiner (Live), BAM VIP Access (Live), BAM Drops (Soon), BAM Play 2 Earn (Soon)
 
 ## User Preferences
 

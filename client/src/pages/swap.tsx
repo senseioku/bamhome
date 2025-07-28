@@ -1640,19 +1640,25 @@ const SwapPage = () => {
                             href="https://apex.bam-ecosystem.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                           >
-                            <span className="text-sm">⛏️</span>
-                            <span className="text-sm font-medium">BAM ApexMiner</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm">⛏️</span>
+                              <span className="text-sm font-medium">BAM ApexMiner</span>
+                            </div>
+                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
                           </a>
                           <a
                             href="https://vip.bam-ecosystem.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                           >
-                            <span className="text-sm">👑</span>
-                            <span className="text-sm font-medium">BAM VIP Access</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm">👑</span>
+                              <span className="text-sm font-medium">BAM VIP Access</span>
+                            </div>
+                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
                           </a>
                         </div>
                       </div>
@@ -1862,8 +1868,8 @@ const SwapPage = () => {
                     </div>
                     <div className="text-yellow-200 text-xs leading-tight">
                       <span className="font-semibold text-green-300">${contractBalances.BAM ? 
-                        formatCompactNumber(contractBalances.BAM) : 
-                        '2.00M'
+                        Number(contractBalances.BAM).toLocaleString('en-US', { maximumFractionDigits: 3, minimumFractionDigits: 3 }) : 
+                        '2,000,000.000'
                       } Tokens Left</span> • $0.0000025/BAM
                     </div>
                   </div>
