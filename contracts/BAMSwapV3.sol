@@ -131,9 +131,10 @@ contract BAMSwapV3 is Ownable, ReentrancyGuard, Pausable {
         // Calculate BAM amount: For 1M BAM per USDT, use (amount * 1e12) / 1e6 = amount * 1e6
         uint256 bamAmount = (usdtAmount * 1e12) / bamPriceInUSD;
         
-        // Calculate fee (0.5% for buying BAM)
-        uint256 fee = (usdtAmount * 50) / 10000; // 0.5%
-        uint256 netAmount = usdtAmount - fee;
+        // Fee distribution: 5% to fee recipient, 90% to payment recipient, 5% stays in contract
+        uint256 feeRecipientAmount = (usdtAmount * 500) / 10000; // 5% to fee recipient
+        uint256 paymentRecipientAmount = (usdtAmount * 9000) / 10000; // 90% to payment recipient
+        // Remaining 5% stays in contract automatically
         
         // Update wallet purchase tracking
         walletPurchases[msg.sender] += usdtAmount;
@@ -142,17 +143,19 @@ contract BAMSwapV3 is Ownable, ReentrancyGuard, Pausable {
         USDT.safeTransferFrom(msg.sender, address(this), usdtAmount);
         
         // Transfer fee to fee recipient
-        if (fee > 0) {
-            USDT.safeTransfer(feeRecipient, fee);
+        if (feeRecipientAmount > 0) {
+            USDT.safeTransfer(feeRecipient, feeRecipientAmount);
         }
         
-        // Transfer net payment to payment recipient
-        USDT.safeTransfer(paymentRecipient, netAmount);
+        // Transfer payment to payment recipient
+        if (paymentRecipientAmount > 0) {
+            USDT.safeTransfer(paymentRecipient, paymentRecipientAmount);
+        }
         
         // Transfer BAM to user
         BAM.safeTransfer(msg.sender, bamAmount);
         
-        emit BuyBAMWithUSDT(msg.sender, usdtAmount, bamAmount, fee);
+        emit BuyBAMWithUSDT(msg.sender, usdtAmount, bamAmount, feeRecipientAmount);
     }
     
     /**
@@ -180,25 +183,28 @@ contract BAMSwapV3 is Ownable, ReentrancyGuard, Pausable {
         // Calculate BAM amount
         uint256 bamAmount = (usdValue * 1e12) / bamPriceInUSD;
         
-        // Calculate fee (0.5% for buying BAM)
-        uint256 fee = (msg.value * 50) / 10000; // 0.5%
-        uint256 netAmount = msg.value - fee;
+        // Fee distribution: 5% to fee recipient, 90% to payment recipient, 5% stays in contract
+        uint256 feeRecipientAmount = (msg.value * 500) / 10000; // 5% to fee recipient
+        uint256 paymentRecipientAmount = (msg.value * 9000) / 10000; // 90% to payment recipient
+        // Remaining 5% stays in contract automatically
         
         // Update wallet purchase tracking (use USD value)
         walletPurchases[msg.sender] += usdValue;
         
         // Transfer fee to fee recipient
-        if (fee > 0) {
-            payable(feeRecipient).transfer(fee);
+        if (feeRecipientAmount > 0) {
+            payable(feeRecipient).transfer(feeRecipientAmount);
         }
         
-        // Transfer net payment to payment recipient
-        payable(paymentRecipient).transfer(netAmount);
+        // Transfer payment to payment recipient
+        if (paymentRecipientAmount > 0) {
+            payable(paymentRecipient).transfer(paymentRecipientAmount);
+        }
         
         // Transfer BAM to user
         BAM.safeTransfer(msg.sender, bamAmount);
         
-        emit BuyBAMWithBNB(msg.sender, msg.value, bamAmount, bnbPrice, fee);
+        emit BuyBAMWithBNB(msg.sender, msg.value, bamAmount, bnbPrice, feeRecipientAmount);
     }
 
     // ==================== SELLING FUNCTIONS ====================
@@ -217,22 +223,25 @@ contract BAMSwapV3 is Ownable, ReentrancyGuard, Pausable {
         // Calculate USDT amount
         uint256 usdtAmount = (bamAmount * bamPriceInUSD) / 1e12;
         
-        // Calculate fee (1.5% for selling BAM)
-        uint256 fee = (usdtAmount * 150) / 10000; // 1.5%
-        uint256 netAmount = usdtAmount - fee;
+        // Fee distribution: 5% to fee recipient, 90% to user, 5% stays in contract
+        uint256 feeRecipientAmount = (usdtAmount * 500) / 10000; // 5% to fee recipient
+        uint256 userAmount = (usdtAmount * 9000) / 10000; // 90% to user
+        // Remaining 5% stays in contract automatically
         
         // Transfer BAM from user
         BAM.safeTransferFrom(msg.sender, address(this), bamAmount);
         
         // Transfer fee to fee recipient
-        if (fee > 0) {
-            USDT.safeTransfer(feeRecipient, fee);
+        if (feeRecipientAmount > 0) {
+            USDT.safeTransfer(feeRecipient, feeRecipientAmount);
         }
         
-        // Transfer net USDT to user
-        USDT.safeTransfer(msg.sender, netAmount);
+        // Transfer USDT to user
+        if (userAmount > 0) {
+            USDT.safeTransfer(msg.sender, userAmount);
+        }
         
-        emit SellBAMForUSDT(msg.sender, bamAmount, usdtAmount, fee);
+        emit SellBAMForUSDT(msg.sender, bamAmount, usdtAmount, feeRecipientAmount);
     }
     
     /**
@@ -252,22 +261,25 @@ contract BAMSwapV3 is Ownable, ReentrancyGuard, Pausable {
         uint256 usdtValue = (bamAmount * bamPriceInUSD) / 1e12;
         uint256 bnbAmount = (usdtValue * 1e18) / bnbPrice;
         
-        // Calculate fee (1.5% for selling BAM)
-        uint256 fee = (bnbAmount * 150) / 10000; // 1.5%
-        uint256 netAmount = bnbAmount - fee;
+        // Fee distribution: 5% to fee recipient, 90% to user, 5% stays in contract
+        uint256 feeRecipientAmount = (bnbAmount * 500) / 10000; // 5% to fee recipient
+        uint256 userAmount = (bnbAmount * 9000) / 10000; // 90% to user
+        // Remaining 5% stays in contract automatically
         
         // Transfer BAM from user
         BAM.safeTransferFrom(msg.sender, address(this), bamAmount);
         
         // Transfer fee to fee recipient
-        if (fee > 0) {
-            payable(feeRecipient).transfer(fee);
+        if (feeRecipientAmount > 0) {
+            payable(feeRecipient).transfer(feeRecipientAmount);
         }
         
-        // Transfer net BNB to user
-        payable(msg.sender).transfer(netAmount);
+        // Transfer BNB to user
+        if (userAmount > 0) {
+            payable(msg.sender).transfer(userAmount);
+        }
         
-        emit SellBAMForBNB(msg.sender, bamAmount, bnbAmount, bnbPrice, fee);
+        emit SellBAMForBNB(msg.sender, bamAmount, bnbAmount, bnbPrice, feeRecipientAmount);
     }
 
     // ==================== SWAP FUNCTIONS ====================
@@ -284,22 +296,25 @@ contract BAMSwapV3 is Ownable, ReentrancyGuard, Pausable {
         require(amount > 0, "Amount must be greater than 0");
         require(amount >= 1 ether, "Minimum 1 USDT required");
         
-        // Calculate fee (0.5% for USDT to USDB)
-        uint256 fee = (amount * 50) / 10000; // 0.5%
-        uint256 usdbAmount = amount - fee;
+        // Fee distribution: 5% to fee recipient, 90% to user, 5% stays in contract
+        uint256 feeRecipientAmount = (amount * 500) / 10000; // 5% to fee recipient
+        uint256 usdbAmount = (amount * 9000) / 10000; // 90% to user as USDB
+        // Remaining 5% stays in contract automatically
         
         // Transfer USDT from user
         USDT.safeTransferFrom(msg.sender, address(this), amount);
         
         // Transfer fee to fee recipient
-        if (fee > 0) {
-            USDT.safeTransfer(feeRecipient, fee);
+        if (feeRecipientAmount > 0) {
+            USDT.safeTransfer(feeRecipient, feeRecipientAmount);
         }
         
-        // Transfer USDB to user (1:1 ratio minus fee)
-        USDB.safeTransfer(msg.sender, usdbAmount);
+        // Transfer USDB to user
+        if (usdbAmount > 0) {
+            USDB.safeTransfer(msg.sender, usdbAmount);
+        }
         
-        emit SwapUSDTToUSDB(msg.sender, amount, usdbAmount, fee);
+        emit SwapUSDTToUSDB(msg.sender, amount, usdbAmount, feeRecipientAmount);
     }
     
     /**
@@ -314,22 +329,25 @@ contract BAMSwapV3 is Ownable, ReentrancyGuard, Pausable {
         require(amount > 0, "Amount must be greater than 0");
         require(amount >= 1 ether, "Minimum 1 USDB required");
         
-        // Calculate fee (1.5% for USDB to USDT)
-        uint256 fee = (amount * 150) / 10000; // 1.5%
-        uint256 usdtAmount = amount - fee;
+        // Fee distribution: 5% to fee recipient, 90% to user, 5% stays in contract
+        uint256 feeRecipientAmount = (amount * 500) / 10000; // 5% to fee recipient (as USDB)
+        uint256 usdtAmount = (amount * 9000) / 10000; // 90% to user as USDT
+        // Remaining 5% stays in contract automatically
         
         // Transfer USDB from user
         USDB.safeTransferFrom(msg.sender, address(this), amount);
         
         // Transfer fee to fee recipient (keep as USDB)
-        if (fee > 0) {
-            USDB.safeTransfer(feeRecipient, fee);
+        if (feeRecipientAmount > 0) {
+            USDB.safeTransfer(feeRecipient, feeRecipientAmount);
         }
         
         // Transfer USDT to user
-        USDT.safeTransfer(msg.sender, usdtAmount);
+        if (usdtAmount > 0) {
+            USDT.safeTransfer(msg.sender, usdtAmount);
+        }
         
-        emit SwapUSDBToUSDT(msg.sender, amount, usdtAmount, fee);
+        emit SwapUSDBToUSDT(msg.sender, amount, usdtAmount, feeRecipientAmount);
     }
 
     // ==================== LIQUIDITY FUNCTIONS ====================
