@@ -293,7 +293,7 @@ This is a comprehensive DeFi (Decentralized Finance) platform for the BAM (Build
 ✓ Random message system: Shows one unique message per day after page loading animation with glassmorphism design
 ✓ Engagement-focused content: Messages designed to trigger speculation, FOMO, and viral momentum (#BAM hashtags)
 ✓ Enhanced modal design: Improved Contextual Learning style with catchy colors, progress bars, and animated effects
-✓ One-time daily display: Uses localStorage to ensure each user sees only one message per day with automatic rotation
+✓ Random message display: Shows a different motivational message every time user visits, reloads, or refreshes the page
 ✓ Professional presentation: "Daily Alpha" branding with exclusive insights, action buttons, and animated backgrounds
 
 ## User Preferences

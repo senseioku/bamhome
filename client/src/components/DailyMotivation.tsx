@@ -305,24 +305,15 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
 
 export const useDailyMotivation = () => {
   const [showMotivation, setShowMotivation] = useState(false);
-  const [hasShownToday, setHasShownToday] = useState(false);
 
   useEffect(() => {
-    // Check if already shown today
-    const today = new Date().toDateString();
-    const lastShown = localStorage.getItem('bam-motivation-last-shown');
-    
-    if (lastShown !== today && !hasShownToday) {
-      // Show after a delay (after loading animation completes)
-      const timer = setTimeout(() => {
-        setShowMotivation(true);
-        setHasShownToday(true);
-        localStorage.setItem('bam-motivation-last-shown', today);
-      }, 3500); // Show after 3.5 seconds (after page loader)
+    // Show random message every time user visits/reloads the page
+    const timer = setTimeout(() => {
+      setShowMotivation(true);
+    }, 3500); // Show after 3.5 seconds (after page loader)
 
-      return () => clearTimeout(timer);
-    }
-  }, [hasShownToday]);
+    return () => clearTimeout(timer);
+  }, []); // Empty dependency array means this runs on every mount (page visit/reload)
 
   const hideMotivation = () => {
     setShowMotivation(false);
