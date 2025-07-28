@@ -19,6 +19,7 @@ import { Home, ArrowLeft, Menu, X, Wallet, Copy, LogOut, ChevronDown, Shield } f
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useContextualLearning } from '@/components/ContextualLearning';
+import { useDailyMotivation } from '@/components/DailyMotivation';
 
 interface TokenInfo {
   symbol: string;
@@ -66,6 +67,9 @@ const SwapPage = () => {
 
   // Contextual Learning System
   const { activeTrigger, showTip, hideTip, ContextualLearningComponent } = useContextualLearning();
+  
+  // Daily Motivation System
+  const { showMotivation, hideMotivation, DailyMotivationComponent } = useDailyMotivation();
   const [hasAlreadyPurchased, setHasAlreadyPurchased] = useState<boolean>(false);
   const [showPurchasedWarning, setShowPurchasedWarning] = useState<boolean>(false);
   const [isCheckingPurchaseHistory, setIsCheckingPurchaseHistory] = useState<boolean>(false);
@@ -2497,6 +2501,9 @@ const SwapPage = () => {
 
       {/* Contextual Learning Component */}
       {ContextualLearningComponent}
+      
+      {/* Daily Motivation Component */}
+      {DailyMotivationComponent}
     </div>
     </TooltipProvider>
   );
