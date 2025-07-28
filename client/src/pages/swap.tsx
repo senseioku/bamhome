@@ -560,9 +560,11 @@ const SwapPage = () => {
     if (num === 0) return '0';
     
     if (num >= 1000000000) {
-      return `${(num / 1000000000).toFixed(2)}B`;
+      // Show 3 decimal places for billions to capture 2M BAM movement (0.002B)
+      return `${(num / 1000000000).toFixed(3)}B`;
     } else if (num >= 1000000) {
-      return `${(num / 1000000).toFixed(2)}M`;
+      // For millions, show with commas for better readability
+      return `${(num / 1000000).toLocaleString('en-US', { maximumFractionDigits: 0 })}M`;
     } else if (num >= 1000) {
       return `${(num / 1000).toFixed(2)}K`;
     } else if (num >= 1) {
