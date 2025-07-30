@@ -428,7 +428,7 @@ const SwapPage = () => {
     }
   }, []);
 
-  // Connect Wallet with signature verification and purchase history check
+  // Secure wallet connection using centralized security manager
   const connectWallet = async () => {
     try {
       setIsLoading(true);
@@ -437,11 +437,18 @@ const SwapPage = () => {
       // Show contextual tip about wallet security
       showTip('wallet-connect');
       
-      // This will now include signature verification to prevent watch-only wallets
-      const address = await web3Utils.connectWallet();
-      setWalletAddress(address);
-      await updateBalances(address);
-      await checkPurchaseHistory(address);
+      // Use secure wallet connection with mandatory verification
+      const { secureWalletConnect } = await import('../lib/walletSecurity');
+      const result = await secureWalletConnect();
+      
+      if (result.isVerified) {
+        setWalletAddress(result.address);
+        await updateBalances(result.address);
+        await checkPurchaseHistory(result.address);
+        console.log('✅ Secure wallet connection successful');
+      } else {
+        throw new Error(result.error || 'Wallet verification failed');
+      }
       
     } catch (err: any) {
       // Enhanced error handling for signature verification failures
@@ -460,25 +467,31 @@ const SwapPage = () => {
     }
   };
 
-  // Check for existing wallet connection on page load
+  // Secure auto-connection using centralized security manager
   useEffect(() => {
-    const checkWalletConnection = async () => {
+    const secureAutoConnection = async () => {
+      const { secureAutoConnect } = await import('../lib/walletSecurity');
+      
       try {
-        const provider = await web3Utils.getProvider();
-        if (provider) {
-          const accounts = await provider.request({ method: 'eth_accounts' });
-          if (accounts && accounts.length > 0) {
-            setWalletAddress(accounts[0]);
-            await updateBalances(accounts[0]);
-            await checkPurchaseHistory(accounts[0]);
-          }
+        const result = await secureAutoConnect();
+        
+        if (result && result.isVerified) {
+          setWalletAddress(result.address);
+          await updateBalances(result.address);
+          await checkPurchaseHistory(result.address);
+          console.log('✅ Secure auto-connection successful');
+        } else if (result && !result.isVerified) {
+          console.warn('❌ Auto-connection verification failed:', result.error);
+          setWalletAddress('');
+          setBalances({});
+          setHasAlreadyPurchased(false);
         }
       } catch (error) {
-        // Silent fail - no wallet connection
+        console.error('❌ Secure auto-connection error:', error);
       }
     };
 
-    checkWalletConnection();
+    secureAutoConnection();
     
     // Check contract balances on page load
     checkContractBalances();

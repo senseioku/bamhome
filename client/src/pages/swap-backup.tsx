@@ -378,7 +378,7 @@ const SwapPage = () => {
     }
   };
 
-  // Check for existing wallet connection on page load
+  // Check for existing wallet connection on page load with MANDATORY signature verification
   useEffect(() => {
     const checkWalletConnection = async () => {
       try {
@@ -386,9 +386,24 @@ const SwapPage = () => {
         if (provider) {
           const accounts = await provider.request({ method: 'eth_accounts' });
           if (accounts && accounts.length > 0) {
-            setWalletAddress(accounts[0]);
-            await updateBalances(accounts[0]);
-            await checkPurchaseHistory(accounts[0]);
+            try {
+              // ✅ ALWAYS require signature verification - even for previously connected wallets
+              console.log('🔐 Auto-connection detected - verifying wallet ownership...');
+              await web3Utils.verifyWalletOwnership(accounts[0]);
+              
+              // Only set wallet address after successful signature verification
+              setWalletAddress(accounts[0]);
+              await updateBalances(accounts[0]);
+              await checkPurchaseHistory(accounts[0]);
+              
+              console.log('✅ Auto-connection verified successfully');
+            } catch (signatureError) {
+              // If signature verification fails, clear wallet connection
+              console.warn('❌ Auto-connection signature verification failed:', signatureError);
+              setWalletAddress('');
+              setBalances({});
+              setHasAlreadyPurchased(false);
+            }
           }
         }
       } catch (error) {
