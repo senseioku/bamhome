@@ -38,13 +38,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     message: { message: 'Too many chat requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req, res) => {
+    keyGenerator: (req) => {
       const walletAddress = req.headers['x-wallet-address'] as string;
-      if (walletAddress) {
-        return `wallet:${walletAddress}`;
-      }
-      // Use standard IP with proper IPv6 handling
-      return req.ip || req.connection.remoteAddress || 'unknown';
+      return walletAddress ? `wallet:${walletAddress}` : req.ip;
     }
   });
 
