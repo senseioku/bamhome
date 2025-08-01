@@ -113,7 +113,7 @@ export default function Navigation() {
                     scrollToSection('home');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 w-full text-left px-3 py-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 rounded-lg transition-colors border-b border-gray-700"
+                  className="flex items-center gap-3 w-full text-left px-0 py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700"
                 >
                   <Home className="w-5 h-5" />
                   <span>Home</span>
@@ -124,7 +124,7 @@ export default function Navigation() {
                     scrollToSection('ecosystem');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 w-full text-left px-3 py-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 rounded-lg transition-colors border-b border-gray-700"
+                  className="flex items-center gap-3 w-full text-left px-0 py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700"
                 >
                   <Globe className="w-5 h-5" />
                   <span>Ecosystem</span>
@@ -135,7 +135,7 @@ export default function Navigation() {
                     scrollToSection('tokenomics');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 w-full text-left px-3 py-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 rounded-lg transition-colors border-b border-gray-700"
+                  className="flex items-center gap-3 w-full text-left px-0 py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700"
                 >
                   <TrendingUp className="w-5 h-5" />
                   <span>Tokenomics</span>
@@ -146,20 +146,20 @@ export default function Navigation() {
                     scrollToSection('projects');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 w-full text-left px-3 py-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 rounded-lg transition-colors border-b border-gray-700"
+                  className="flex items-center gap-3 w-full text-left px-0 py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700"
                 >
                   <Briefcase className="w-5 h-5" />
                   <span>Projects</span>
                 </button>
               </div>
               
-              <div className="mt-6 bg-gray-800 rounded-lg p-4">
+              <div className="mt-6">
                 <div className="text-yellow-400 font-semibold mb-3">Platform Access</div>
                 
                 <Link href="/swap">
                   <div 
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3 py-3 text-gray-300 hover:text-yellow-400 hover:bg-gray-700/50 rounded-lg transition-colors border-b border-gray-700 cursor-pointer"
+                    className="flex items-center justify-between py-3 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700 cursor-pointer"
                   >
                     <div className="flex items-center gap-2">
                       <RefreshCw className="w-4 h-4" />
@@ -171,7 +171,7 @@ export default function Navigation() {
                   </div>
                 </Link>
                 
-                <div className="flex items-center justify-between px-3 py-3 text-gray-500 border-b border-gray-700">
+                <div className="flex items-center justify-between py-3 text-gray-500 border-b border-gray-700">
                   <div className="flex items-center gap-2">
                     <Gift className="w-4 h-4" />
                     <span>BAM Drops</span>
@@ -181,7 +181,7 @@ export default function Navigation() {
                   </span>
                 </div>
                 
-                <div className="flex items-center justify-between px-3 py-3 text-gray-500 border-b border-gray-700">
+                <div className="flex items-center justify-between py-3 text-gray-500 border-b border-gray-700">
                   <div className="flex items-center gap-2">
                     <Gamepad2 className="w-4 h-4" />
                     <span>BAM Play 2 Earn</span>
@@ -191,7 +191,7 @@ export default function Navigation() {
                   </span>
                 </div>
                 
-                <div className="flex items-center justify-between px-3 py-3 text-gray-500 border-b border-gray-700">
+                <div className="flex items-center justify-between py-3 text-gray-500 border-b border-gray-700">
                   <div className="flex items-center gap-2">
                     <Crown className="w-4 h-4" />
                     <span>BAM ApexMiner</span>
@@ -201,7 +201,7 @@ export default function Navigation() {
                   </span>
                 </div>
                 
-                <div className="flex items-center justify-between px-3 py-3 text-gray-500">
+                <div className="flex items-center justify-between py-3 text-gray-500">
                   <div className="flex items-center gap-2">
                     <Crown className="w-4 h-4" />
                     <span>BAM VIP Access</span>
