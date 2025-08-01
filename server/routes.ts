@@ -5,15 +5,101 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { aiService } from "./ai";
 import { cryptoService } from "./cryptoService";
 import { z } from "zod";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import cors from "cors";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Security middleware
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", "https:"],
+      },
+    },
+  }));
+  
+  app.use(cors({
+    origin: process.env.NODE_ENV === 'production' 
+      ? process.env.ALLOWED_ORIGINS?.split(',') || []
+      : true,
+    credentials: true
+  }));
+
+  // Rate limiting
+  const chatRateLimit = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 50, // Limit each wallet to 50 requests per windowMs
+    message: { message: 'Too many chat requests, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => req.headers['x-wallet-address'] as string || req.ip
+  });
+
+  const generalRateLimit = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes  
+    max: 100, // General API limit
+    message: { message: 'Too many requests, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  app.use('/api/', generalRateLimit);
+  app.use('/api/chat/', chatRateLimit);
+
   // Auth middleware
   await setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', async (req: any, res) => {
+  // Custom wallet-based authentication middleware with signature verification
+  const walletAuth = async (req: any, res: any, next: any) => {
     try {
-      const userId = 'test-user-123'; // Temporary for testing
+      const walletAddress = req.headers['x-wallet-address'] as string;
+      const signature = req.headers['x-wallet-signature'] as string;
+      
+      if (!walletAddress) {
+        return res.status(401).json({ message: 'Wallet address required' });
+      }
+
+      // In production, verify signature here
+      // TODO: Implement proper wallet signature verification
+      if (process.env.NODE_ENV === 'production' && !signature) {
+        return res.status(401).json({ message: 'Wallet signature required' });
+      }
+
+      // Validate wallet address format
+      if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+        return res.status(400).json({ message: 'Invalid wallet address format' });
+      }
+
+      // Get or create user based on wallet address
+      let user = await storage.getUserByWallet(walletAddress.toLowerCase());
+      if (!user) {
+        user = await storage.upsertUser({
+          walletAddress: walletAddress.toLowerCase(),
+          isVerified: true,
+          lastActive: new Date()
+        });
+      } else {
+        // Update last active
+        await storage.updateUserActivity(user.id);
+      }
+
+      req.user = { id: user.id, walletAddress: user.walletAddress };
+      next();
+    } catch (error) {
+      console.error('Wallet auth error:', error);
+      return res.status(500).json({ message: 'Authentication failed' });
+    }
+  };
+
+  // Auth routes
+  app.get('/api/auth/user', walletAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -22,34 +108,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Custom wallet-based authentication middleware
-  const walletAuth = async (req: any, res: any, next: any) => {
-    const walletAddress = req.headers['x-wallet-address'];
-    const signature = req.headers['x-wallet-signature'];
-    
-    if (!walletAddress) {
-      return res.status(401).json({ message: 'Wallet address required' });
-    }
+  // Input validation schemas
+  const createConversationSchema = z.object({
+    title: z.string().min(1).max(100),
+    category: z.enum(['crypto', 'research', 'learn', 'general']).default('general')
+  });
 
-    // Get or create user based on wallet address
-    let user = await storage.getUserByWallet(walletAddress);
-    if (!user) {
-      user = await storage.upsertUser({
-        walletAddress,
-        isVerified: true,
-        lastActive: new Date()
-      });
-    }
-
-    req.user = { id: user.id, walletAddress: user.walletAddress };
-    next();
-  };
+  const sendMessageSchema = z.object({
+    content: z.string().min(1).max(4000)
+  });
 
   // Chat routes with wallet authentication
   app.post('/api/chat/conversations', walletAuth, async (req: any, res) => {
     try {
+      const validation = createConversationSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: 'Invalid input', 
+          errors: validation.error.issues 
+        });
+      }
+
       const userId = req.user.id;
-      const { title, category = 'general' } = req.body;
+      const { title, category } = validation.data;
 
       const conversation = await storage.createConversation({
         userId,
@@ -95,12 +176,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/chat/conversations/:id/messages', walletAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const { content } = req.body;
-      const userId = req.user.id;
-
-      if (!content?.trim()) {
-        return res.status(400).json({ message: 'Message content is required' });
+      const validation = sendMessageSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: 'Invalid message content', 
+          errors: validation.error.issues 
+        });
       }
+
+      const { content } = validation.data;
+      const userId = req.user.id;
 
       const conversation = await storage.getConversation(id);
       if (!conversation) {
