@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { aiService } from "./ai";
 import { cryptoService } from "./cryptoService";
+import { blockchainAnalytics } from "./blockchainAnalytics";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -328,6 +329,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: 'Failed to generate response',
         details: error.message 
       });
+    }
+  });
+
+  // Transaction Analysis Routes
+  app.post('/api/tx/analyze', async (req, res) => {
+    try {
+      const { txHash } = req.body;
+
+      if (!txHash) {
+        return res.status(400).json({ error: 'Transaction hash is required' });
+      }
+
+      // Validate transaction hash format
+      if (!/^0x[a-fA-F0-9]{64}$/.test(txHash)) {
+        return res.status(400).json({ error: 'Invalid transaction hash format' });
+      }
+
+      const analysisResult = await blockchainAnalytics.analyzeTransaction(txHash);
+      res.json(analysisResult);
+
+    } catch (error: any) {
+      console.error('Transaction analysis error:', error);
+      res.status(500).json({ 
+        error: 'Failed to analyze transaction',
+        details: error.message 
+      });
+    }
+  });
+
+  app.get('/api/tx/recent', async (req, res) => {
+    try {
+      // This would fetch from database in production
+      // For now, return mock recent analyses
+      res.json([]);
+    } catch (error: any) {
+      console.error('Get recent analyses error:', error);
+      res.status(500).json({ message: 'Failed to get recent analyses' });
     }
   });
 

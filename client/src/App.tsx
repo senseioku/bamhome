@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/home";
 import SwapPage from "@/pages/swap";
 import AiChat from "@/pages/AiChat";
+import TxStoryVisualizer from "@/pages/TxStoryVisualizer";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/swap" component={SwapPage} />
       <Route path="/ai-chat" component={AiChat} />
+      <Route path="/tx-visualizer" component={TxStoryVisualizer} />
       <Route component={NotFound} />
     </Switch>
   );

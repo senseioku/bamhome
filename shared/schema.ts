@@ -147,6 +147,28 @@ export type InsertLearningTopic = typeof learningTopics.$inferInsert;
 export type UserActivity = typeof userActivity.$inferSelect;
 export type InsertUserActivity = typeof userActivity.$inferInsert;
 
+// Transaction Analysis Schema
+export const transactionAnalyses = pgTable("transaction_analyses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  txHash: varchar("tx_hash").notNull().unique(),
+  userId: varchar("user_id").references(() => users.id),
+  blockNumber: varchar("block_number"),
+  fromAddress: varchar("from_address"),
+  toAddress: varchar("to_address"),
+  value: varchar("value"),
+  gasUsed: varchar("gas_used"),
+  gasPrice: varchar("gas_price"),
+  status: varchar("status"),
+  aiStory: jsonb("ai_story"),
+  visualData: jsonb("visual_data"),
+  analysisMetadata: jsonb("analysis_metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type TransactionAnalysis = typeof transactionAnalyses.$inferSelect;
+export type InsertTransactionAnalysis = typeof transactionAnalyses.$inferInsert;
+
 // Zod schemas
 export const insertUserSchema = createInsertSchema(users);
 export const insertConversationSchema = createInsertSchema(conversations);
@@ -154,3 +176,4 @@ export const insertMessageSchema = createInsertSchema(messages);
 export const insertCryptoUpdateSchema = createInsertSchema(cryptoUpdates);
 export const insertLearningTopicSchema = createInsertSchema(learningTopics);
 export const insertUserActivitySchema = createInsertSchema(userActivity);
+export const insertTransactionAnalysisSchema = createInsertSchema(transactionAnalyses);
