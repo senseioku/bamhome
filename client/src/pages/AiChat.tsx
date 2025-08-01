@@ -131,9 +131,13 @@ export default function AiChat() {
         setIsVerified(true);
         setWalletAddress(address);
         setShowVerificationDialog(false);
+        
+        // Store wallet address for API authentication
+        localStorage.setItem('verifiedWalletAddress', address);
       } else {
         console.log('Verification failed:', verification.error);
         setVerificationError(verification.error || 'Verification failed');
+        localStorage.removeItem('verifiedWalletAddress');
       }
     } catch (error: any) {
       console.error('Verification error:', error);

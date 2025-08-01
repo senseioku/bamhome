@@ -22,10 +22,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Chat routes - Temporary bypass for testing
-  app.post('/api/chat/conversations', async (req: any, res) => {
+  // Custom wallet-based authentication middleware
+  const walletAuth = async (req: any, res: any, next: any) => {
+    const walletAddress = req.headers['x-wallet-address'];
+    const signature = req.headers['x-wallet-signature'];
+    
+    if (!walletAddress) {
+      return res.status(401).json({ message: 'Wallet address required' });
+    }
+
+    // Get or create user based on wallet address
+    let user = await storage.getUserByWallet(walletAddress);
+    if (!user) {
+      user = await storage.upsertUser({
+        walletAddress,
+        isVerified: true,
+        lastActive: new Date()
+      });
+    }
+
+    req.user = { id: user.id, walletAddress: user.walletAddress };
+    next();
+  };
+
+  // Chat routes with wallet authentication
+  app.post('/api/chat/conversations', walletAuth, async (req: any, res) => {
     try {
-      const userId = 'test-user-123'; // Temporary for testing
+      const userId = req.user.id;
       const { title, category = 'general' } = req.body;
 
       const conversation = await storage.createConversation({
@@ -41,9 +64,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/conversations', async (req: any, res) => {
+  app.get('/api/chat/conversations', walletAuth, async (req: any, res) => {
     try {
-      const userId = 'test-user-123'; // Temporary for testing
+      const userId = req.user.id;
       const conversations = await storage.getConversations(userId);
       res.json(conversations);
     } catch (error) {
@@ -52,7 +75,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/conversations/:id', async (req: any, res) => {
+  app.get('/api/chat/conversations/:id', walletAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
       const conversation = await storage.getConversation(id);
@@ -69,11 +92,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/messages', async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/messages', walletAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
       const { content } = req.body;
-      const userId = 'test-user-123'; // Temporary for testing
+      const userId = req.user.id;
 
       if (!content?.trim()) {
         return res.status(400).json({ message: 'Message content is required' });
@@ -128,7 +151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/chat/conversations/:id', async (req: any, res) => {
+  app.delete('/api/chat/conversations/:id', walletAuth, async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteConversation(id);
@@ -209,9 +232,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User stats route
-  app.get('/api/user/stats', async (req: any, res) => {
+  app.get('/api/user/stats', walletAuth, async (req: any, res) => {
     try {
-      const userId = 'test-user-123'; // Temporary for testing
+      const userId = req.user.id;
       const stats = await storage.getUserStats(userId);
       res.json(stats);
     } catch (error) {

@@ -12,9 +12,17 @@ export async function apiRequest(
   method: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
+  
+  // Add wallet address from localStorage if available
+  const walletAddress = localStorage.getItem('verifiedWalletAddress');
+  if (walletAddress) {
+    headers['x-wallet-address'] = walletAddress;
+  }
+
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -29,8 +37,17 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+    const headers: Record<string, string> = {};
+    
+    // Add wallet address from localStorage if available
+    const walletAddress = localStorage.getItem('verifiedWalletAddress');
+    if (walletAddress) {
+      headers['x-wallet-address'] = walletAddress;
+    }
+
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",
+      headers,
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
