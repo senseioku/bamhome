@@ -76,25 +76,46 @@ export class WalletSecurityManager {
         };
       }
 
-      // Create signature challenge  
-      const message = `Verify ownership of ${expectedAddress} for BAM AIChat access at ${Date.now()}`;
-      
+      // Use the exact same signature verification as BAM Swap
       try {
-        // Use the provider's request method for better compatibility
+        const timestamp = Date.now();
+        const message = `BAM Ecosystem - Wallet Verification & Risk Acknowledgment
+
+IMPORTANT: CRYPTOCURRENCY INVESTMENT RISKS
+By signing this message, I acknowledge and accept:
+
+• Cryptocurrency investments carry significant financial risk
+• All profits depend entirely on market conditions and community support
+• I must conduct my own research (DYOR) before making any investment decisions
+• I understand that I may lose some or all of my investment
+• I should only invest what I can afford to lose completely
+• BAM Ecosystem is not responsible for any market-related losses
+• Past performance does not guarantee future results
+• Market volatility can result in rapid and substantial losses
+
+I FULLY UNDERSTAND AND ACCEPT ALL RISKS INVOLVED.
+I CONFIRM THAT I AM INVESTING ONLY WHAT I CAN AFFORD TO LOSE.
+
+Address: ${expectedAddress}
+Timestamp: ${timestamp}
+
+This signature verifies wallet ownership and does not authorize any transactions.`;
+        
+        // Request signature using the same method as BAM Swap
+        console.log('🔐 Requesting wallet signature for security verification...');
         const signature = await (window as any).ethereum.request({
           method: 'personal_sign',
           params: [message, expectedAddress],
         });
         
-        // Verify signature using web3 utils
-        const recoveredAddress = web3.eth.accounts.recover(message, signature);
-        
-        if (recoveredAddress.toLowerCase() !== expectedAddress.toLowerCase()) {
+        if (!signature) {
           return {
             isValid: false,
-            error: 'Signature verification failed. Please try again.'
+            error: 'Signature verification failed. Watch-only wallets cannot access BAM AIChat.'
           };
         }
+        
+        console.log('✅ Wallet ownership verified successfully');
 
         // Store verified session
         this.verifiedSessions.set(sessionKey, {
@@ -109,10 +130,22 @@ export class WalletSecurityManager {
         };
 
       } catch (signError: any) {
-        return {
-          isValid: false,
-          error: 'Signature rejected. Please sign the message to verify wallet ownership.'
-        };
+        if (signError.code === 4001) {
+          return {
+            isValid: false,
+            error: 'Signature rejected. BAM AIChat requires wallet signature verification for security.'
+          };
+        } else if (signError.message?.includes('watch') || signError.message?.includes('readonly')) {
+          return {
+            isValid: false,
+            error: 'Watch-only wallets cannot access BAM AIChat. Please use a wallet with signing capabilities.'
+          };
+        } else {
+          return {
+            isValid: false,
+            error: 'Failed to verify wallet ownership. Please ensure you have a signing-capable wallet.'
+          };
+        }
       }
 
     } catch (error: any) {
