@@ -6,7 +6,7 @@ The deployment errors have been resolved:
 
 ### **Issues Fixed:**
 1. **404 Routing Error**: Fixed by switching to `functions`/`rewrites` configuration instead of `builds`/`routes`
-2. **Runtime Configuration**: Using proper `nodejs18.x` runtime specification
+2. **Runtime Configuration**: Using proper `@vercel/node@3.0.7` runtime specification
 3. **Output Directory**: Correctly configured `outputDirectory: "dist/public"` for frontend files
 4. **File Exclusion**: Updated `.vercelignore` to include necessary server files for deployment
 5. **API Entry Point**: Created proper serverless function entry at `api/index.ts`
@@ -22,7 +22,7 @@ The deployment errors have been resolved:
   "outputDirectory": "dist/public",
   "functions": {
     "api/index.ts": {
-      "runtime": "nodejs18.x"
+      "runtime": "@vercel/node@3.0.7"
     }
   },
   "rewrites": [
