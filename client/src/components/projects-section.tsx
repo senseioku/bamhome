@@ -8,7 +8,8 @@ import {
   Vote, 
   Key, 
   PlusCircle,
-  Gift 
+  Gift,
+  Brain
 } from "lucide-react";
 
 export default function ProjectsSection() {
@@ -36,6 +37,12 @@ export default function ProjectsSection() {
       title: "BAM Drops",
       description: "Regular token drops and airdrops for active community members and ecosystem participants.",
       color: "text-purple-400"
+    },
+    {
+      icon: <Brain className="h-10 w-10" />,
+      title: "BAM AIGPT",
+      description: "AI-powered chatbot providing real-time crypto insights, research capabilities, and educational content for the BAM community.",
+      color: "text-green-400"
     },
     {
       icon: <Gamepad2 className="h-10 w-10" />,
