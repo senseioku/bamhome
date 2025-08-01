@@ -72,18 +72,22 @@ export class WalletSecurityManager {
       if (balanceInTokens < parseFloat(this.MIN_BAM_REQUIREMENT)) {
         return {
           isValid: false,
-          error: `Insufficient BAM tokens. You need at least ${this.MIN_BAM_REQUIREMENT} BAM tokens to access BAM AIGPT.`
+          error: `Insufficient BAM tokens. You need at least ${this.MIN_BAM_REQUIREMENT} BAM tokens to access BAM AIChat.`
         };
       }
 
-      // Create signature challenge
-      const message = `Verify ownership of ${expectedAddress} for BAM AIGPT access at ${Date.now()}`;
+      // Create signature challenge  
+      const message = `Verify ownership of ${expectedAddress} for BAM AIChat access at ${Date.now()}`;
       
       try {
-        const signature = await web3.eth.personal.sign(message, expectedAddress, '');
+        // Use the provider's request method for better compatibility
+        const signature = await (window as any).ethereum.request({
+          method: 'personal_sign',
+          params: [message, expectedAddress],
+        });
         
-        // Verify signature
-        const recoveredAddress = await web3.eth.personal.ecRecover(message, signature);
+        // Verify signature using web3 utils
+        const recoveredAddress = web3.eth.accounts.recover(message, signature);
         
         if (recoveredAddress.toLowerCase() !== expectedAddress.toLowerCase()) {
           return {

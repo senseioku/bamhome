@@ -32,7 +32,7 @@ export interface ChatResponse {
 }
 
 export class BAMAIService {
-  private systemPrompt = `You are BAM AIGPT, a specialized AI assistant for the BAM Ecosystem - a cutting-edge DeFi platform focused on the BAM token and cryptocurrency education.
+  private systemPrompt = `You are BAM AIChat, a specialized AI assistant for the BAM Ecosystem - a cutting-edge DeFi platform focused on the BAM token and cryptocurrency education.
 
 ## Your Role & Expertise:
 - **Crypto & DeFi Expert**: Provide comprehensive insights on cryptocurrency, DeFi protocols, blockchain technology, and market analysis

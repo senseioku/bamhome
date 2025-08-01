@@ -99,7 +99,7 @@ export default function HeroSection() {
                 className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 rounded-full"
               >
                 <Brain className="mr-1 h-4 w-4" />
-                BAM AIGPT
+                BAM AIChat
                 <Badge className="ml-1 bg-emerald-500 text-white text-xs">
                   NEW
                 </Badge>

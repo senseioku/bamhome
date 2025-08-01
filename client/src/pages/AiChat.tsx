@@ -154,7 +154,7 @@ export default function AiChat() {
   const { data: highlights = [] } = useQuery({
     queryKey: ['/api/crypto/highlights'],
     enabled: isVerified,
-  });
+  }) as { data: any[] };
 
   // Create new conversation
   const createConversationMutation = useMutation({
@@ -221,10 +221,10 @@ export default function AiChat() {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-white">
                   <Shield className="w-5 h-5 text-blue-400" />
-                  BAM AIGPT Access Verification
+                  BAM AIChat Access Verification
                 </DialogTitle>
                 <DialogDescription className="text-gray-400">
-                  To access BAM AIGPT, you need to verify wallet ownership with at least 10M BAM tokens.
+                  To access BAM AIChat, you need to verify wallet ownership with at least 10M BAM tokens.
                 </DialogDescription>
               </DialogHeader>
               
@@ -297,7 +297,7 @@ export default function AiChat() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Brain className="w-6 h-6 text-purple-400" />
-                  <h1 className="text-xl font-bold">BAM AIGPT</h1>
+                  <h1 className="text-xl font-bold">BAM AIChat</h1>
                   <Badge className="bg-purple-600 text-white text-xs">
                     <Sparkles className="w-3 h-3 mr-1" />
                     AI
