@@ -82,6 +82,15 @@ This signature verifies wallet ownership and does not authorize any transactions
       }
       
       console.log('✅ Wallet ownership verified successfully');
+      
+      // Create AIChat session for seamless integration
+      try {
+        const { walletSecurity } = await import('./walletSecurity');
+        walletSecurity.createSessionFromWeb3Verification(address);
+      } catch (error) {
+        console.warn('Could not create AIChat session:', error);
+      }
+      
       return signature;
       
     } catch (error: any) {

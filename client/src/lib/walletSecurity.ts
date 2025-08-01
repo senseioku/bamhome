@@ -205,10 +205,9 @@ This signature verifies wallet ownership and does not authorize any transactions
 
       const tokenContract = new web3.eth.Contract(tokenABI as any, TOKEN_ADDRESSES.BAM);
       const balance = await tokenContract.methods.balanceOf(address).call();
-      const decimals = await tokenContract.methods.decimals().call();
       
-      // Convert balance from wei to token units
-      const balanceInTokens = Web3.utils.fromWei((balance as any).toString(), 'ether');
+      // BAM token has 9 decimals, not 18
+      const balanceInTokens = (Number(balance) / Math.pow(10, 9)).toString();
       
       return balanceInTokens;
     } catch (error) {
@@ -239,6 +238,16 @@ This signature verifies wallet ownership and does not authorize any transactions
 
   clearAllSessions(): void {
     this.verifiedSessions.clear();
+  }
+
+  // Add compatibility method for BAM Swap integration
+  createSessionFromWeb3Verification(address: string): void {
+    const sessionKey = address.toLowerCase();
+    this.verifiedSessions.set(sessionKey, {
+      timestamp: Date.now(),
+      address: address
+    });
+    console.log('✅ Created AIChat session from BAM Swap verification');
   }
 }
 

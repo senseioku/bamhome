@@ -74,7 +74,7 @@ export default function AiChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedConversation]);
 
-  // Check if wallet verification needed
+  // Check if wallet verification needed - improved compatibility with BAM Swap
   useEffect(() => {
     const checkVerification = async () => {
       if (!(window as any).ethereum) {
@@ -86,12 +86,27 @@ export default function AiChat() {
         const accounts = await (window as any).ethereum.request({ method: 'eth_accounts' });
         if (accounts && accounts.length > 0) {
           const address = accounts[0];
-          const isValid = walletSecurity.isSessionValid(address);
-          if (isValid) {
+          
+          // Check if session is valid from walletSecurity
+          const isSessionValid = walletSecurity.isSessionValid(address);
+          
+          if (isSessionValid) {
             setIsVerified(true);
             setWalletAddress(address);
           } else {
-            setShowVerificationDialog(true);
+            // Try to verify immediately if wallet is connected but no session
+            try {
+              const verification = await walletSecurity.verifyWalletOwnership(address);
+              if (verification.isValid) {
+                setIsVerified(true);
+                setWalletAddress(address);
+              } else {
+                setShowVerificationDialog(true);
+                setVerificationError(verification.error || 'Wallet verification required');
+              }
+            } catch (error) {
+              setShowVerificationDialog(true);
+            }
           }
         } else {
           setShowVerificationDialog(true);
@@ -116,17 +131,28 @@ export default function AiChat() {
       }
 
       const address = accounts[0];
+      console.log('🔐 Starting wallet verification for AIChat access...');
+      
       const verification: WalletVerification = await walletSecurity.verifyWalletOwnership(address);
 
       if (verification.isValid) {
+        console.log('✅ AIChat wallet verification successful');
         setIsVerified(true);
         setWalletAddress(address);
         setShowVerificationDialog(false);
       } else {
+        console.warn('❌ AIChat wallet verification failed:', verification.error);
         setVerificationError(verification.error || 'Verification failed');
       }
     } catch (error: any) {
-      setVerificationError('Failed to verify wallet. Please try again.');
+      console.error('❌ AIChat verification error:', error);
+      if (error.message?.includes('insufficient') || error.message?.includes('10M')) {
+        setVerificationError('You need at least 10M BAM tokens to access BAM AIChat.');
+      } else if (error.message?.includes('signature') || error.message?.includes('rejected')) {
+        setVerificationError('Wallet signature required for access verification.');
+      } else {
+        setVerificationError('Failed to verify wallet. Please try again.');
+      }
     } finally {
       setVerificationLoading(false);
     }
