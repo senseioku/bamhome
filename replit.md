@@ -62,3 +62,13 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 - **Blockchain Interaction**: Web3.js for interacting with the Binance Smart Chain (BSC) network.
 - **Price Feeds**: Chainlink price feeds (BNB/USD oracle on BSC mainnet) with CoinGecko API as a fallback for reliable token pricing.
 - **BSCScan**: For burn verification and transaction transparency.
+- **AI Services**: Anthropic Claude API for AI chat functionality with crypto-focused responses.
+
+## Deployment Configuration
+
+### Vercel Setup (January 2025)
+- **Serverless Functions**: `/api/ai.js` for Claude AI chat, `/api/wallet/verify.js` for token verification
+- **Build Command**: `npx vite build` (optimized for Vercel)
+- **Runtime**: Node.js 18.x with individual function configurations
+- **Environment Variables**: ANTHROPIC_API_KEY required for AI chat functionality
+- **Mobile Optimization**: Compact interface with fixed chat input positioning
