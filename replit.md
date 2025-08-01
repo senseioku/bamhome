@@ -3,6 +3,12 @@
 ## Overview
 The BAM Ecosystem is a comprehensive DeFi platform centered around the BAM token. It's a full-stack web application designed to offer various DeFi products, including a token swap, presale functionalities, and future gaming (Play 2 Earn) and airdrop (BAM Drops) platforms. The project aims to build wealth collectively, leveraging community engagement and robust tokenomics. Its ambition is to establish BAM as a prominent token in the DeFi space, offering utility, deflationary mechanisms, and investor confidence through transparent vesting schedules and a secure ecosystem.
 
+## Recent Changes (August 2025)
+- **Vercel Deployment Configuration**: Fixed runtime specification from invalid `nodejs18.x` to proper `@vercel/node@3.0.7` format
+- **Routing Fix**: Implemented `functions`/`rewrites` configuration to resolve 404 errors in production deployment
+- **Build Process**: Optimized build pipeline generating 40.7kb server bundle and frontend assets in `dist/public/`
+- **Security Implementation**: Production-ready cryptographic wallet verification with 10M+ BAM token requirement for AIChat access
+
 ## User Preferences
 Preferred communication style: Senior engineer level - technical, direct, AI-powered analysis with stored information utilization.
 
