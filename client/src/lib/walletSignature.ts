@@ -20,11 +20,24 @@ export class WalletSignatureService {
    * Get verification message from server
    */
   async getVerificationMessage(): Promise<VerificationMessageResponse> {
-    const response = await fetch(`${this.API_BASE}/verification-message`);
-    if (!response.ok) {
-      throw new Error('Failed to get verification message');
+    try {
+      const response = await fetch(`${this.API_BASE}/verification-message`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error ${response.status}: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      return data;
+    } catch (error: any) {
+      console.error('Failed to get verification message:', error);
+      throw new Error(`Failed to get verification message: ${error.message}`);
     }
-    return response.json();
   }
 
   /**
@@ -102,6 +115,17 @@ export class WalletSignatureService {
           timestamp
         })
       });
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        return {
+          success: false,
+          error: `Server returned invalid response format`
+        };
+      }
 
       const result = await response.json();
       

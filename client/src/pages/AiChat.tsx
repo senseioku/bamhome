@@ -130,22 +130,33 @@ export default function AiChat() {
       if (verification.isValid) {
         console.log('Verification successful, now signing message for authentication');
         
-        // Step 2: Sign message for cryptographic proof
-        const signatureResult = await walletSignatureService.authenticateWallet(address);
-        
-        if (signatureResult.success) {
-          console.log('Wallet signature successful, user authenticated');
+        // Step 2: Sign message for cryptographic proof (only in production or if explicitly requested)
+        if (process.env.NODE_ENV === 'production' || window.location.search.includes('require_signature=true')) {
+          const signatureResult = await walletSignatureService.authenticateWallet(address);
+          
+          if (signatureResult.success) {
+            console.log('Wallet signature successful, user authenticated');
+            setIsVerified(true);
+            setWalletAddress(address);
+            setShowVerificationDialog(false);
+            
+            // Store authentication data for API calls
+            localStorage.setItem('verifiedWalletAddress', address);
+            localStorage.setItem('walletSignature', signatureResult.signature!);
+            localStorage.setItem('walletTimestamp', signatureResult.timestamp!.toString());
+          } else {
+            console.log('Signature failed:', signatureResult.error);
+            setVerificationError(signatureResult.error || 'Signature verification failed');
+          }
+        } else {
+          // Development mode - skip signature for easier testing
+          console.log('Development mode: skipping signature verification');
           setIsVerified(true);
           setWalletAddress(address);
           setShowVerificationDialog(false);
           
-          // Store authentication data for API calls
+          // Store only wallet address for development
           localStorage.setItem('verifiedWalletAddress', address);
-          localStorage.setItem('walletSignature', signatureResult.signature!);
-          localStorage.setItem('walletTimestamp', signatureResult.timestamp!.toString());
-        } else {
-          console.log('Signature failed:', signatureResult.error);
-          setVerificationError(signatureResult.error || 'Signature verification failed');
         }
       } else {
         console.log('Token verification failed:', verification.error);

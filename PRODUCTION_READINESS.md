@@ -96,6 +96,18 @@ The platform now meets enterprise security standards and can safely handle:
 - High-volume API requests with rate limiting
 
 ### **Production Deployment Guide:**
+
+#### **For Vercel Deployment:**
+1. Ensure `vercel.json` configuration is properly set up
+2. Configure environment variables in Vercel dashboard:
+   - `NODE_ENV=production`
+   - `ANTHROPIC_API_KEY=your_production_api_key`
+   - `DATABASE_URL=your_production_database_url`
+   - `ALLOWED_ORIGINS=https://yourdomain.vercel.app`
+3. Run build process: `npm run build`
+4. Deploy to Vercel: `vercel --prod`
+
+#### **For Replit Deployment:**
 1. Run `./scripts/production-setup.sh` for automated setup
 2. Configure environment variables (see deployment checklist)
 3. Set up SSL/TLS certificates and monitoring

@@ -27,6 +27,14 @@ export class WalletVerificationService {
         };
       }
 
+      // Validate signature format (should be hex string starting with 0x)
+      if (!signature || !signature.startsWith('0x') || signature.length !== 132) {
+        return {
+          isValid: false,
+          error: "Invalid signature format - must be 132 character hex string starting with 0x"
+        };
+      }
+
       // Create message with timestamp for replay attack prevention
       const message = timestamp 
         ? `${this.VERIFICATION_MESSAGE}\nTimestamp: ${timestamp}`
@@ -50,11 +58,20 @@ export class WalletVerificationService {
         };
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Wallet verification error:", error);
+      
+      // Provide more specific error messages
+      if (error.code === 'INVALID_ARGUMENT') {
+        return {
+          isValid: false,
+          error: "Invalid signature format - signature must be a valid hex string"
+        };
+      }
+      
       return {
         isValid: false,
-        error: "Invalid signature format or verification failed"
+        error: `Signature verification failed: ${error.message || 'Unknown error'}`
       };
     }
   }
