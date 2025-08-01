@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown, Brain } from "lucide-react";
 
 export default function Navigation() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -60,173 +59,137 @@ export default function Navigation() {
               </button>
             </div>
 
-            {/* Mobile menu button */}
+            {/* Mobile Navigation */}
             <div className="lg:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-gray-300 hover:text-white"
-              >
-                {isMobileMenuOpen ? (
-                  <X className="w-6 h-6" />
-                ) : (
-                  <Menu className="w-6 h-6" />
-                )}
-              </Button>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6 text-gray-300" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="!w-screen !h-screen p-0 bg-gray-900 border-0 !max-w-none !inset-0 !fixed !top-0 !left-0 !right-0 !bottom-0 sm:!w-80 !z-[9999]" style={{width: '100vw', height: '100vh', minHeight: '100vh'}}>
+                  <div className="flex flex-col w-screen bg-gray-900/98 backdrop-blur-sm relative z-[10000] !fixed !inset-0 overflow-hidden" style={{width: '100vw', height: '100vh', minHeight: '100vh'}}>
+                    {/* Compact Header */}
+                    <div className="flex items-center justify-between p-3 border-b border-gray-700 bg-gray-800/50 flex-shrink-0">
+                      <div className="flex items-center gap-2">
+                        <img 
+                          src="/assets/bamToken_1752877645023.png" 
+                          alt="BAM Token" 
+                          className="h-4 w-4 rounded-full"
+                        />
+                        <div>
+                          <span className="text-xs font-bold text-yellow-400">BAM</span>
+                          <span className="text-xs text-gray-400 ml-1">Ecosystem</span>
+                        </div>
+                      </div>
+                      <SheetClose className="text-gray-400 hover:text-white p-1">
+                        <X className="w-4 h-4" />
+                      </SheetClose>
+                    </div>
+
+                    {/* Scrollable Content */}
+                    <div className="flex-1 overflow-y-auto">
+                      {/* Navigation Items */}
+                      <div className="py-1">
+                        <a href="/#home" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                          <Home className="w-4 h-4" />
+                          <span className="text-sm font-medium">Home</span>
+                        </a>
+                        <a href="/#ecosystem" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                          <Globe className="w-4 h-4" />
+                          <span className="text-sm font-medium">Ecosystem</span>
+                        </a>
+                        <a href="/#tokenomics" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                          <TrendingUp className="w-4 h-4" />
+                          <span className="text-sm font-medium">Tokenomics</span>
+                        </a>
+                        <a href="/#projects" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                          <Briefcase className="w-4 h-4" />
+                          <span className="text-sm font-medium">Projects</span>
+                        </a>
+                      </div>
+
+                      {/* Platform Access Section */}
+                      <div className="border-t border-gray-700 bg-gray-800/30">
+                        <div className="px-4 py-2">
+                          <div className="text-xs font-semibold text-yellow-400">Platform Access</div>
+                        </div>
+                        <div className="pb-2">
+                          <a
+                            href="/swap"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <RefreshCw className="w-4 h-4" />
+                              <span className="text-sm font-medium">BAM Swap</span>
+                            </div>
+                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
+                          </a>
+                          <a
+                            href="/ai-chat"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Brain className="w-4 h-4" />
+                              <span className="text-sm font-medium">BAM AIGPT</span>
+                            </div>
+                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
+                          </a>
+                          <a
+                            href="/#projects"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Gift className="w-4 h-4" />
+                              <span className="text-sm font-medium">BAM Drops</span>
+                            </div>
+                            <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full">Soon</span>
+                          </a>
+                          <a
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); }}
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Gamepad2 className="w-4 h-4" />
+                              <span className="text-sm font-medium">BAM Play 2 Earn</span>
+                            </div>
+                            <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full">Soon</span>
+                          </a>
+                          <a
+                            href="https://apex.bam-ecosystem.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Crown className="w-4 h-4" />
+                              <span className="text-sm font-medium">BAM ApexMiner</span>
+                            </div>
+                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
+                          </a>
+                          <a
+                            href="https://vip.bam-ecosystem.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Crown className="w-4 h-4" />
+                              <span className="text-sm font-medium">BAM VIP Access</span>
+                            </div>
+                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>
       </nav>
-
-      {/* Full Screen Mobile Navigation */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden bg-gray-900">
-          <div className="flex flex-col h-full p-6">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <img 
-                  src="/assets/bamToken_1752877645023.png" 
-                  alt="BAM Token" 
-                  className="h-8 w-8 rounded-full"
-                />
-                <div>
-                  <span className="text-lg font-bold text-yellow-400">BAM</span>
-                  <span className="text-sm text-gray-300 ml-2">Ecosystem</span>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-            
-            <div className="flex-1 space-y-1">
-              <button 
-                onClick={() => {
-                  scrollToSection('home');
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-3 w-full text-left py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700"
-              >
-                <Home className="w-5 h-5" />
-                <span>Home</span>
-              </button>
-              
-              <button 
-                onClick={() => {
-                  scrollToSection('ecosystem');
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-3 w-full text-left py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700"
-              >
-                <Globe className="w-5 h-5" />
-                <span>Ecosystem</span>
-              </button>
-              
-              <button 
-                onClick={() => {
-                  scrollToSection('tokenomics');
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-3 w-full text-left py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700"
-              >
-                <TrendingUp className="w-5 h-5" />
-                <span>Tokenomics</span>
-              </button>
-              
-              <button 
-                onClick={() => {
-                  scrollToSection('projects');
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-3 w-full text-left py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700"
-              >
-                <Briefcase className="w-5 h-5" />
-                <span>Projects</span>
-              </button>
-              
-              <div className="pt-6">
-                <div className="text-yellow-400 font-semibold mb-4">Platform Access</div>
-                
-                <Link href="/swap">
-                  <div 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-between py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700 cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2">
-                      <RefreshCw className="w-4 h-4" />
-                      <span>BAM Swap</span>
-                    </div>
-                    <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-1 rounded-full">
-                      Live
-                    </span>
-                  </div>
-                </Link>
-                
-                <Link href="/ai-chat">
-                  <div 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-between py-4 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700 cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Brain className="w-4 h-4" />
-                      <span>BAM AIGPT</span>
-                    </div>
-                    <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-1 rounded-full">
-                      Live
-                    </span>
-                  </div>
-                </Link>
-                
-                <div className="flex items-center justify-between py-4 text-gray-500 border-b border-gray-700">
-                  <div className="flex items-center gap-2">
-                    <Gift className="w-4 h-4" />
-                    <span>BAM Drops</span>
-                  </div>
-                  <span className="bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    Soon
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between py-4 text-gray-500 border-b border-gray-700">
-                  <div className="flex items-center gap-2">
-                    <Gamepad2 className="w-4 h-4" />
-                    <span>BAM Play 2 Earn</span>
-                  </div>
-                  <span className="bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    Soon
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between py-4 text-gray-500 border-b border-gray-700">
-                  <div className="flex items-center gap-2">
-                    <Crown className="w-4 h-4" />
-                    <span>BAM ApexMiner</span>
-                  </div>
-                  <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-1 rounded-full">
-                    Live
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between py-4 text-gray-500">
-                  <div className="flex items-center gap-2">
-                    <Crown className="w-4 h-4" />
-                    <span>BAM VIP Access</span>
-                  </div>
-                  <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-1 rounded-full">
-                    Live
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
