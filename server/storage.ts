@@ -166,13 +166,16 @@ export class DatabaseStorage implements IStorage {
 
   // Crypto updates operations
   async getCryptoUpdates(category?: string, limit = 50): Promise<CryptoUpdate[]> {
-    let query = db.select().from(cryptoUpdates);
+    const baseQuery = db.select().from(cryptoUpdates);
     
     if (category) {
-      query = query.where(eq(cryptoUpdates.category, category));
+      return await baseQuery
+        .where(eq(cryptoUpdates.category, category))
+        .orderBy(desc(cryptoUpdates.publishedAt))
+        .limit(limit);
     }
     
-    return await query
+    return await baseQuery
       .orderBy(desc(cryptoUpdates.publishedAt))
       .limit(limit);
   }
@@ -196,17 +199,21 @@ export class DatabaseStorage implements IStorage {
 
   // Learning topics operations
   async getLearningTopics(category?: string, difficulty?: string): Promise<LearningTopic[]> {
-    let query = db.select().from(learningTopics).where(eq(learningTopics.isPublished, true));
+    let conditions = [eq(learningTopics.isPublished, true)];
     
     if (category) {
-      query = query.where(and(eq(learningTopics.isPublished, true), eq(learningTopics.category, category)));
+      conditions.push(eq(learningTopics.category, category));
     }
     
     if (difficulty) {
-      query = query.where(and(eq(learningTopics.isPublished, true), eq(learningTopics.difficulty, difficulty)));
+      conditions.push(eq(learningTopics.difficulty, difficulty));
     }
     
-    return await query.orderBy(learningTopics.title);
+    return await db
+      .select()
+      .from(learningTopics)
+      .where(and(...conditions))
+      .orderBy(learningTopics.title);
   }
 
   async getLearningTopic(id: string): Promise<LearningTopic | undefined> {

@@ -52,13 +52,13 @@ export default function AiChat() {
   // Fetch conversations
   const { data: conversations = [] } = useQuery({
     queryKey: ['/api/chat/conversations'],
-  });
+  }) as { data: Conversation[] };
 
   // Fetch current conversation details
   const { data: conversationData, isLoading: loadingConversation } = useQuery({
     queryKey: ['/api/chat/conversations', selectedConversation],
     enabled: !!selectedConversation,
-  });
+  }) as { data: { conversation: Conversation; messages: Message[] } | undefined; isLoading: boolean };
 
   // Fetch crypto updates
   const { data: cryptoUpdates = [] } = useQuery({
@@ -73,12 +73,9 @@ export default function AiChat() {
   // Create new conversation
   const createConversationMutation = useMutation({
     mutationFn: async ({ title, category }: { title: string; category: string }) => {
-      return apiRequest('/api/chat/conversations', {
-        method: 'POST',
-        body: { title, category }
-      });
+      return apiRequest('/api/chat/conversations', 'POST', { title, category });
     },
-    onSuccess: (conversation) => {
+    onSuccess: (conversation: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] });
       setSelectedConversation(conversation.id);
     }
@@ -87,10 +84,7 @@ export default function AiChat() {
   // Send message
   const sendMessageMutation = useMutation({
     mutationFn: async ({ conversationId, content }: { conversationId: string; content: string }) => {
-      return apiRequest(`/api/chat/conversations/${conversationId}/messages`, {
-        method: 'POST',
-        body: { content }
-      });
+      return apiRequest(`/api/chat/conversations/${conversationId}/messages`, 'POST', { content });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', selectedConversation] });
@@ -236,7 +230,7 @@ export default function AiChat() {
                 <h3 className="text-sm font-medium text-gray-300 mb-3">Recent Chats</h3>
                 <ScrollArea className="h-64">
                   <div className="space-y-1">
-                    {conversations.map((conv: Conversation) => (
+                    {conversations.map((conv) => (
                       <Button
                         key={conv.id}
                         variant="ghost"
@@ -383,7 +377,7 @@ export default function AiChat() {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400" />
                   </div>
                 ) : (
-                  conversationData?.messages?.map((message: Message) => (
+                  conversationData?.messages?.map((message) => (
                     <div
                       key={message.id}
                       className={`flex gap-3 ${

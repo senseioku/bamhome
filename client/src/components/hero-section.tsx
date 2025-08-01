@@ -1,6 +1,8 @@
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Rocket, TrendingUp, Star, CheckCircle } from "lucide-react";
+import { Rocket, TrendingUp, Star, CheckCircle, RefreshCw, Play, Brain, Sparkles } from "lucide-react";
 import { web3Utils } from "@/lib/web3";
 import { TOKEN_ADDRESSES } from "@/lib/contracts";
 import { useState } from "react";
@@ -74,23 +76,28 @@ export default function HeroSection() {
             Community-driven wealth multiplier on BSC combining staking, DeFi utility, and collective growth.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              size="lg"
-              className="btn-gradient text-white font-semibold text-lg px-8 py-4 rounded-full hover:shadow-lg transition-all duration-300"
-              onClick={() => window.open("https://apex.bam-ecosystem.com", "_blank")}
-            >
-              <Rocket className="mr-2 h-5 w-5" />
-              Launch App
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-2 border-primary bg-primary/10 text-primary font-semibold text-lg px-8 py-4 rounded-full hover:bg-primary hover:text-white transition-all duration-300"
-              onClick={() => scrollToSection("tokenomics")}
-            >
-              <TrendingUp className="mr-2 h-5 w-5" />
-              View Tokenomics
-            </Button>
+            <Link href="/swap">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
+              >
+                <RefreshCw className="mr-2 h-5 w-5" />
+                Start Trading
+              </Button>
+            </Link>
+            <Link href="/ai-chat">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 relative"
+              >
+                <Brain className="mr-2 h-5 w-5" />
+                Try BAM AIGPT
+                <Badge className="ml-2 bg-emerald-500 text-white text-xs">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  NEW
+                </Badge>
+              </Button>
+            </Link>
             <Button 
               onClick={addBAMTokenToWallet}
               variant="outline"
