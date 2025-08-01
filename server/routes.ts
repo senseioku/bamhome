@@ -37,7 +37,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     message: { message: 'Too many chat requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req) => req.headers['x-wallet-address'] as string || req.ip
+    keyGenerator: (req) => {
+      const walletAddress = req.headers['x-wallet-address'] as string;
+      return walletAddress ? `wallet:${walletAddress}` : `ip:${req.ip}`;
+    }
   });
 
   const generalRateLimit = rateLimit({
