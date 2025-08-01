@@ -5,10 +5,11 @@
 The deployment errors have been resolved:
 
 ### **Issues Fixed:**
-1. **Conflicting Configuration**: Removed conflicting `builds` and `functions` configuration
-2. **Environment Variables**: Updated configuration to avoid `NOW_` prefix conflicts  
-3. **API Entry Point**: Created proper serverless function entry at `api/index.ts`
-4. **Build Process**: Configured proper build output directory
+1. **Runtime Configuration**: Fixed invalid runtime version error by using proper `@vercel/node` runtime
+2. **Build Configuration**: Switched from `functions` to `builds` configuration to avoid conflicts
+3. **File Exclusion**: Updated `.vercelignore` to include necessary server files for deployment
+4. **API Entry Point**: Created proper serverless function entry at `api/index.ts`
+5. **Build Process**: Configured proper build output directory
 
 ### **Current Configuration:**
 
