@@ -428,7 +428,7 @@ const SwapPage = () => {
     }
   }, []);
 
-  // Secure wallet connection using centralized security manager
+  // Simple, working wallet connection (restored from backup)
   const connectWallet = async () => {
     try {
       setIsLoading(true);
@@ -437,28 +437,13 @@ const SwapPage = () => {
       // Show contextual tip about wallet security
       showTip('wallet-connect');
       
-      // Use secure wallet connection with mandatory verification
-      const walletModule = await import('../lib/walletSecurity');
-      const result = await walletModule.secureWalletConnect();
-      
-      if (result.isVerified) {
-        setWalletAddress(result.address);
-        await updateBalances(result.address);
-        await checkPurchaseHistory(result.address);
-        console.log('✅ Secure wallet connection successful');
-      } else {
-        throw new Error(result.error || 'Wallet verification failed');
-      }
+      const address = await web3Utils.connectWallet();
+      setWalletAddress(address);
+      await updateBalances(address);
+      await checkPurchaseHistory(address);
       
     } catch (err: any) {
-      // Enhanced error handling for signature verification failures
-      if (err.message?.includes('watch') || err.message?.includes('readonly') || err.message?.includes('Signature')) {
-        setError(`🔒 Risk Acknowledgment Required: ${err.message}`);
-      } else if (err.message?.includes('rejected') || err.code === 4001) {
-        setError('⚠️ You must sign the risk acknowledgment to access BAM Ecosystem');
-      } else {
-        setError(err.message || 'Failed to connect wallet');
-      }
+      setError(err.message || 'Failed to connect wallet');
       setWalletAddress('');
       setBalances({});
       setHasAlreadyPurchased(false);
@@ -467,31 +452,40 @@ const SwapPage = () => {
     }
   };
 
-  // Secure auto-connection using centralized security manager
+  // Simple auto-connection (restored from backup)
   useEffect(() => {
-    const secureAutoConnection = async () => {
-      const walletModule = await import('../lib/walletSecurity');
-      
+    const checkWalletConnection = async () => {
       try {
-        const result = await walletModule.secureAutoConnect();
-        
-        if (result && result.isVerified) {
-          setWalletAddress(result.address);
-          await updateBalances(result.address);
-          await checkPurchaseHistory(result.address);
-          console.log('✅ Secure auto-connection successful');
-        } else if (result && !result.isVerified) {
-          console.warn('❌ Auto-connection verification failed:', result.error);
-          setWalletAddress('');
-          setBalances({});
-          setHasAlreadyPurchased(false);
+        const provider = await web3Utils.getProvider();
+        if (provider) {
+          const accounts = await provider.request({ method: 'eth_accounts' });
+          if (accounts && accounts.length > 0) {
+            try {
+              // Always require signature verification - even for previously connected wallets
+              console.log('🔐 Auto-connection detected - verifying wallet ownership...');
+              await web3Utils.verifyWalletOwnership(accounts[0]);
+              
+              // Only set wallet address after successful signature verification
+              setWalletAddress(accounts[0]);
+              await updateBalances(accounts[0]);
+              await checkPurchaseHistory(accounts[0]);
+              
+              console.log('✅ Auto-connection verified successfully');
+            } catch (signatureError) {
+              // If signature verification fails, clear wallet connection
+              console.warn('❌ Auto-connection signature verification failed:', signatureError);
+              setWalletAddress('');
+              setBalances({});
+              setHasAlreadyPurchased(false);
+            }
+          }
         }
       } catch (error) {
-        console.error('❌ Secure auto-connection error:', error);
+        console.error('❌ Error checking wallet connection:', error);
       }
     };
 
-    secureAutoConnection();
+    checkWalletConnection();
     
     // Check contract balances on page load
     checkContractBalances();
