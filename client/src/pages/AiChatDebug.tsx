@@ -47,21 +47,23 @@ interface Conversation {
   lastMessageAt: string;
 }
 
-export default function AiChat() {
+export default function AiChatDebug() {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('general');
   const [showSidebar, setShowSidebar] = useState(window.innerWidth >= 768);
-  const [isVerified, setIsVerified] = useState(false);
+  // TEMPORARY: Skip verification for debugging button functionality
+  const [isVerified, setIsVerified] = useState(true);
   const [showVerificationDialog, setShowVerificationDialog] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
-  const [walletAddress, setWalletAddress] = useState('');
+  const [walletAddress, setWalletAddress] = useState('0x742d35Cc6634C0532925a3b8D6d26c1EfC1E8C2b'); // Mock for debug
   
   // Debug logging for verification state
   useEffect(() => {
-    console.log('AiChat component - isVerified:', isVerified, 'walletAddress:', walletAddress);
+    console.log('AiChat DEBUG - isVerified:', isVerified, 'walletAddress:', walletAddress);
   }, [isVerified, walletAddress]);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -78,70 +80,6 @@ export default function AiChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedConversation]);
-
-  // Check if wallet verification needed
-  useEffect(() => {
-    const checkVerification = async () => {
-      if (!(window as any).ethereum) {
-        setShowVerificationDialog(true);
-        return;
-      }
-
-      try {
-        const accounts = await (window as any).ethereum.request({ method: 'eth_accounts' });
-        if (accounts && accounts.length > 0) {
-          const address = accounts[0];
-          const isValid = walletSecurity.isSessionValid(address);
-          if (isValid) {
-            setIsVerified(true);
-            setWalletAddress(address);
-          } else {
-            setShowVerificationDialog(true);
-          }
-        } else {
-          setShowVerificationDialog(true);
-        }
-      } catch (error) {
-        setShowVerificationDialog(true);
-      }
-    };
-
-    checkVerification();
-  }, []);
-
-  const handleWalletVerification = async () => {
-    console.log('Starting wallet verification...');
-    setVerificationLoading(true);
-    setVerificationError(null);
-
-    try {
-      const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
-      if (!accounts || accounts.length === 0) {
-        setVerificationError('Please connect your wallet to continue.');
-        return;
-      }
-
-      const address = accounts[0];
-      console.log('Verifying wallet address:', address);
-      const verification: WalletVerification = await walletSecurity.verifyWalletOwnership(address);
-      console.log('Verification result:', verification);
-
-      if (verification.isValid) {
-        console.log('Verification successful, setting user as verified');
-        setIsVerified(true);
-        setWalletAddress(address);
-        setShowVerificationDialog(false);
-      } else {
-        console.log('Verification failed:', verification.error);
-        setVerificationError(verification.error || 'Verification failed');
-      }
-    } catch (error: any) {
-      console.error('Verification error:', error);
-      setVerificationError('Failed to verify wallet. Please try again.');
-    } finally {
-      setVerificationLoading(false);
-    }
-  };
 
   // Fetch conversations (only if verified)
   const { data: conversations = [] } = useQuery({
@@ -229,93 +167,16 @@ export default function AiChat() {
     { id: 'general', name: 'General Chat', icon: MessageCircle, color: 'bg-gray-500' }
   ];
 
-  if (!isVerified) {
-    return (
-      <div className="min-h-screen bg-black text-white flex flex-col">
-        <Navigation />
-        
-        {/* Compact Mobile Login */}
-        <div className="flex-1 flex items-center justify-center p-4 pt-20">
-          <div className="w-full max-w-sm space-y-6">
-            {/* Header */}
-            <div className="text-center">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Brain className="w-6 h-6 text-white" />
-              </div>
-              <h2 className="text-lg font-bold text-white mb-1">BAM AIChat</h2>
-              <p className="text-sm text-gray-400">AI-powered crypto companion</p>
-            </div>
-
-            {/* Requirements Card */}
-            <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-4 space-y-3">
-              <div className="flex items-center gap-2 text-blue-400">
-                <Shield className="w-4 h-4" />
-                <span className="text-sm font-medium">Access Requirements</span>
-              </div>
-              <div className="space-y-2 text-xs text-gray-300">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                  <span>Hold 10M+ BAM tokens</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                  <span>Verify wallet ownership</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                  <span>Connect MetaMask/Web3 wallet</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Error Message */}
-            {verificationError && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                <div className="flex items-start gap-2 text-red-400">
-                  <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm">{verificationError}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleWalletVerification}
-                disabled={verificationLoading}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-3"
-              >
-                {verificationLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Verifying...
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Wallet className="w-4 h-4" />
-                    Verify Wallet Access
-                  </div>
-                )}
-              </Button>
-              
-              <Link href="/" className="block">
-                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
-                  <ChevronLeft className="w-4 h-4 mr-2" />
-                  Back to Home
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       <Navigation />
       
       <div className="flex-1 flex pt-16 relative">
+        {/* Debug Notice */}
+        <div className="fixed top-16 right-4 z-50 bg-yellow-600 text-black px-3 py-1 rounded text-xs font-bold">
+          DEBUG MODE
+        </div>
+
         {/* Mobile Sidebar Toggle */}
         {!showSidebar && (
           <Button
@@ -357,7 +218,10 @@ export default function AiChat() {
                 {categories.map((category) => (
                   <Button
                     key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
+                    onClick={() => {
+                      console.log('Category selected:', category.id);
+                      setSelectedCategory(category.id);
+                    }}
                     variant={selectedCategory === category.id ? 'default' : 'outline'}
                     size="sm"
                     className={`text-xs ${
@@ -405,6 +269,7 @@ export default function AiChat() {
                     <Button
                       key={conv.id}
                       onClick={() => {
+                        console.log('Conversation selected:', conv.id);
                         setSelectedConversation(conv.id);
                         if (window.innerWidth < 768) setShowSidebar(false);
                       }}
@@ -435,7 +300,7 @@ export default function AiChat() {
               <div className="text-xs text-gray-400 space-y-1">
                 <div className="flex items-center gap-2">
                   <Wallet className="w-3 h-3" />
-                  <span>Verified: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+                  <span>DEBUG: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="w-3 h-3" />
@@ -536,7 +401,7 @@ export default function AiChat() {
               </div>
             </div>
           ) : (
-            // Chat Interface
+            // Chat Interface (same as original)
             <>
               {/* Chat Header - Compact Mobile */}
               <div className="p-3 md:p-4 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm">
