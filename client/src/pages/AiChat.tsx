@@ -132,59 +132,104 @@ export default function AiChat() {
     }
   };
 
-  // Fetch conversations (only if verified)
-  const { data: conversations = [] } = useQuery({
-    queryKey: ['/api/chat/conversations'],
-    enabled: isVerified,
-  }) as { data: Conversation[] };
+  // For static deployment, we'll use local state instead of API calls
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversationData, setConversationData] = useState<{ conversation: Conversation; messages: Message[] } | undefined>();
+  const [loadingConversation, setLoadingConversation] = useState(false);
+  const [highlights] = useState<any[]>([]); // Placeholder for crypto highlights
 
-  // Fetch current conversation details
-  const { data: conversationData, isLoading: loadingConversation } = useQuery({
-    queryKey: ['/api/chat/conversations', selectedConversation],
-    enabled: !!selectedConversation && isVerified,
-  }) as { data: { conversation: Conversation; messages: Message[] } | undefined; isLoading: boolean };
-
-  // Fetch crypto updates
-  const { data: cryptoUpdates = [] } = useQuery({
-    queryKey: ['/api/crypto/updates'],
-    enabled: isVerified,
-  });
-
-  // Fetch highlighted content
-  const { data: highlights = [] } = useQuery({
-    queryKey: ['/api/crypto/highlights'],
-    enabled: isVerified,
-  }) as { data: any[] };
-
-  // Create new conversation
+  // Create new conversation (local state for static deployment)
   const createConversationMutation = useMutation({
     mutationFn: async ({ title, category }: { title: string; category: string }) => {
-      return apiRequest('/api/chat/conversations', 'POST', { title, category });
+      const newConversation: Conversation = {
+        id: Date.now().toString(),
+        userId: null,
+        title,
+        category,
+        isActive: true,
+        messageCount: 0,
+        lastMessageAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      return newConversation;
     },
-    onSuccess: (conversation: any) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] });
+    onSuccess: (conversation: Conversation) => {
+      setConversations(prev => [conversation, ...prev]);
+      setConversationData({
+        conversation,
+        messages: []
+      });
       setSelectedConversation(conversation.id);
     }
   });
 
-  // Send message
+  // Send message using AI API
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ conversationId, content }: { conversationId: string; content: string }) => {
-      return apiRequest(`/api/chat/conversations/${conversationId}/messages`, 'POST', { content });
+    mutationFn: async ({ content }: { content: string }) => {
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: content,
+          conversationHistory: conversationData?.messages || []
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', selectedConversation] });
-      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations'] });
+    onSuccess: (aiResponse) => {
+      // Add user message and AI response to conversation
+      if (conversationData) {
+        const userMessage: Message = {
+          id: Date.now().toString(),
+          conversationId: selectedConversation || null,
+          role: 'user',
+          content: messageInput.trim(),
+          metadata: null,
+          tokens: null,
+          createdAt: new Date()
+        };
+        
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          conversationId: selectedConversation || null,
+          role: 'assistant',
+          content: aiResponse.response,
+          metadata: null,
+          tokens: null,
+          createdAt: new Date()
+        };
+
+        setConversationData(prev => ({
+          ...prev!,
+          messages: [...(prev?.messages || []), userMessage, aiMessage]
+        }));
+
+        // Update conversation count
+        setConversations(prev => 
+          prev.map(conv => 
+            conv.id === selectedConversation 
+              ? { ...conv, messageCount: conv.messageCount + 2 }
+              : conv
+          )
+        );
+      }
       setMessageInput('');
     }
   });
 
   const handleSendMessage = async () => {
-    if (!messageInput.trim() || !selectedConversation) return;
+    if (!messageInput.trim()) return;
 
     try {
       await sendMessageMutation.mutateAsync({
-        conversationId: selectedConversation,
         content: messageInput.trim()
       });
     } catch (error) {
