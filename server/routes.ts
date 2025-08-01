@@ -220,6 +220,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Wallet verification route for BAM AIChat
+  app.post('/api/wallet/verify', async (req, res) => {
+    try {
+      const { address, signature, message } = req.body;
+
+      if (!address || !signature || !message) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: address, signature, message' 
+        });
+      }
+
+      // Import ethers for signature verification
+      const { ethers } = await import('ethers');
+      
+      // Verify the signature
+      const recoveredAddress = ethers.verifyMessage(message, signature);
+      
+      if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
+        return res.status(401).json({ 
+          error: 'Invalid signature - signature does not match address' 
+        });
+      }
+
+      // Check BAM token balance using Web3
+      const Web3 = (await import('web3')).default;
+      const web3 = new Web3('https://bsc-dataseed1.binance.org/');
+      
+      const BAM_TOKEN_ADDRESS = '0x4BA74Df6b4a74cb1A7c9F60b4e5c5c19d58A2DA0';
+      const tokenABI = [
+        {
+          "constant": true,
+          "inputs": [{"name": "_owner", "type": "address"}],
+          "name": "balanceOf",
+          "outputs": [{"name": "balance", "type": "uint256"}],
+          "type": "function"
+        },
+        {
+          "constant": true,
+          "inputs": [],
+          "name": "decimals",
+          "outputs": [{"name": "", "type": "uint8"}],
+          "type": "function"
+        }
+      ];
+
+      const tokenContract = new web3.eth.Contract(tokenABI as any, BAM_TOKEN_ADDRESS);
+      const balance = await tokenContract.methods.balanceOf(address).call();
+      const decimals = await tokenContract.methods.decimals().call();
+      
+      // Convert balance using proper decimals
+      const balanceInTokens = Number(balance) / Math.pow(10, Number(decimals));
+      const requiredBalance = 10000000; // 10M BAM tokens
+      
+      if (balanceInTokens < requiredBalance) {
+        return res.status(403).json({ 
+          error: 'Insufficient BAM token balance',
+          required: requiredBalance,
+          current: balanceInTokens,
+          message: 'You need at least 10M BAM tokens to access BAM AIChat'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        address: address,
+        bamBalance: balanceInTokens,
+        verified: true,
+        message: 'Wallet successfully verified for BAM AIChat access'
+      });
+
+    } catch (error) {
+      console.error('Wallet verification error:', error);
+      res.status(500).json({ 
+        error: 'Wallet verification failed',
+        details: error.message 
+      });
+    }
+  });
+
+  // AI chat route
+  app.post('/api/ai', async (req, res) => {
+    try {
+      const { message, conversationHistory = [] } = req.body;
+
+      if (!message) {
+        return res.status(400).json({ error: 'Message is required' });
+      }
+
+      // Generate AI response using the AI service
+      const aiResponse = await aiService.chat([
+        ...conversationHistory.map((msg: any) => ({
+          role: msg.role,
+          content: msg.content
+        })),
+        { role: 'user', content: message }
+      ], 'general');
+
+      res.status(200).json({
+        response: aiResponse.message,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('AI Chat Error:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate response',
+        details: error.message 
+      });
+    }
+  });
+
   // Health check
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
