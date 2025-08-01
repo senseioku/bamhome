@@ -68,7 +68,14 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 
 ### Vercel Setup (January 2025)
 - **Serverless Functions**: `/api/ai.js` for Claude AI chat, `/api/wallet/verify.js` for token verification
-- **Build Command**: `npx vite build` (optimized for Vercel)
-- **Runtime**: Node.js 18.x with individual function configurations
+- **Build Command**: `vite build` (optimized for Vercel with legacy peer deps)
+- **Runtime**: Node.js 18.x with individual `.vc-config.json` function configurations
 - **Environment Variables**: ANTHROPIC_API_KEY required for AI chat functionality
-- **Mobile Optimization**: Compact interface with fixed chat input positioning
+- **Mobile Optimization**: Compact interface with fixed chat input positioning - **VERIFIED WORKING**
+
+### Recent Updates (January 2025)
+- ✅ All TypeScript errors resolved in AiChat component using proper type assertions
+- ✅ Vercel build configuration optimized with `vite build` and `--legacy-peer-deps`
+- ✅ Mobile interface confirmed working perfectly on production devices
+- ✅ Wallet verification system displaying proper error messages and requirements
+- ✅ BAM AIChat ready for full production deployment
