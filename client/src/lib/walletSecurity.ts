@@ -206,8 +206,9 @@ This signature verifies wallet ownership and does not authorize any transactions
       const tokenContract = new web3.eth.Contract(tokenABI as any, TOKEN_ADDRESSES.BAM);
       const balance = await tokenContract.methods.balanceOf(address).call();
       
-      // BAM token has 9 decimals, not 18
-      const balanceInTokens = (Number(balance) / Math.pow(10, 9)).toString();
+      // Check actual decimals from contract
+      const decimals = await tokenContract.methods.decimals().call();
+      const balanceInTokens = (Number(balance) / Math.pow(10, Number(decimals))).toString();
       
       return balanceInTokens;
     } catch (error) {
@@ -248,6 +249,26 @@ This signature verifies wallet ownership and does not authorize any transactions
       address: address
     });
     console.log('✅ Created AIChat session from BAM Swap verification');
+  }
+
+  // Add reverse compatibility - create session for BAM Swap integration
+  async createSessionForBamSwap(address: string): Promise<void> {
+    try {
+      // Import web3 utils and create session there too
+      const web3Utils = await import('./web3');
+      
+      // Store verification in localStorage for BAM Swap compatibility
+      const verificationData = {
+        address: address.toLowerCase(),
+        timestamp: Date.now(),
+        verified: true
+      };
+      
+      localStorage.setItem('bamSwapWalletVerified', JSON.stringify(verificationData));
+      console.log('✅ Created BAM Swap session from AIChat verification');
+    } catch (error) {
+      console.warn('Could not create BAM Swap session:', error);
+    }
   }
 }
 

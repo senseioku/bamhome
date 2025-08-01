@@ -140,6 +140,9 @@ export default function AiChat() {
         setIsVerified(true);
         setWalletAddress(address);
         setShowVerificationDialog(false);
+        
+        // Create BAM Swap session for compatibility
+        await walletSecurity.createSessionForBamSwap(address);
       } else {
         console.warn('❌ AIChat wallet verification failed:', verification.error);
         setVerificationError(verification.error || 'Verification failed');

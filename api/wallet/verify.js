@@ -3,12 +3,19 @@ import { ethers } from 'ethers';
 const BSC_RPC_URL = 'https://bsc-dataseed1.binance.org/';
 const BAM_TOKEN_ADDRESS = '0x4BA74Df6b4a74cb1A7c9F60b4e5c5c19d58A2DA0';
 
-// BAM Token ABI (minimal for balanceOf)
+// BAM Token ABI (minimal for balanceOf and decimals)
 const BAM_TOKEN_ABI = [
   {
     "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
     "name": "balanceOf",
     "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{"internalType": "uint8", "name": "", "type": "uint8"}],
     "stateMutability": "view",
     "type": "function"
   }
@@ -53,7 +60,9 @@ export default async function handler(req, res) {
     const bamContract = new ethers.Contract(BAM_TOKEN_ADDRESS, BAM_TOKEN_ABI, provider);
     
     const balance = await bamContract.balanceOf(address);
-    const balanceInTokens = ethers.formatUnits(balance, 9); // BAM has 9 decimals
+    // Get actual decimals from contract
+    const decimals = await bamContract.decimals();
+    const balanceInTokens = ethers.formatUnits(balance, decimals);
     const balanceNumber = parseFloat(balanceInTokens);
 
     const requiredBalance = 10000000; // 10M BAM tokens

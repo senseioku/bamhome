@@ -452,7 +452,7 @@ const SwapPage = () => {
     }
   };
 
-  // Simple auto-connection (restored from backup)
+  // Simple auto-connection with AIChat compatibility check
   useEffect(() => {
     const checkWalletConnection = async () => {
       try {
@@ -460,19 +460,38 @@ const SwapPage = () => {
         if (provider) {
           const accounts = await provider.request({ method: 'eth_accounts' });
           if (accounts && accounts.length > 0) {
+            const address = accounts[0];
+            
+            // Check if there's an existing verification from localStorage (AIChat compatibility)
+            const savedVerification = localStorage.getItem('bamSwapWalletVerified');
+            let skipSignature = false;
+            
+            if (savedVerification) {
+              try {
+                const verificationData = JSON.parse(savedVerification);
+                if (verificationData.address === address.toLowerCase() && 
+                    verificationData.verified &&
+                    (Date.now() - verificationData.timestamp) < 3600000) { // 1 hour
+                  skipSignature = true;
+                  console.log('✅ Using existing wallet verification from AIChat');
+                }
+              } catch (e) {
+                localStorage.removeItem('bamSwapWalletVerified');
+              }
+            }
+            
             try {
-              // Always require signature verification - even for previously connected wallets
-              console.log('🔐 Auto-connection detected - verifying wallet ownership...');
-              await web3Utils.verifyWalletOwnership(accounts[0]);
+              if (!skipSignature) {
+                console.log('🔐 Auto-connection detected - verifying wallet ownership...');
+                await web3Utils.verifyWalletOwnership(address);
+              }
               
-              // Only set wallet address after successful signature verification
-              setWalletAddress(accounts[0]);
-              await updateBalances(accounts[0]);
-              await checkPurchaseHistory(accounts[0]);
+              setWalletAddress(address);
+              await updateBalances(address);
+              await checkPurchaseHistory(address);
               
               console.log('✅ Auto-connection verified successfully');
             } catch (signatureError) {
-              // If signature verification fails, clear wallet connection
               console.warn('❌ Auto-connection signature verification failed:', signatureError);
               setWalletAddress('');
               setBalances({});
