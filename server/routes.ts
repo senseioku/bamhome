@@ -11,18 +11,29 @@ import cors from "cors";
 import { walletVerificationService } from "./walletVerification";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Security middleware
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "https:"],
+  // Security middleware - relaxed for development
+  if (process.env.NODE_ENV === 'production') {
+    app.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          imgSrc: ["'self'", "data:", "https:"],
+          connectSrc: ["'self'", "https:", "wss:", "ws:"],
+          fontSrc: ["'self'", "https:", "data:"],
+          objectSrc: ["'none'"],
+        },
       },
-    },
-  }));
+      crossOriginOpenerPolicy: { policy: "same-origin" }
+    }));
+  } else {
+    // Development mode - minimal security headers to allow Vite dev server
+    app.use(helmet({
+      contentSecurityPolicy: false,
+      crossOriginOpenerPolicy: false
+    }));
+  }
   
   app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
@@ -38,9 +49,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     message: { message: 'Too many chat requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req) => {
-      const walletAddress = req.headers['x-wallet-address'] as string;
-      return walletAddress ? `wallet:${walletAddress}` : req.ip;
+    skip: (req) => {
+      // Skip rate limiting in development mode for easier testing
+      return process.env.NODE_ENV === 'development';
     }
   });
 
