@@ -131,7 +131,7 @@ export default function Navigation() {
                           >
                             <div className="flex items-center gap-3">
                               <Brain className="w-4 h-4" />
-                              <span className="text-sm font-medium">BAM AIGPT</span>
+                              <span className="text-sm font-medium">BAM AIChat</span>
                             </div>
                             <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
                           </a>

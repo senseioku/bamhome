@@ -40,7 +40,7 @@ export default function ProjectsSection() {
     },
     {
       icon: <Brain className="h-10 w-10" />,
-      title: "BAM AIGPT",
+      title: "BAM AIChat",
       description: "AI-powered chatbot providing real-time crypto insights, research capabilities, and educational content for the BAM community.",
       color: "text-green-400"
     },
