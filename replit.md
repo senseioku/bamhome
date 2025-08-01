@@ -37,6 +37,7 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 - **Tokenomics Implementation**: Integration of vesting schedules, anti-dump mechanisms, and a 25% initial token burn to a verified BSCScan burn address.
 
 ### Key Features
+- **BAM AIChat**: Production-ready AI chat platform with Claude 4.0 Sonnet integration, featuring cryptographic wallet signature verification, 10M+ BAM token requirement, conversation management, crypto market data, and educational content delivery.
 - **BAM Swap**: Enables various token swaps (USDT, BNB, BAM, USDB) with a dynamic fee structure, real-time pricing via Chainlink oracles and CoinGecko fallback, and flexible purchase limits. Includes professional token selection, quote displays, and transaction notifications.
 - **Presale System**: Multi-phase presale with dynamic pricing, adjustable purchase limits, and real-time token tracking.
 - **Tokenomics Visualization**: Detailed overview of token distribution, vesting timelines, and allocation cards.

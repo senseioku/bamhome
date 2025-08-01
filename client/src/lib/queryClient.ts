@@ -14,10 +14,19 @@ export async function apiRequest(
 ): Promise<Response> {
   const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
   
-  // Add wallet address from localStorage if available
+  // Add authentication data from localStorage
   const walletAddress = localStorage.getItem('verifiedWalletAddress');
+  const signature = localStorage.getItem('walletSignature');
+  const timestamp = localStorage.getItem('walletTimestamp');
+  
   if (walletAddress) {
     headers['x-wallet-address'] = walletAddress;
+  }
+  if (signature) {
+    headers['x-wallet-signature'] = signature;
+  }
+  if (timestamp) {
+    headers['x-wallet-timestamp'] = timestamp;
   }
 
   const res = await fetch(url, {
@@ -39,10 +48,19 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     const headers: Record<string, string> = {};
     
-    // Add wallet address from localStorage if available
+    // Add authentication data from localStorage
     const walletAddress = localStorage.getItem('verifiedWalletAddress');
+    const signature = localStorage.getItem('walletSignature');
+    const timestamp = localStorage.getItem('walletTimestamp');
+    
     if (walletAddress) {
       headers['x-wallet-address'] = walletAddress;
+    }
+    if (signature) {
+      headers['x-wallet-signature'] = signature;
+    }
+    if (timestamp) {
+      headers['x-wallet-timestamp'] = timestamp;
     }
 
     const res = await fetch(queryKey.join("/") as string, {

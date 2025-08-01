@@ -8,6 +8,7 @@ import { z } from "zod";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import cors from "cors";
+import { walletVerificationService } from "./walletVerification";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Security middleware
@@ -37,9 +38,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     message: { message: 'Too many chat requests, please try again later' },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req) => {
+    keyGenerator: (req, res) => {
       const walletAddress = req.headers['x-wallet-address'] as string;
-      return walletAddress ? `wallet:${walletAddress}` : `ip:${req.ip}`;
+      if (walletAddress) {
+        return `wallet:${walletAddress}`;
+      }
+      // Use standard IP with proper IPv6 handling
+      return req.ip || req.connection.remoteAddress || 'unknown';
     }
   });
 
@@ -57,25 +62,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Custom wallet-based authentication middleware with signature verification
+  // Production-ready wallet authentication with signature verification
   const walletAuth = async (req: any, res: any, next: any) => {
     try {
       const walletAddress = req.headers['x-wallet-address'] as string;
       const signature = req.headers['x-wallet-signature'] as string;
+      const timestamp = req.headers['x-wallet-timestamp'] ? 
+        parseInt(req.headers['x-wallet-timestamp'] as string) : undefined;
       
       if (!walletAddress) {
         return res.status(401).json({ message: 'Wallet address required' });
       }
 
-      // In production, verify signature here
-      // TODO: Implement proper wallet signature verification
-      if (process.env.NODE_ENV === 'production' && !signature) {
-        return res.status(401).json({ message: 'Wallet signature required' });
-      }
+      // In production, require signature verification
+      if (process.env.NODE_ENV === 'production') {
+        if (!signature) {
+          return res.status(401).json({ message: 'Wallet signature required for production' });
+        }
 
-      // Validate wallet address format
-      if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-        return res.status(400).json({ message: 'Invalid wallet address format' });
+        // Verify timestamp for replay attack prevention
+        if (timestamp && !walletVerificationService.isTimestampValid(timestamp)) {
+          return res.status(401).json({ message: 'Authentication timestamp expired' });
+        }
+
+        // Verify wallet signature
+        const verification = await walletVerificationService.verifyWalletSignature(
+          walletAddress, 
+          signature, 
+          timestamp
+        );
+
+        if (!verification.isValid) {
+          return res.status(401).json({ 
+            message: 'Wallet signature verification failed',
+            error: verification.error 
+          });
+        }
+      } else {
+        // Development mode - validate address format only
+        if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+          return res.status(400).json({ message: 'Invalid wallet address format' });
+        }
       }
 
       // Get or create user based on wallet address
@@ -331,9 +358,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Health check
+  // Health check endpoint for load balancers
   app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    res.json({ 
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
+
+  // Wallet verification endpoints
+  app.get('/api/auth/verification-message', (req, res) => {
+    const timestamp = Date.now();
+    const message = walletVerificationService.getVerificationMessage(timestamp);
+    res.json({ 
+      message,
+      timestamp,
+      expires: timestamp + (10 * 60 * 1000) // 10 minutes from now
+    });
+  });
+
+  app.post('/api/auth/verify-wallet', async (req, res) => {
+    try {
+      const { walletAddress, signature, timestamp } = req.body;
+
+      if (!walletAddress || !signature) {
+        return res.status(400).json({ 
+          message: 'Wallet address and signature required' 
+        });
+      }
+
+      const verification = await walletVerificationService.verifyWalletSignature(
+        walletAddress, 
+        signature, 
+        timestamp
+      );
+
+      if (verification.isValid) {
+        res.json({ 
+          success: true,
+          address: verification.address,
+          message: 'Wallet verification successful'
+        });
+      } else {
+        res.status(401).json({ 
+          success: false,
+          message: verification.error || 'Wallet verification failed'
+        });
+      }
+    } catch (error) {
+      console.error('Wallet verification endpoint error:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Verification service error' 
+      });
+    }
   });
 
   const httpServer = createServer(app);

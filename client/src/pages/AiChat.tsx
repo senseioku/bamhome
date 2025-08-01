@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { walletSecurity, type WalletVerification } from '@/lib/walletSecurity';
+import { walletSignatureService } from '@/lib/walletSignature';
 import Navigation from '@/components/navigation';
 import { 
   MessageCircle, 
@@ -127,17 +128,31 @@ export default function AiChat() {
       console.log('Verification result:', verification);
 
       if (verification.isValid) {
-        console.log('Verification successful, setting user as verified');
-        setIsVerified(true);
-        setWalletAddress(address);
-        setShowVerificationDialog(false);
+        console.log('Verification successful, now signing message for authentication');
         
-        // Store wallet address for API authentication
-        localStorage.setItem('verifiedWalletAddress', address);
+        // Step 2: Sign message for cryptographic proof
+        const signatureResult = await walletSignatureService.authenticateWallet(address);
+        
+        if (signatureResult.success) {
+          console.log('Wallet signature successful, user authenticated');
+          setIsVerified(true);
+          setWalletAddress(address);
+          setShowVerificationDialog(false);
+          
+          // Store authentication data for API calls
+          localStorage.setItem('verifiedWalletAddress', address);
+          localStorage.setItem('walletSignature', signatureResult.signature!);
+          localStorage.setItem('walletTimestamp', signatureResult.timestamp!.toString());
+        } else {
+          console.log('Signature failed:', signatureResult.error);
+          setVerificationError(signatureResult.error || 'Signature verification failed');
+        }
       } else {
-        console.log('Verification failed:', verification.error);
-        setVerificationError(verification.error || 'Verification failed');
+        console.log('Token verification failed:', verification.error);
+        setVerificationError(verification.error || 'Token verification failed');
         localStorage.removeItem('verifiedWalletAddress');
+        localStorage.removeItem('walletSignature');
+        localStorage.removeItem('walletTimestamp');
       }
     } catch (error: any) {
       console.error('Verification error:', error);
