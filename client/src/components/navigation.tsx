@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown } from "lucide-react";
+import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown, Brain } from "lucide-react";
 
 export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -164,6 +164,21 @@ export default function Navigation() {
                     <div className="flex items-center gap-2">
                       <RefreshCw className="w-4 h-4" />
                       <span>BAM Swap</span>
+                    </div>
+                    <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                      Live
+                    </span>
+                  </div>
+                </Link>
+                
+                <Link href="/ai-chat">
+                  <div 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between py-3 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Brain className="w-4 h-4" />
+                      <span>BAM AIGPT</span>
                     </div>
                     <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
                       Live
