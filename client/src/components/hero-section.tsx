@@ -76,24 +76,31 @@ export default function HeroSection() {
             Community-driven wealth multiplier on BSC combining staking, DeFi utility, and collective growth.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/swap">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
-              >
-                <RefreshCw className="mr-2 h-5 w-5" />
-                Start Trading
-              </Button>
-            </Link>
+            <Button
+              size="lg"
+              className="btn-gradient text-white font-semibold text-lg px-8 py-4 rounded-full hover:shadow-lg transition-all duration-300"
+              onClick={() => window.open("https://apex.bam-ecosystem.com", "_blank")}
+            >
+              <Rocket className="mr-2 h-5 w-5" />
+              Launch App
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-2 border-primary bg-primary/10 text-primary font-semibold text-lg px-8 py-4 rounded-full hover:bg-primary hover:text-white transition-all duration-300"
+              onClick={() => scrollToSection("tokenomics")}
+            >
+              <TrendingUp className="mr-2 h-5 w-5" />
+              View Tokenomics
+            </Button>
             <Link href="/ai-chat">
               <Button
-                size="lg"
-                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105 relative"
+                size="sm"
+                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 rounded-full"
               >
-                <Brain className="mr-2 h-5 w-5" />
-                Try BAM AIGPT
-                <Badge className="ml-2 bg-emerald-500 text-white text-xs">
-                  <Sparkles className="w-3 h-3 mr-1" />
+                <Brain className="mr-1 h-4 w-4" />
+                BAM AIGPT
+                <Badge className="ml-1 bg-emerald-500 text-white text-xs">
                   NEW
                 </Badge>
               </Button>

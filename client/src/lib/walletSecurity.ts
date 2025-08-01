@@ -1,196 +1,184 @@
-// Centralized wallet security verification system
-// Prevents any wallet access without proper signature verification
+import Web3 from 'web3';
+import { TOKEN_ADDRESSES } from './contracts';
 
-import { Web3Utils } from './web3';
-
-export interface WalletVerificationResult {
-  isVerified: boolean;
-  address: string;
-  signature?: string;
+export interface WalletVerification {
+  isValid: boolean;
+  address?: string;
+  bamBalance?: string;
   error?: string;
 }
 
-class WalletSecurityManager {
-  private web3Utils: Web3Utils;
-  private verifiedWallets: Set<string> = new Set();
-  private sessionSignatures: Map<string, { signature: string; timestamp: number }> = new Map();
-  
-  // Session timeout: 1 hour
-  private readonly SESSION_TIMEOUT = 60 * 60 * 1000;
+export class WalletSecurityManager {
+  private static instance: WalletSecurityManager;
+  private verifiedSessions: Map<string, { timestamp: number; address: string }> = new Map();
+  private readonly SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour
+  private readonly MIN_BAM_REQUIREMENT = '10000000'; // 10M BAM tokens
 
-  constructor() {
-    this.web3Utils = new Web3Utils();
+  static getInstance(): WalletSecurityManager {
+    if (!WalletSecurityManager.instance) {
+      WalletSecurityManager.instance = new WalletSecurityManager();
+    }
+    return WalletSecurityManager.instance;
   }
 
-  /**
-   * Comprehensive wallet verification - REQUIRED for all wallet access
-   * This function MUST be called before setting any wallet address in state
-   */
-  async verifyWalletAccess(address: string, forceReVerification = false): Promise<WalletVerificationResult> {
+  async verifyWalletOwnership(expectedAddress: string): Promise<WalletVerification> {
     try {
-      // Normalize address
-      const normalizedAddress = address.toLowerCase();
+      // Check if already verified and session is valid
+      const sessionKey = expectedAddress.toLowerCase();
+      const existingSession = this.verifiedSessions.get(sessionKey);
       
-      // Check if wallet is already verified and session is valid
-      if (!forceReVerification && this.isSessionValid(normalizedAddress)) {
-        console.log('✅ Wallet session valid, skipping re-verification');
+      if (existingSession && (Date.now() - existingSession.timestamp) < this.SESSION_TIMEOUT) {
         return {
-          isVerified: true,
-          address: address,
-          signature: this.sessionSignatures.get(normalizedAddress)?.signature
+          isValid: true,
+          address: expectedAddress,
+          bamBalance: await this.getBAMBalance(expectedAddress)
         };
       }
 
-      // Always require fresh signature verification
-      console.log('🔐 Performing mandatory wallet signature verification...');
-      const signature = await this.web3Utils.verifyWalletOwnership(address);
-      
-      // Store verified wallet and signature
-      this.verifiedWallets.add(normalizedAddress);
-      this.sessionSignatures.set(normalizedAddress, {
-        signature,
-        timestamp: Date.now()
-      });
+      // Get Web3 provider
+      if (!(window as any).ethereum) {
+        return {
+          isValid: false,
+          error: 'No Web3 wallet detected. Please install MetaMask or another Web3 wallet.'
+        };
+      }
 
-      console.log('✅ Wallet verification successful');
-      return {
-        isVerified: true,
-        address: address,
-        signature
-      };
+      const web3 = new Web3((window as any).ethereum);
+      
+      // Request account access
+      const accounts = await (window as any).ethereum.request({ 
+        method: 'eth_requestAccounts' 
+      });
+      
+      if (!accounts || accounts.length === 0) {
+        return {
+          isValid: false,
+          error: 'No wallet accounts found. Please connect your wallet.'
+        };
+      }
+
+      const currentAddress = accounts[0].toLowerCase();
+      if (currentAddress !== expectedAddress.toLowerCase()) {
+        return {
+          isValid: false,
+          error: 'Connected wallet address does not match expected address.'
+        };
+      }
+
+      // Verify BAM token balance
+      const bamBalance = await this.getBAMBalance(expectedAddress);
+      const balanceInTokens = parseFloat(bamBalance);
+      
+      if (balanceInTokens < parseFloat(this.MIN_BAM_REQUIREMENT)) {
+        return {
+          isValid: false,
+          error: `Insufficient BAM tokens. You need at least ${this.MIN_BAM_REQUIREMENT} BAM tokens to access BAM AIGPT.`
+        };
+      }
+
+      // Create signature challenge
+      const message = `Verify ownership of ${expectedAddress} for BAM AIGPT access at ${Date.now()}`;
+      
+      try {
+        const signature = await web3.eth.personal.sign(message, expectedAddress, '');
+        
+        // Verify signature
+        const recoveredAddress = await web3.eth.personal.ecRecover(message, signature);
+        
+        if (recoveredAddress.toLowerCase() !== expectedAddress.toLowerCase()) {
+          return {
+            isValid: false,
+            error: 'Signature verification failed. Please try again.'
+          };
+        }
+
+        // Store verified session
+        this.verifiedSessions.set(sessionKey, {
+          timestamp: Date.now(),
+          address: expectedAddress
+        });
+
+        return {
+          isValid: true,
+          address: expectedAddress,
+          bamBalance
+        };
+
+      } catch (signError: any) {
+        return {
+          isValid: false,
+          error: 'Signature rejected. Please sign the message to verify wallet ownership.'
+        };
+      }
 
     } catch (error: any) {
-      console.error('❌ Wallet verification failed:', error);
-      
-      // Clear any previous verification for this wallet
-      this.clearWalletVerification(address);
-      
+      console.error('Wallet verification error:', error);
       return {
-        isVerified: false,
-        address: address,
-        error: error.message || 'Verification failed'
+        isValid: false,
+        error: 'Failed to verify wallet. Please ensure you have a Web3 wallet connected.'
       };
     }
   }
 
-  /**
-   * Check if a wallet session is still valid
-   */
-  private isSessionValid(normalizedAddress: string): boolean {
-    const session = this.sessionSignatures.get(normalizedAddress);
+  private async getBAMBalance(address: string): Promise<string> {
+    try {
+      const web3 = new Web3('https://bsc-dataseed1.binance.org/');
+      
+      // BAM token contract ABI (ERC20 standard)
+      const tokenABI = [
+        {
+          "constant": true,
+          "inputs": [{"name": "_owner", "type": "address"}],
+          "name": "balanceOf",
+          "outputs": [{"name": "balance", "type": "uint256"}],
+          "type": "function"
+        },
+        {
+          "constant": true,
+          "inputs": [],
+          "name": "decimals",
+          "outputs": [{"name": "", "type": "uint8"}],
+          "type": "function"
+        }
+      ];
+
+      const tokenContract = new web3.eth.Contract(tokenABI as any, TOKEN_ADDRESSES.BAM);
+      const balance = await tokenContract.methods.balanceOf(address).call();
+      const decimals = await tokenContract.methods.decimals().call();
+      
+      // Convert balance from wei to token units
+      const balanceInTokens = Web3.utils.fromWei((balance as any).toString(), 'ether');
+      
+      return balanceInTokens;
+    } catch (error) {
+      console.error('Error getting BAM balance:', error);
+      return '0';
+    }
+  }
+
+  isSessionValid(address: string): boolean {
+    const sessionKey = address.toLowerCase();
+    const session = this.verifiedSessions.get(sessionKey);
+    
     if (!session) return false;
     
-    const now = Date.now();
-    const isValid = (now - session.timestamp) < this.SESSION_TIMEOUT;
-    
-    if (!isValid) {
-      // Session expired, clear it
-      this.clearWalletVerification(normalizedAddress);
+    const isExpired = (Date.now() - session.timestamp) >= this.SESSION_TIMEOUT;
+    if (isExpired) {
+      this.verifiedSessions.delete(sessionKey);
+      return false;
     }
     
-    return isValid;
+    return true;
   }
 
-  /**
-   * Clear verification for a specific wallet
-   */
-  clearWalletVerification(address: string): void {
-    const normalizedAddress = address.toLowerCase();
-    this.verifiedWallets.delete(normalizedAddress);
-    this.sessionSignatures.delete(normalizedAddress);
-    console.log(`🗑️ Cleared verification for wallet: ${address}`);
+  clearSession(address: string): void {
+    const sessionKey = address.toLowerCase();
+    this.verifiedSessions.delete(sessionKey);
   }
 
-  /**
-   * Clear all wallet verifications (useful for logout)
-   */
-  clearAllVerifications(): void {
-    this.verifiedWallets.clear();
-    this.sessionSignatures.clear();
-    console.log('🗑️ Cleared all wallet verifications');
-  }
-
-  /**
-   * Check if a wallet is currently verified (without re-verification)
-   */
-  isWalletVerified(address: string): boolean {
-    const normalizedAddress = address.toLowerCase();
-    return this.verifiedWallets.has(normalizedAddress) && this.isSessionValid(normalizedAddress);
-  }
-
-  /**
-   * Secure auto-connection that ALWAYS requires signature verification
-   * Use this instead of direct eth_accounts calls
-   */
-  async secureAutoConnect(): Promise<WalletVerificationResult | null> {
-    try {
-      const provider = await this.web3Utils.getProvider();
-      if (!provider) return null;
-
-      // Get connected accounts
-      const accounts = await provider.request({ method: 'eth_accounts' });
-      if (!accounts || accounts.length === 0) return null;
-
-      // ALWAYS verify the wallet - no exceptions
-      console.log('🔄 Secure auto-connection attempting verification...');
-      const result = await this.verifyWalletAccess(accounts[0], false);
-      
-      if (result.isVerified) {
-        console.log('✅ Secure auto-connection successful');
-      } else {
-        console.warn('❌ Secure auto-connection failed verification');
-      }
-      
-      return result;
-
-    } catch (error: any) {
-      console.error('❌ Secure auto-connection error:', error);
-      return {
-        isVerified: false,
-        address: '',
-        error: error.message || 'Auto-connection failed'
-      };
-    }
-  }
-
-  /**
-   * Get verification status for debugging
-   */
-  getVerificationStatus(): {
-    verifiedWallets: string[];
-    activeSessions: number;
-  } {
-    return {
-      verifiedWallets: Array.from(this.verifiedWallets),
-      activeSessions: this.sessionSignatures.size
-    };
+  clearAllSessions(): void {
+    this.verifiedSessions.clear();
   }
 }
 
-// Singleton instance to ensure consistent verification across the app
-export const walletSecurity = new WalletSecurityManager();
-
-// Helper function for components to use
-export async function secureWalletConnect(): Promise<WalletVerificationResult> {
-  const web3Utils = new Web3Utils();
-  
-  try {
-    // First connect to wallet (this will trigger MetaMask popup if needed)
-    const address = await web3Utils.connectWallet();
-    
-    // Then verify through security manager
-    return await walletSecurity.verifyWalletAccess(address, true);
-    
-  } catch (error: any) {
-    return {
-      isVerified: false,
-      address: '',
-      error: error.message || 'Connection failed'
-    };
-  }
-}
-
-// Helper function for secure auto-connection
-export async function secureAutoConnect(): Promise<WalletVerificationResult | null> {
-  return await walletSecurity.secureAutoConnect();
-}
+export const walletSecurity = WalletSecurityManager.getInstance();
