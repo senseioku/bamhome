@@ -5,11 +5,12 @@
 The deployment errors have been resolved:
 
 ### **Issues Fixed:**
-1. **Runtime Configuration**: Fixed invalid runtime version error by using proper `@vercel/node` runtime
-2. **Build Configuration**: Switched from `functions` to `builds` configuration to avoid conflicts
-3. **File Exclusion**: Updated `.vercelignore` to include necessary server files for deployment
-4. **API Entry Point**: Created proper serverless function entry at `api/index.ts`
-5. **Build Process**: Configured proper build output directory
+1. **404 Routing Error**: Fixed by switching to `functions`/`rewrites` configuration instead of `builds`/`routes`
+2. **Runtime Configuration**: Using proper `nodejs18.x` runtime specification
+3. **Output Directory**: Correctly configured `outputDirectory: "dist/public"` for frontend files
+4. **File Exclusion**: Updated `.vercelignore` to include necessary server files for deployment
+5. **API Entry Point**: Created proper serverless function entry at `api/index.ts`
+6. **Build Process**: Configured proper build command and output structure
 
 ### **Current Configuration:**
 
@@ -17,24 +18,23 @@ The deployment errors have been resolved:
 ```json
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/public",
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node",
-      "maxDuration": 30
+      "runtime": "nodejs18.x"
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api"
+      "destination": "/api/index.ts"
     },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/public"
+  ]
 }
 ```
 
