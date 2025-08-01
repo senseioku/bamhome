@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown } from "lucide-react";
 
 export default function Navigation() {
@@ -33,7 +32,7 @@ export default function Navigation() {
               </div>
             </Link>
 
-            {/* Desktop Navigation - Hidden for cleaner look */}
+            {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('home')}
@@ -63,139 +62,159 @@ export default function Navigation() {
 
             {/* Mobile menu button */}
             <div className="lg:hidden">
-              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
-                    <Menu className="w-6 h-6" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-80 bg-gray-900 border-gray-700">
-                  <div className="flex flex-col space-y-6 mt-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <img 
-                        src="/assets/bamToken_1752877645023.png" 
-                        alt="BAM Token" 
-                        className="h-8 w-8 rounded-full"
-                      />
-                      <div>
-                        <span className="text-lg font-bold text-yellow-400">BAM</span>
-                        <span className="text-sm text-gray-300 ml-2">Ecosystem</span>
-                      </div>
-                      <SheetClose asChild>
-                        <Button variant="ghost" size="sm" className="ml-auto text-gray-400 hover:text-white">
-                          <X className="w-5 h-5" />
-                        </Button>
-                      </SheetClose>
-                    </div>
-                    
-                    <button 
-                      onClick={() => {
-                        scrollToSection('home');
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors py-3 border-b border-gray-700"
-                    >
-                      <Home className="w-5 h-5" />
-                      <span>Home</span>
-                    </button>
-                    
-                    <button 
-                      onClick={() => {
-                        scrollToSection('ecosystem');
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors py-3 border-b border-gray-700"
-                    >
-                      <Globe className="w-5 h-5" />
-                      <span>Ecosystem</span>
-                    </button>
-                    
-                    <button 
-                      onClick={() => {
-                        scrollToSection('tokenomics');
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors py-3 border-b border-gray-700"
-                    >
-                      <TrendingUp className="w-5 h-5" />
-                      <span>Tokenomics</span>
-                    </button>
-                    
-                    <button 
-                      onClick={() => {
-                        scrollToSection('projects');
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="flex items-center gap-3 text-gray-300 hover:text-yellow-400 transition-colors py-3 border-b border-gray-700"
-                    >
-                      <Briefcase className="w-5 h-5" />
-                      <span>Projects</span>
-                    </button>
-                    
-                    <div className="bg-gray-800 rounded-lg p-4 mt-4">
-                      <div className="text-yellow-400 font-semibold mb-3">Platform Access</div>
-                      
-                      <Link href="/swap">
-                        <SheetClose asChild>
-                          <div className="flex items-center justify-between py-3 text-gray-300 hover:text-yellow-400 transition-colors border-b border-gray-700">
-                            <div className="flex items-center gap-2">
-                              <RefreshCw className="w-4 h-4" />
-                              <span>BAM Swap</span>
-                            </div>
-                            <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
-                              Live
-                            </span>
-                          </div>
-                        </SheetClose>
-                      </Link>
-                      
-                      <div className="flex items-center justify-between py-3 text-gray-500 border-b border-gray-700">
-                        <div className="flex items-center gap-2">
-                          <Gift className="w-4 h-4" />
-                          <span>BAM Drops</span>
-                        </div>
-                        <span className="bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                          Soon
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between py-3 text-gray-500 border-b border-gray-700">
-                        <div className="flex items-center gap-2">
-                          <Gamepad2 className="w-4 h-4" />
-                          <span>BAM Play 2 Earn</span>
-                        </div>
-                        <span className="bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                          Soon
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between py-3 text-gray-500 border-b border-gray-700">
-                        <div className="flex items-center gap-2">
-                          <Crown className="w-4 h-4" />
-                          <span>BAM ApexMiner</span>
-                        </div>
-                        <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
-                          Live
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between py-3 text-gray-500">
-                        <div className="flex items-center gap-2">
-                          <Crown className="w-4 h-4" />
-                          <span>BAM VIP Access</span>
-                        </div>
-                        <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
-                          Live
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-gray-300 hover:text-white"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </Button>
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Navigation Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="fixed right-0 top-0 h-full w-80 bg-gray-900 border-l border-gray-700 overflow-y-auto">
+            <div className="flex flex-col p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <img 
+                    src="/assets/bamToken_1752877645023.png" 
+                    alt="BAM Token" 
+                    className="h-8 w-8 rounded-full"
+                  />
+                  <div>
+                    <span className="text-lg font-bold text-yellow-400">BAM</span>
+                    <span className="text-sm text-gray-300 ml-2">Ecosystem</span>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+              
+              <div className="space-y-1">
+                <button 
+                  onClick={() => {
+                    scrollToSection('home');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full text-left px-3 py-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 rounded-lg transition-colors border-b border-gray-700"
+                >
+                  <Home className="w-5 h-5" />
+                  <span>Home</span>
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    scrollToSection('ecosystem');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full text-left px-3 py-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 rounded-lg transition-colors border-b border-gray-700"
+                >
+                  <Globe className="w-5 h-5" />
+                  <span>Ecosystem</span>
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    scrollToSection('tokenomics');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full text-left px-3 py-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 rounded-lg transition-colors border-b border-gray-700"
+                >
+                  <TrendingUp className="w-5 h-5" />
+                  <span>Tokenomics</span>
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    scrollToSection('projects');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 w-full text-left px-3 py-4 text-gray-300 hover:text-yellow-400 hover:bg-gray-800/50 rounded-lg transition-colors border-b border-gray-700"
+                >
+                  <Briefcase className="w-5 h-5" />
+                  <span>Projects</span>
+                </button>
+              </div>
+              
+              <div className="mt-6 bg-gray-800 rounded-lg p-4">
+                <div className="text-yellow-400 font-semibold mb-3">Platform Access</div>
+                
+                <Link href="/swap">
+                  <div 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-3 text-gray-300 hover:text-yellow-400 hover:bg-gray-700/50 rounded-lg transition-colors border-b border-gray-700 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4" />
+                      <span>BAM Swap</span>
+                    </div>
+                    <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                      Live
+                    </span>
+                  </div>
+                </Link>
+                
+                <div className="flex items-center justify-between px-3 py-3 text-gray-500 border-b border-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Gift className="w-4 h-4" />
+                    <span>BAM Drops</span>
+                  </div>
+                  <span className="bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    Soon
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between px-3 py-3 text-gray-500 border-b border-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Gamepad2 className="w-4 h-4" />
+                    <span>BAM Play 2 Earn</span>
+                  </div>
+                  <span className="bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    Soon
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between px-3 py-3 text-gray-500 border-b border-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Crown className="w-4 h-4" />
+                    <span>BAM ApexMiner</span>
+                  </div>
+                  <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                    Live
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between px-3 py-3 text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <Crown className="w-4 h-4" />
+                    <span>BAM VIP Access</span>
+                  </div>
+                  <span className="bg-gradient-to-r from-green-400 to-green-600 text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                    Live
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
