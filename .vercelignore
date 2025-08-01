@@ -7,8 +7,13 @@ node_modules
 *.log
 coverage
 .nyc_output
-server
-shared
 replit.md
 .replit
 package-lock.json
+server/ai.ts
+server/chainlink.ts
+server/cryptoService.ts
+server/db.ts
+server/index.ts
+server/replitAuth.ts
+server/routes.ts
