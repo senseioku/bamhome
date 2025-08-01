@@ -141,7 +141,6 @@ export default function AiChat() {
   // Create new conversation (local state for static deployment)
   const createConversationMutation = useMutation({
     mutationFn: async ({ title, category }: { title: string; category: string }) => {
-      // Since we're using mock data, we'll create a simplified conversation object
       const newConversation = {
         id: Date.now().toString(),
         userId: null,
@@ -152,7 +151,7 @@ export default function AiChat() {
         lastMessageAt: new Date(),
         createdAt: new Date(),
         updatedAt: new Date()
-      } as Conversation;
+      } as unknown as Conversation;
       return newConversation;
     },
     onSuccess: (conversation: Conversation) => {
@@ -196,7 +195,7 @@ export default function AiChat() {
           metadata: null,
           tokens: null,
           createdAt: new Date()
-        } as Message;
+        } as unknown as Message;
         
         const aiMessage = {
           id: (Date.now() + 1).toString(),
@@ -206,7 +205,7 @@ export default function AiChat() {
           metadata: null,
           tokens: null,
           createdAt: new Date()
-        } as Message;
+        } as unknown as Message;
 
         setConversationData(prev => ({
           ...prev!,
