@@ -243,3 +243,99 @@ This signature verifies wallet ownership and does not authorize any transactions
 }
 
 export const walletSecurity = WalletSecurityManager.getInstance();
+
+// Secure wallet connection function for BAM Swap
+export interface SecureWalletResult {
+  isVerified: boolean;
+  address: string;
+  error?: string;
+}
+
+export async function secureWalletConnect(): Promise<SecureWalletResult> {
+  try {
+    // Check if wallet is available
+    if (!(window as any).ethereum) {
+      return {
+        isVerified: false,
+        address: '',
+        error: 'No Web3 wallet detected. Please install MetaMask or another Web3 wallet.'
+      };
+    }
+
+    // Request account access
+    const accounts = await (window as any).ethereum.request({ 
+      method: 'eth_requestAccounts' 
+    });
+    
+    if (!accounts || accounts.length === 0) {
+      return {
+        isVerified: false,
+        address: '',
+        error: 'No wallet accounts found. Please connect your wallet.'
+      };
+    }
+
+    const address = accounts[0];
+    
+    // Verify wallet ownership with signature
+    const walletManager = WalletSecurityManager.getInstance();
+    const verification = await walletManager.verifyWalletOwnership(address);
+    
+    if (!verification.isValid) {
+      return {
+        isVerified: false,
+        address: '',
+        error: verification.error || 'Wallet verification failed'
+      };
+    }
+
+    return {
+      isVerified: true,
+      address: address
+    };
+
+  } catch (error: any) {
+    console.error('Secure wallet connection error:', error);
+    return {
+      isVerified: false,
+      address: '',
+      error: error.message || 'Failed to connect wallet securely'
+    };
+  }
+}
+
+export async function secureAutoConnect(): Promise<SecureWalletResult | null> {
+  try {
+    // Check if wallet is available
+    if (!(window as any).ethereum) {
+      return null;
+    }
+
+    // Get current accounts without prompting
+    const accounts = await (window as any).ethereum.request({ 
+      method: 'eth_accounts' 
+    });
+    
+    if (!accounts || accounts.length === 0) {
+      return null;
+    }
+
+    const address = accounts[0];
+    
+    // Check if we have a valid session
+    const walletManager = WalletSecurityManager.getInstance();
+    if (walletManager.isSessionValid(address)) {
+      return {
+        isVerified: true,
+        address: address
+      };
+    }
+
+    // If no valid session, don't auto-verify (user needs to manually connect)
+    return null;
+
+  } catch (error: any) {
+    console.error('Secure auto-connection error:', error);
+    return null;
+  }
+}

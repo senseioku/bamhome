@@ -438,8 +438,8 @@ const SwapPage = () => {
       showTip('wallet-connect');
       
       // Use secure wallet connection with mandatory verification
-      const { secureWalletConnect } = await import('../lib/walletSecurity');
-      const result = await secureWalletConnect();
+      const walletModule = await import('../lib/walletSecurity');
+      const result = await walletModule.secureWalletConnect();
       
       if (result.isVerified) {
         setWalletAddress(result.address);
@@ -470,10 +470,10 @@ const SwapPage = () => {
   // Secure auto-connection using centralized security manager
   useEffect(() => {
     const secureAutoConnection = async () => {
-      const { secureAutoConnect } = await import('../lib/walletSecurity');
+      const walletModule = await import('../lib/walletSecurity');
       
       try {
-        const result = await secureAutoConnect();
+        const result = await walletModule.secureAutoConnect();
         
         if (result && result.isVerified) {
           setWalletAddress(result.address);
