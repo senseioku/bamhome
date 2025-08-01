@@ -213,85 +213,106 @@ export default function AiChat() {
 
   if (!isVerified) {
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-black text-white flex flex-col">
         <Navigation />
-        <div className="pt-16 flex items-center justify-center min-h-screen">
-          <Dialog open={showVerificationDialog} onOpenChange={setShowVerificationDialog}>
-            <DialogContent className="sm:max-w-md bg-gray-900 border-gray-700">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-white">
-                  <Shield className="w-5 h-5 text-blue-400" />
-                  BAM AIChat Access Verification
-                </DialogTitle>
-                <DialogDescription className="text-gray-400">
-                  To access BAM AIChat, you need to verify wallet ownership with at least 10M BAM tokens.
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="space-y-4">
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-blue-400 mb-2">
-                    <Wallet className="w-4 h-4" />
-                    <span className="font-medium">Requirements:</span>
-                  </div>
-                  <ul className="text-sm text-gray-300 space-y-1">
-                    <li>• Hold at least 10M BAM tokens</li>
-                    <li>• Sign wallet verification message</li>
-                    <li>• Connect with MetaMask or Web3 wallet</li>
-                  </ul>
+        
+        {/* Compact Mobile Login */}
+        <div className="flex-1 flex items-center justify-center p-4 pt-20">
+          <div className="w-full max-w-sm space-y-6">
+            {/* Header */}
+            <div className="text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Brain className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="text-lg font-bold text-white mb-1">BAM AIChat</h2>
+              <p className="text-sm text-gray-400">AI-powered crypto companion</p>
+            </div>
+
+            {/* Requirements Card */}
+            <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-4 space-y-3">
+              <div className="flex items-center gap-2 text-blue-400">
+                <Shield className="w-4 h-4" />
+                <span className="text-sm font-medium">Access Requirements</span>
+              </div>
+              <div className="space-y-2 text-xs text-gray-300">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                  <span>Hold 10M+ BAM tokens</span>
                 </div>
-
-                {verificationError && (
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                    <div className="flex items-center gap-2 text-red-400">
-                      <AlertTriangle className="w-4 h-4" />
-                      <span className="text-sm">{verificationError}</span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleWalletVerification}
-                    disabled={verificationLoading}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
-                  >
-                    {verificationLoading ? 'Verifying...' : 'Verify Wallet'}
-                  </Button>
-                  <Link href="/">
-                    <Button variant="outline" className="border-gray-600 text-gray-300">
-                      Back to Home
-                    </Button>
-                  </Link>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                  <span>Verify wallet ownership</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                  <span>Connect MetaMask/Web3 wallet</span>
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
+            </div>
+
+            {/* Error Message */}
+            {verificationError && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                <div className="flex items-start gap-2 text-red-400">
+                  <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">{verificationError}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <Button
+                onClick={handleWalletVerification}
+                disabled={verificationLoading}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-3"
+              >
+                {verificationLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Verifying...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Wallet className="w-4 h-4" />
+                    Verify Wallet Access
+                  </div>
+                )}
+              </Button>
+              
+              <Link href="/" className="block">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Back to Home
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       <Navigation />
       
-      <div className="pt-16 flex h-screen">
+      <div className="flex-1 flex pt-16 relative">
         {/* Mobile Sidebar Toggle */}
         {!showSidebar && (
           <Button
             onClick={() => setShowSidebar(true)}
             size="sm"
             variant="ghost"
-            className="fixed top-20 left-4 z-40 md:hidden bg-gray-800 hover:bg-gray-700"
+            className="fixed top-20 left-4 z-40 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm"
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
         )}
 
-        {/* Sidebar */}
+        {/* Mobile Sidebar */}
         {showSidebar && (
-          <div className="w-full md:w-80 bg-gray-900 border-r border-gray-700 flex flex-col fixed md:relative h-full z-30">
+          <div className="w-full md:w-80 bg-gray-900/95 backdrop-blur-sm border-r border-gray-700 flex flex-col fixed md:relative h-full z-30 md:bg-gray-900">
             {/* Sidebar Header */}
             <div className="p-4 border-b border-gray-700">
               <div className="flex items-center justify-between mb-4">
@@ -401,115 +422,141 @@ export default function AiChat() {
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col">
           {!selectedConversation ? (
-            // Welcome Screen
-            <div className="flex-1 flex items-center justify-center p-4">
-              <div className="text-center max-w-2xl">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Brain className="w-8 h-8 text-white" />
-                </div>
-                <h2 className="text-2xl font-bold mb-4">Welcome to BAM AIGPT</h2>
-                <p className="text-gray-400 mb-6">
-                  Your AI-powered crypto companion. Get real-time insights, research assistance, and learn about DeFi.
-                </p>
-                
-                {/* Quick Actions */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                  {categories.slice(0, 4).map((category) => (
-                    <Button
-                      key={category.id}
-                      onClick={() => {
-                        setSelectedCategory(category.id);
-                        handleNewConversation();
-                      }}
-                      variant="outline"
-                      className="p-4 h-auto border-gray-600 hover:bg-gray-800"
-                    >
-                      <div className="text-center">
-                        <category.icon className="w-6 h-6 mx-auto mb-2 text-purple-400" />
-                        <div className="font-medium">{category.name}</div>
-                        <div className="text-xs text-gray-400 mt-1">
-                          {category.id === 'crypto' && 'Market analysis & insights'}
-                          {category.id === 'research' && 'Deep research & reports'}
-                          {category.id === 'learn' && 'DeFi education & guides'}
-                          {category.id === 'general' && 'General conversations'}
-                        </div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-
-                {/* Recent Updates */}
-                {highlights.length > 0 && (
-                  <div className="text-left">
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                      <Star className="w-5 h-5 text-yellow-400" />
-                      Latest Crypto Highlights
-                    </h3>
-                    <div className="space-y-3">
-                      {highlights.slice(0, 3).map((update: any) => (
-                        <div key={update.id} className="bg-gray-800/50 rounded-lg p-3 text-left">
-                          <div className="font-medium text-sm mb-1">{update.title}</div>
-                          <div className="text-xs text-gray-400">{update.summary}</div>
-                        </div>
-                      ))}
-                    </div>
+            // Welcome Screen - Mobile Optimized
+            <div className="flex-1 flex flex-col">
+              <div className="flex-1 flex items-center justify-center p-4 min-h-0">
+                <div className="text-center max-w-md w-full">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6">
+                    <Brain className="w-6 h-6 md:w-8 md:h-8 text-white" />
                   </div>
-                )}
+                  <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Welcome to BAM AIChat</h2>
+                  <p className="text-gray-400 text-sm md:text-base mb-6">
+                    AI-powered crypto companion for insights and DeFi education.
+                  </p>
+                  
+                  {/* Quick Actions - Compact Mobile Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {categories.slice(0, 4).map((category) => (
+                      <Button
+                        key={category.id}
+                        onClick={() => {
+                          setSelectedCategory(category.id);
+                          handleNewConversation();
+                        }}
+                        variant="outline"
+                        className="p-3 h-auto border-gray-600 hover:bg-gray-800 text-left"
+                      >
+                        <div className="flex flex-col items-center">
+                          <category.icon className="w-5 h-5 mb-2 text-purple-400" />
+                          <div className="font-medium text-xs">{category.name}</div>
+                          <div className="text-xs text-gray-400 mt-1 text-center leading-tight">
+                            {category.id === 'crypto' && 'Market insights'}
+                            {category.id === 'research' && 'Deep research'}
+                            {category.id === 'learn' && 'DeFi guides'}
+                            {category.id === 'general' && 'Chat'}
+                          </div>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Fixed Chat Input at Bottom */}
+              <div className="p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+                <div className="max-w-md mx-auto">
+                  <div className="flex gap-2">
+                    <Input
+                      value={messageInput}
+                      onChange={(e) => setMessageInput(e.target.value)}
+                      placeholder="Ask about crypto, DeFi, or start a conversation..."
+                      className="flex-1 bg-gray-800 border-gray-600 text-white text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          if (messageInput.trim()) {
+                            handleNewConversation();
+                          }
+                        }
+                      }}
+                    />
+                    <Button
+                      onClick={() => {
+                        if (messageInput.trim()) {
+                          handleNewConversation();
+                        }
+                      }}
+                      disabled={!messageInput.trim()}
+                      className="bg-purple-600 hover:bg-purple-700 px-3"
+                      size="sm"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-2 text-center">
+                    Start by typing a question or select a category above
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
             // Chat Interface
             <>
-              {/* Chat Header */}
-              <div className="p-4 border-b border-gray-700 bg-gray-900">
-                <div className="flex items-center gap-3">
+              {/* Chat Header - Compact Mobile */}
+              <div className="p-3 md:p-4 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+                <div className="flex items-center gap-2">
                   <Button
                     onClick={() => setShowSidebar(true)}
                     size="sm"
                     variant="ghost"
-                    className="md:hidden"
+                    className="md:hidden p-1"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{conversationData?.conversation?.title || 'Loading...'}</h3>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm md:text-base truncate">
+                      {conversationData?.conversation?.title || 'Loading...'}
+                    </h3>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge className="bg-purple-600 text-white text-xs">
                         {conversationData?.conversation?.category || selectedCategory}
                       </Badge>
                       <span className="text-xs text-gray-400">
-                        Claude 4.0 • {conversationData?.messages?.length || 0} messages
+                        {conversationData?.messages?.length || 0} msgs
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Messages */}
-              <ScrollArea className="flex-1 p-4">
-                <div className="max-w-4xl mx-auto space-y-4">
+              {/* Messages - Mobile Optimized */}
+              <ScrollArea className="flex-1 p-3 md:p-4">
+                <div className="max-w-4xl mx-auto space-y-3">
                   {loadingConversation ? (
                     <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400" />
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-400" />
                     </div>
                   ) : (
                     conversationData?.messages?.map((message) => (
                       <div
                         key={message.id}
-                        className={`flex gap-3 ${
+                        className={`flex gap-2 ${
                           message.role === 'user' ? 'justify-end' : 'justify-start'
                         }`}
                       >
                         <div
-                          className={`max-w-[80%] rounded-lg p-3 ${
+                          className={`max-w-[85%] md:max-w-[80%] rounded-lg p-3 ${
                             message.role === 'user'
                               ? 'bg-purple-600 text-white'
                               : 'bg-gray-800 text-gray-100'
                           }`}
                         >
-                          <div className="whitespace-pre-wrap text-sm">{message.content}</div>
-                          <div className="text-xs opacity-70 mt-2">
-                            {new Date(message.createdAt).toLocaleTimeString()}
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
+                          <div className="text-xs opacity-70 mt-1">
+                            {new Date(message.createdAt).toLocaleTimeString([], { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
                           </div>
                         </div>
                       </div>
@@ -519,16 +566,15 @@ export default function AiChat() {
                 </div>
               </ScrollArea>
 
-              {/* Message Input */}
-              <div className="p-4 border-t border-gray-700 bg-gray-900">
+              {/* Message Input - Fixed Bottom */}
+              <div className="p-3 md:p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
                 <div className="max-w-4xl mx-auto">
                   <div className="flex gap-2">
-                    <Textarea
+                    <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
                       placeholder="Ask about crypto, DeFi, or anything else..."
-                      className="flex-1 bg-gray-800 border-gray-600 text-white resize-none"
-                      rows={1}
+                      className="flex-1 bg-gray-800 border-gray-600 text-white text-sm"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -539,13 +585,18 @@ export default function AiChat() {
                     <Button
                       onClick={handleSendMessage}
                       disabled={!messageInput.trim() || sendMessageMutation.isPending}
-                      className="bg-purple-600 hover:bg-purple-700"
+                      className="bg-purple-600 hover:bg-purple-700 px-3"
+                      size="sm"
                     >
-                      <Send className="w-4 h-4" />
+                      {sendMessageMutation.isPending ? (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
-                  <div className="text-xs text-gray-400 mt-2 text-center">
-                    Press Enter to send • Shift+Enter for new line
+                  <div className="text-xs text-gray-400 mt-1 text-center">
+                    Press Enter to send
                   </div>
                 </div>
               </div>
