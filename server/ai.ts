@@ -157,5 +157,4 @@ Remember: You're here to educate, inform, and guide users in their crypto journe
   }
 }
 
-// Export singleton instance
 export const aiService = new BAMAIService();

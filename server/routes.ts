@@ -5,138 +5,15 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { aiService } from "./ai";
 import { cryptoService } from "./cryptoService";
 import { z } from "zod";
-import rateLimit from "express-rate-limit";
-import helmet from "helmet";
-import cors from "cors";
-import { walletVerificationService } from "./walletVerification";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Security middleware - relaxed for development
-  if (process.env.NODE_ENV === 'production') {
-    app.use(helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-          imgSrc: ["'self'", "data:", "https:"],
-          connectSrc: ["'self'", "https:", "wss:", "ws:"],
-          fontSrc: ["'self'", "https:", "data:"],
-          objectSrc: ["'none'"],
-        },
-      },
-      crossOriginOpenerPolicy: { policy: "same-origin" }
-    }));
-  } else {
-    // Development mode - minimal security headers to allow Vite dev server
-    app.use(helmet({
-      contentSecurityPolicy: false,
-      crossOriginOpenerPolicy: false
-    }));
-  }
-  
-  app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-      ? process.env.ALLOWED_ORIGINS?.split(',') || []
-      : true,
-    credentials: true
-  }));
-
-  // Rate limiting
-  const chatRateLimit = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50, // Limit each wallet to 50 requests per windowMs
-    message: { message: 'Too many chat requests, please try again later' },
-    standardHeaders: true,
-    legacyHeaders: false,
-    skip: (req) => {
-      // Skip rate limiting in development mode for easier testing
-      return process.env.NODE_ENV === 'development';
-    }
-  });
-
-  const generalRateLimit = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes  
-    max: 100, // General API limit
-    message: { message: 'Too many requests, please try again later' },
-    standardHeaders: true,
-    legacyHeaders: false,
-  });
-
-  app.use('/api/', generalRateLimit);
-  app.use('/api/chat/', chatRateLimit);
-
   // Auth middleware
   await setupAuth(app);
 
-  // Production-ready wallet authentication with signature verification
-  const walletAuth = async (req: any, res: any, next: any) => {
-    try {
-      const walletAddress = req.headers['x-wallet-address'] as string;
-      const signature = req.headers['x-wallet-signature'] as string;
-      const timestamp = req.headers['x-wallet-timestamp'] ? 
-        parseInt(req.headers['x-wallet-timestamp'] as string) : undefined;
-      
-      if (!walletAddress) {
-        return res.status(401).json({ message: 'Wallet address required' });
-      }
-
-      // In production, require signature verification
-      if (process.env.NODE_ENV === 'production') {
-        if (!signature) {
-          return res.status(401).json({ message: 'Wallet signature required for production' });
-        }
-
-        // Verify timestamp for replay attack prevention
-        if (timestamp && !walletVerificationService.isTimestampValid(timestamp)) {
-          return res.status(401).json({ message: 'Authentication timestamp expired' });
-        }
-
-        // Verify wallet signature
-        const verification = await walletVerificationService.verifyWalletSignature(
-          walletAddress, 
-          signature, 
-          timestamp
-        );
-
-        if (!verification.isValid) {
-          return res.status(401).json({ 
-            message: 'Wallet signature verification failed',
-            error: verification.error 
-          });
-        }
-      } else {
-        // Development mode - validate address format only
-        if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-          return res.status(400).json({ message: 'Invalid wallet address format' });
-        }
-      }
-
-      // Get or create user based on wallet address
-      let user = await storage.getUserByWallet(walletAddress.toLowerCase());
-      if (!user) {
-        user = await storage.upsertUser({
-          walletAddress: walletAddress.toLowerCase(),
-          isVerified: true,
-          lastActive: new Date()
-        });
-      } else {
-        // Update last active
-        await storage.updateUserActivity(user.id);
-      }
-
-      req.user = { id: user.id, walletAddress: user.walletAddress };
-      next();
-    } catch (error) {
-      console.error('Wallet auth error:', error);
-      return res.status(500).json({ message: 'Authentication failed' });
-    }
-  };
-
   // Auth routes
-  app.get('/api/auth/user', walletAuth, async (req: any, res) => {
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -145,29 +22,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Input validation schemas
-  const createConversationSchema = z.object({
-    title: z.string().min(1).max(100),
-    category: z.enum(['crypto', 'research', 'learn', 'general']).default('general')
-  });
-
-  const sendMessageSchema = z.object({
-    content: z.string().min(1).max(4000)
-  });
-
-  // Chat routes with wallet authentication
-  app.post('/api/chat/conversations', walletAuth, async (req: any, res) => {
+  // Chat routes
+  app.post('/api/chat/conversations', isAuthenticated, async (req: any, res) => {
     try {
-      const validation = createConversationSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json({ 
-          message: 'Invalid input', 
-          errors: validation.error.issues 
-        });
-      }
-
-      const userId = req.user.id;
-      const { title, category } = validation.data;
+      const userId = req.user.claims.sub;
+      const { title, category = 'general' } = req.body;
 
       const conversation = await storage.createConversation({
         userId,
@@ -182,9 +41,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/conversations', walletAuth, async (req: any, res) => {
+  app.get('/api/chat/conversations', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       const conversations = await storage.getConversations(userId);
       res.json(conversations);
     } catch (error) {
@@ -193,7 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/conversations/:id', walletAuth, async (req: any, res) => {
+  app.get('/api/chat/conversations/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       const conversation = await storage.getConversation(id);
@@ -210,19 +69,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/messages', walletAuth, async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const validation = sendMessageSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json({ 
-          message: 'Invalid message content', 
-          errors: validation.error.issues 
-        });
-      }
+      const { content } = req.body;
+      const userId = req.user.claims.sub;
 
-      const { content } = validation.data;
-      const userId = req.user.id;
+      if (!content?.trim()) {
+        return res.status(400).json({ message: 'Message content is required' });
+      }
 
       const conversation = await storage.getConversation(id);
       if (!conversation) {
@@ -273,7 +128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/chat/conversations/:id', walletAuth, async (req: any, res) => {
+  app.delete('/api/chat/conversations/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteConversation(id);
@@ -354,9 +209,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User stats route
-  app.get('/api/user/stats', walletAuth, async (req: any, res) => {
+  app.get('/api/user/stats', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.claims.sub;
       const stats = await storage.getUserStats(userId);
       res.json(stats);
     } catch (error) {
@@ -365,61 +220,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Health check endpoint for load balancers
+  // Health check
   app.get('/api/health', (req, res) => {
-    res.json({ 
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development'
-    });
-  });
-
-  // Wallet verification endpoints
-  app.get('/api/auth/verification-message', (req, res) => {
-    const timestamp = Date.now();
-    const message = walletVerificationService.getVerificationMessage(timestamp);
-    res.json({ 
-      message,
-      timestamp,
-      expires: timestamp + (10 * 60 * 1000) // 10 minutes from now
-    });
-  });
-
-  app.post('/api/auth/verify-wallet', async (req, res) => {
-    try {
-      const { walletAddress, signature, timestamp } = req.body;
-
-      if (!walletAddress || !signature) {
-        return res.status(400).json({ 
-          message: 'Wallet address and signature required' 
-        });
-      }
-
-      const verification = await walletVerificationService.verifyWalletSignature(
-        walletAddress, 
-        signature, 
-        timestamp
-      );
-
-      if (verification.isValid) {
-        res.json({ 
-          success: true,
-          address: verification.address,
-          message: 'Wallet verification successful'
-        });
-      } else {
-        res.status(401).json({ 
-          success: false,
-          message: verification.error || 'Wallet verification failed'
-        });
-      }
-    } catch (error) {
-      console.error('Wallet verification endpoint error:', error);
-      res.status(500).json({ 
-        success: false,
-        message: 'Verification service error' 
-      });
-    }
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
   const httpServer = createServer(app);

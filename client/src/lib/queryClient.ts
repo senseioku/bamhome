@@ -8,30 +8,13 @@ async function throwIfResNotOk(res: Response) {
 }
 
 export async function apiRequest(
-  url: string,
   method: string,
+  url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
-  
-  // Add authentication data from localStorage
-  const walletAddress = localStorage.getItem('verifiedWalletAddress');
-  const signature = localStorage.getItem('walletSignature');
-  const timestamp = localStorage.getItem('walletTimestamp');
-  
-  if (walletAddress) {
-    headers['x-wallet-address'] = walletAddress;
-  }
-  if (signature) {
-    headers['x-wallet-signature'] = signature;
-  }
-  if (timestamp) {
-    headers['x-wallet-timestamp'] = timestamp;
-  }
-
   const res = await fetch(url, {
     method,
-    headers,
+    headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -46,26 +29,8 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const headers: Record<string, string> = {};
-    
-    // Add authentication data from localStorage
-    const walletAddress = localStorage.getItem('verifiedWalletAddress');
-    const signature = localStorage.getItem('walletSignature');
-    const timestamp = localStorage.getItem('walletTimestamp');
-    
-    if (walletAddress) {
-      headers['x-wallet-address'] = walletAddress;
-    }
-    if (signature) {
-      headers['x-wallet-signature'] = signature;
-    }
-    if (timestamp) {
-      headers['x-wallet-timestamp'] = timestamp;
-    }
-
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",
-      headers,
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {

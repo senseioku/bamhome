@@ -76,7 +76,7 @@ export class DatabaseStorage implements IStorage {
       .insert(users)
       .values(userData)
       .onConflictDoUpdate({
-        target: users.walletAddress,
+        target: users.id,
         set: {
           ...userData,
           updatedAt: new Date(),

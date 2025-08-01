@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { walletSecurity, type WalletVerification } from '@/lib/walletSecurity';
-import { walletSignatureService } from '@/lib/walletSignature';
 import Navigation from '@/components/navigation';
 import { 
   MessageCircle, 
@@ -58,11 +57,6 @@ export default function AiChat() {
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [walletAddress, setWalletAddress] = useState('');
-  
-  // Debug logging for verification state
-  useEffect(() => {
-    console.log('AiChat component - isVerified:', isVerified, 'walletAddress:', walletAddress);
-  }, [isVerified, walletAddress]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -111,7 +105,6 @@ export default function AiChat() {
   }, []);
 
   const handleWalletVerification = async () => {
-    console.log('Starting wallet verification...');
     setVerificationLoading(true);
     setVerificationError(null);
 
@@ -123,50 +116,16 @@ export default function AiChat() {
       }
 
       const address = accounts[0];
-      console.log('Verifying wallet address:', address);
       const verification: WalletVerification = await walletSecurity.verifyWalletOwnership(address);
-      console.log('Verification result:', verification);
 
       if (verification.isValid) {
-        console.log('Verification successful, now signing message for authentication');
-        
-        // Step 2: Sign message for cryptographic proof (only in production or if explicitly requested)
-        if (process.env.NODE_ENV === 'production' || window.location.search.includes('require_signature=true')) {
-          const signatureResult = await walletSignatureService.authenticateWallet(address);
-          
-          if (signatureResult.success) {
-            console.log('Wallet signature successful, user authenticated');
-            setIsVerified(true);
-            setWalletAddress(address);
-            setShowVerificationDialog(false);
-            
-            // Store authentication data for API calls
-            localStorage.setItem('verifiedWalletAddress', address);
-            localStorage.setItem('walletSignature', signatureResult.signature!);
-            localStorage.setItem('walletTimestamp', signatureResult.timestamp!.toString());
-          } else {
-            console.log('Signature failed:', signatureResult.error);
-            setVerificationError(signatureResult.error || 'Signature verification failed');
-          }
-        } else {
-          // Development mode - skip signature for easier testing
-          console.log('Development mode: skipping signature verification');
-          setIsVerified(true);
-          setWalletAddress(address);
-          setShowVerificationDialog(false);
-          
-          // Store only wallet address for development
-          localStorage.setItem('verifiedWalletAddress', address);
-        }
+        setIsVerified(true);
+        setWalletAddress(address);
+        setShowVerificationDialog(false);
       } else {
-        console.log('Token verification failed:', verification.error);
-        setVerificationError(verification.error || 'Token verification failed');
-        localStorage.removeItem('verifiedWalletAddress');
-        localStorage.removeItem('walletSignature');
-        localStorage.removeItem('walletTimestamp');
+        setVerificationError(verification.error || 'Verification failed');
       }
     } catch (error: any) {
-      console.error('Verification error:', error);
       setVerificationError('Failed to verify wallet. Please try again.');
     } finally {
       setVerificationLoading(false);
@@ -234,19 +193,12 @@ export default function AiChat() {
   };
 
   const handleNewConversation = async () => {
-    console.log('Creating new conversation:', { selectedCategory, isVerified });
-    if (!isVerified) {
-      console.error('User not verified - cannot create conversation');
-      return;
-    }
-
     const title = `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Chat ${Date.now()}`;
     try {
-      const result = await createConversationMutation.mutateAsync({
+      await createConversationMutation.mutateAsync({
         title,
         category: selectedCategory
       });
-      console.log('Conversation created successfully:', result);
     } catch (error) {
       console.error('Failed to create conversation:', error);
     }
@@ -403,20 +355,11 @@ export default function AiChat() {
               </div>
 
               <Button
-                onClick={async (e) => {
-                  e.preventDefault();
-                  console.log('New Chat button clicked from sidebar');
-                  await handleNewConversation();
-                }}
-                disabled={createConversationMutation.isPending}
-                className="w-full mt-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50"
+                onClick={handleNewConversation}
+                className="w-full mt-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                 size="sm"
               >
-                {createConversationMutation.isPending ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                ) : (
-                  <Plus className="w-4 h-4 mr-2" />
-                )}
+                <Plus className="w-4 h-4 mr-2" />
                 New Chat
               </Button>
             </div>
@@ -496,15 +439,12 @@ export default function AiChat() {
                     {categories.slice(0, 4).map((category) => (
                       <Button
                         key={category.id}
-                        onClick={async (e) => {
-                          e.preventDefault();
-                          console.log('Category button clicked:', category.id);
+                        onClick={() => {
                           setSelectedCategory(category.id);
-                          await handleNewConversation();
+                          handleNewConversation();
                         }}
-                        disabled={createConversationMutation.isPending}
                         variant="outline"
-                        className="p-3 h-auto border-gray-600 hover:bg-gray-800 text-left disabled:opacity-50"
+                        className="p-3 h-auto border-gray-600 hover:bg-gray-800 text-left"
                       >
                         <div className="flex flex-col items-center">
                           <category.icon className="w-5 h-5 mb-2 text-purple-400" />
@@ -541,22 +481,16 @@ export default function AiChat() {
                       }}
                     />
                     <Button
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        console.log('Welcome input button clicked:', messageInput);
+                      onClick={() => {
                         if (messageInput.trim()) {
-                          await handleNewConversation();
+                          handleNewConversation();
                         }
                       }}
-                      disabled={!messageInput.trim() || createConversationMutation.isPending}
-                      className="bg-purple-600 hover:bg-purple-700 px-3 disabled:opacity-50"
+                      disabled={!messageInput.trim()}
+                      className="bg-purple-600 hover:bg-purple-700 px-3"
                       size="sm"
                     >
-                      {createConversationMutation.isPending ? (
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <Send className="w-4 h-4" />
-                      )}
+                      <Send className="w-4 h-4" />
                     </Button>
                   </div>
                   <div className="text-xs text-gray-400 mt-2 text-center">
