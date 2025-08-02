@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
-import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown, Brain, BarChart3 } from "lucide-react";
+import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown, Brain } from "lucide-react";
 
 export default function Navigation() {
   const scrollToSection = (sectionId: string) => {
@@ -133,17 +133,7 @@ export default function Navigation() {
                               <Brain className="w-4 h-4" />
                               <span className="text-sm font-medium">BAM AIChat</span>
                             </div>
-                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
-                          </a>
-                          <a
-                            href="/tx-visualizer"
-                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
-                          >
-                            <div className="flex items-center gap-3">
-                              <BarChart3 className="w-4 h-4" />
-                              <span className="text-sm font-medium">TX Story Visualizer</span>
-                            </div>
-                            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">New</span>
+                            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">Beta</span>
                           </a>
                           <a
                             href="/#projects"
