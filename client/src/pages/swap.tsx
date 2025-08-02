@@ -1648,6 +1648,16 @@ const SwapPage = () => {
                             <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
                           </div>
                           <a
+                            href="/ai-chat"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm">🤖</span>
+                              <span className="text-sm font-medium">BAM AIChat</span>
+                            </div>
+                            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">Beta</span>
+                          </a>
+                          <a
                             href="/#projects"
                             className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                           >
