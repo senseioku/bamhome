@@ -4,6 +4,23 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { aiService } from "./ai";
 import { cryptoService } from "./cryptoService";
+import { monitoring } from "./monitoring";
+import { 
+  compressionMiddleware, 
+  securityMiddleware, 
+  timeoutMiddleware, 
+  productionLogger,
+  healthCheck,
+  gracefulShutdown 
+} from "./performance";
+import { setupProductionOptimizations, queryOptimizer, ResponseOptimizer } from "./optimization";
+import { 
+  aiCircuitBreaker, 
+  requestDeduplicator, 
+  dbHealthMonitor, 
+  autoScaler, 
+  readinessChecker 
+} from "./scalability";
 import { z } from "zod";
 import {
   generalRateLimit,
@@ -24,7 +41,14 @@ import {
 } from "./security";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Apply enterprise security middleware
+  // Production-ready middleware stack
+  app.use(compressionMiddleware);
+  app.use(securityMiddleware);
+  app.use(timeoutMiddleware(30000));
+  app.use(productionLogger);
+  app.use(autoScaler.middleware());
+  
+  // Enterprise security middleware
   app.use(securityHeaders);
   app.use(corsOptions);
   app.use(securityLogger);
@@ -32,6 +56,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(progressiveSlowDown);
   app.use(generalRateLimit);
   app.use(sanitizeInput);
+  
+  // Monitoring and optimization setup
+  monitoring.setupMiddleware(app);
+  healthCheck(app);
+  setupProductionOptimizations(app);
 
   // Auth middleware
   await setupAuth(app);
@@ -55,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     isAuthenticated, 
     usernameValidation,
     handleValidationErrors,
-    async (req: any, res) => {
+    async (req: any, res: any) => {
     try {
       const userId = req.user.claims.sub;
       const { username, displayName } = req.body;
@@ -103,7 +132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     isAuthenticated,
     chatValidation,
     handleValidationErrors,
-    async (req: any, res) => {
+    async (req: any, res: any) => {
     try {
       const userId = req.user.claims.sub;
       const { title, category = 'general' } = req.body;
@@ -124,8 +153,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/chat/conversations', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const conversations = await storage.getConversations(userId);
-      res.json(conversations);
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      
+      const conversations = await queryOptimizer.cachedQuery(
+        `conversations:${userId}:${page}:${limit}`,
+        () => storage.getConversations(userId)
+      );
+      
+      const paginatedResult = ResponseOptimizer.paginate(conversations, page, limit);
+      const optimizedData = ResponseOptimizer.compressResponse(paginatedResult);
+      
+      res.json(optimizedData);
     } catch (error) {
       console.error('Get conversations error:', error);
       res.status(500).json({ message: 'Failed to get conversations' });
@@ -178,8 +217,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: msg.content
       }));
 
-      // Generate AI response
-      const aiResponse = await aiService.chat(chatHistory, conversation.category);
+      // Generate AI response with circuit breaker and deduplication
+      const cacheKey = `ai_response:${id}:${content.substring(0, 50)}`;
+      const aiResponse = await requestDeduplicator.deduplicate(cacheKey, async () => {
+        return await aiCircuitBreaker.execute(() => 
+          aiService.chat(chatHistory, conversation.category)
+        );
+      });
 
       // Create AI message
       const aiMessage = await storage.createMessage({
@@ -306,7 +350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     enhancedAuth,
     walletValidation,
     handleValidationErrors,
-    async (req, res) => {
+    async (req: any, res: any) => {
     try {
       const { address, signature, message } = req.body;
 
@@ -375,11 +419,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'Wallet successfully verified for BAM AIChat access'
       });
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Wallet verification error:', error);
       res.status(500).json({ 
         error: 'Wallet verification failed',
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
@@ -390,7 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     enhancedAuth,
     chatValidation,
     handleValidationErrors,
-    async (req, res) => {
+    async (req: any, res: any) => {
     try {
       const { message, conversationHistory = [] } = req.body;
 
@@ -412,22 +456,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: new Date().toISOString()
       });
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('AI Chat Error:', error);
       res.status(500).json({ 
         error: 'Failed to generate response',
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
 
 
 
-  // Health check
-  app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  // Enhanced health checks
+  app.get('/api/health', async (req, res) => {
+    const dbHealth = await dbHealthMonitor.checkHealth(db);
+    const scalingStats = autoScaler.getStats();
+    
+    res.json({ 
+      status: dbHealth ? 'healthy' : 'degraded',
+      timestamp: new Date().toISOString(),
+      database: dbHealthMonitor.getStatus(),
+      scaling: scalingStats,
+      uptime: process.uptime()
+    });
+  });
+
+  // Production readiness check
+  app.get('/api/readiness', async (req, res) => {
+    const readiness = await readinessChecker.runChecks();
+    res.status(readiness.ready ? 200 : 503).json(readiness);
+  });
+
+  // System metrics endpoint
+  app.get('/api/metrics', (req, res) => {
+    res.json({
+      deduplicator: requestDeduplicator.getStats(),
+      scaling: autoScaler.getStats(),
+      database: dbHealthMonitor.getStatus(),
+      timestamp: new Date().toISOString(),
+    });
   });
 
   const httpServer = createServer(app);
+  
+  // Setup graceful shutdown
+  gracefulShutdown(httpServer);
+  
   return httpServer;
 }
