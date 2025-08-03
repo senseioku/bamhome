@@ -138,6 +138,31 @@ export const userActivityRelations = relations(userActivity, ({ one }) => ({
 
 // Types
 export type User = typeof users.$inferSelect;
+
+// Chat session storage table
+export const chatSessions = pgTable("chat_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  walletAddress: varchar("wallet_address").notNull(),
+  sessionId: varchar("session_id").notNull().unique(),
+  conversationTitle: varchar("conversation_title"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Chat messages storage table
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").notNull().references(() => chatSessions.sessionId, { onDelete: "cascade" }),
+  messageType: varchar("message_type").notNull(),
+  messageContent: varchar("message_content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ChatSession = typeof chatSessions.$inferSelect;
+export type InsertChatSession = typeof chatSessions.$inferInsert;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = typeof chatMessages.$inferInsert;
 export type UpsertUser = typeof users.$inferInsert;
 export type Conversation = typeof conversations.$inferSelect;
 export type InsertConversation = typeof conversations.$inferInsert;

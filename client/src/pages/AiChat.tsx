@@ -203,7 +203,7 @@ export default function AiChat() {
   const handleDisconnectWallet = async () => {
     try {
       // Clear wallet session
-      walletSecurity.clearSession();
+      walletSecurity.clearSession(walletAddress);
       
       // Reset state
       setIsVerified(false);
@@ -487,7 +487,7 @@ export default function AiChat() {
             onClick={() => setShowSidebar(true)}
             size="sm"
             variant="ghost"
-            className="fixed top-20 left-4 z-40 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm"
+            className="fixed top-20 left-4 z-50 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm"
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -495,7 +495,7 @@ export default function AiChat() {
 
         {/* Mobile Sidebar */}
         {showSidebar && (
-          <div className="w-full md:w-80 bg-gray-900/95 backdrop-blur-sm border-r border-gray-700 flex flex-col fixed md:relative h-full z-30 md:bg-gray-900">
+          <div className="w-full md:w-80 bg-gray-900/95 backdrop-blur-sm border-r border-gray-700 flex flex-col fixed md:relative h-full z-10 md:bg-gray-900">
             {/* Sidebar Header */}
             <div className="p-4 border-b border-gray-700">
               <div className="flex items-center justify-between mb-4">
@@ -635,10 +635,10 @@ export default function AiChat() {
                   )}
                 </div>
 
-                {/* AI Info */}
+                {/* AI Status */}
                 <div className="flex items-center gap-2 text-xs text-gray-400">
                   <Zap className="w-3 h-3" />
-                  <span>Claude 4.0 Sonnet</span>
+                  <span>AI Powered</span>
                 </div>
 
                 {/* Username Creation */}
@@ -657,11 +657,11 @@ export default function AiChat() {
         )}
 
         {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col relative z-20">
           {!selectedConversation ? (
             // Welcome Screen - Mobile Optimized
             <div className="flex-1 flex flex-col">
-              <div className="flex-1 flex items-center justify-center p-4 min-h-0">
+              <div className="flex-1 flex items-center justify-center p-4 min-h-0 relative z-30">
                 <div className="text-center max-w-md w-full">
                   <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6">
                     <Brain className="w-6 h-6 md:w-8 md:h-8 text-white" />
@@ -700,7 +700,7 @@ export default function AiChat() {
               </div>
               
               {/* Fixed Chat Input at Bottom */}
-              <div className="p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+              <div className="p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm relative z-30">
                 <div className="max-w-md mx-auto">
                   <div className="flex gap-2">
                     <Input
