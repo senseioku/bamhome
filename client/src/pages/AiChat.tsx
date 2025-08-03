@@ -481,15 +481,15 @@ export default function AiChat() {
       <Navigation />
       
       <div className="flex-1 flex pt-16 relative">
-        {/* Mobile Sidebar Toggle - Positioned to avoid overlap */}
+        {/* Mobile Sidebar Toggle - Simple positioning */}
         {!showSidebar && (
           <Button
             onClick={() => setShowSidebar(true)}
             size="sm"
             variant="ghost"
-            className="fixed top-20 left-2 z-50 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm"
+            className="fixed top-20 left-4 z-50 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm"
           >
-            <ChevronLeft className="w-3 h-3" />
+            <ChevronLeft className="w-4 h-4" />
           </Button>
         )}
 
@@ -656,23 +656,23 @@ export default function AiChat() {
           </div>
         )}
 
-        {/* Main Chat Area - Adjusted for sidebar overlap */}
-        <div className={`flex-1 flex flex-col relative z-20 transition-all duration-300 ${showSidebar ? 'ml-0 md:ml-0' : 'ml-0'}`}>
+        {/* Main Chat Area - Clean layout with minimal margin adjustment */}
+        <div className={`flex-1 flex flex-col relative z-20 ${!showSidebar ? 'ml-12 md:ml-0' : ''}`}>
           {!selectedConversation ? (
-            // Welcome Screen - Adaptive Layout
+            // Welcome Screen - Clean responsive layout
             <div className="flex-1 flex flex-col">
-              <div className={`flex-1 flex items-center justify-center min-h-0 relative z-30 transition-all duration-300 ${showSidebar ? 'p-1 ml-12 md:ml-0 md:p-2' : 'p-2 ml-12 md:ml-0'}`}>
-                <div className={`text-center w-full transition-all duration-300 ${showSidebar ? 'max-w-xs' : 'max-w-sm'}`}>
-                  <div className={`bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2 transition-all duration-300 ${showSidebar ? 'w-8 h-8' : 'w-10 h-10'}`}>
-                    <Brain className={`text-white transition-all duration-300 ${showSidebar ? 'w-4 h-4' : 'w-5 h-5'}`} />
+              <div className="flex-1 flex items-center justify-center p-2 min-h-0 relative z-30">
+                <div className="text-center max-w-sm w-full">
+                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Brain className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className={`font-bold mb-2 transition-all duration-300 ${showSidebar ? 'text-base' : 'text-lg'}`}>Welcome to BAM AIChat</h2>
-                  <p className={`text-gray-400 mb-3 leading-relaxed transition-all duration-300 ${showSidebar ? 'text-xs' : 'text-xs'}`}>
+                  <h2 className="text-lg font-bold mb-2">Welcome to BAM AIChat</h2>
+                  <p className="text-gray-400 text-xs mb-4 leading-relaxed">
                     AI companion for crypto, business, and general knowledge. From DeFi to cooking recipes - ask anything!
                   </p>
                   
-                  {/* Quick Actions - Responsive Grid */}
-                  <div className={`grid gap-1.5 mb-3 transition-all duration-300 ${showSidebar ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                  {/* Quick Actions - Simple 2x2 Grid */}
+                  <div className="grid grid-cols-2 gap-2 mb-4">
                     {categories.slice(0, 4).map((category) => (
                       <Button
                         key={category.id}
@@ -681,11 +681,11 @@ export default function AiChat() {
                           handleNewConversation();
                         }}
                         variant="outline"
-                        className="p-1.5 h-auto border-gray-600 hover:bg-gray-800"
+                        className="p-2 h-auto border-gray-600 hover:bg-gray-800"
                         size="sm"
                       >
-                        <div className={`flex items-center gap-1.5 ${showSidebar ? 'justify-start' : 'flex-col'}`}>
-                          <category.icon className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                        <div className="flex flex-col items-center gap-1">
+                          <category.icon className="w-3 h-3 text-purple-400" />
                           <div className="font-medium text-xs leading-tight">{category.name}</div>
                         </div>
                       </Button>
@@ -694,8 +694,8 @@ export default function AiChat() {
                 </div>
               </div>
               
-              {/* Fixed Chat Input at Bottom - Adaptive Layout */}
-              <div className={`border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm relative z-30 transition-all duration-300 ${showSidebar ? 'p-1 ml-12 md:ml-0 md:p-2' : 'p-2 ml-12 md:ml-0'}`}>
+              {/* Fixed Chat Input at Bottom */}
+              <div className="p-2 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm relative z-30">
                 <div className="max-w-md mx-auto">
                   <div className="flex gap-1.5">
                     <Input
@@ -734,8 +734,8 @@ export default function AiChat() {
           ) : (
             // Chat Interface
             <>
-              {/* Chat Header - Adaptive Mobile Layout */}
-              <div className={`border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm transition-all duration-300 ${showSidebar ? 'p-1 ml-12 md:ml-0 md:p-2' : 'p-2 ml-12 md:ml-0'}`}>
+              {/* Chat Header - Clean Mobile Layout */}
+              <div className="p-2 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm">
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => setShowSidebar(true)}
@@ -761,8 +761,8 @@ export default function AiChat() {
                 </div>
               </div>
 
-              {/* Messages - Adaptive Mobile Layout */}
-              <ScrollArea className={`flex-1 transition-all duration-300 ${showSidebar ? 'p-1 ml-12 md:ml-0 md:p-2' : 'p-2 ml-12 md:ml-0'}`}>
+              {/* Messages - Clean Mobile Layout */}
+              <ScrollArea className="flex-1 p-2">
                 <div className="max-w-4xl mx-auto space-y-1.5">
                   {loadingConversation ? (
                     <div className="flex items-center justify-center py-4">
@@ -808,8 +808,8 @@ export default function AiChat() {
                 </div>
               </ScrollArea>
 
-              {/* Message Input - Adaptive Bottom */}
-              <div className={`border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm transition-all duration-300 ${showSidebar ? 'p-1 ml-12 md:ml-0 md:p-2' : 'p-2 ml-12 md:ml-0'}`}>
+              {/* Message Input - Clean Bottom */}
+              <div className="p-2 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
                 <div className="max-w-4xl mx-auto">
                   <div className="flex gap-1.5">
                     <Input
