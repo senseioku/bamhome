@@ -257,7 +257,7 @@ export default function AiChat() {
         setVerificationError(verification.error || 'Verification failed');
       }
     } catch (error: any) {
-      console.error('❌ AIChat verification error:', error);
+      console.error('AIChat verification error:', error);
       if (error.message?.includes('insufficient') || error.message?.includes('10M')) {
         setVerificationError('You need at least 10M BAM tokens to access BAM AIChat.');
       } else if (error.message?.includes('signature') || error.message?.includes('rejected')) {

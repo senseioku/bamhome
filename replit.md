@@ -96,3 +96,6 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 - ✅ Advanced abuse detection with 24-hour IP blocking after 20 failed attempts
 - ✅ Security monitoring with detailed request tracking and suspicious activity logging
 - ✅ Input sanitization with NoSQL injection prevention and HTTP parameter pollution protection
+- ✅ AI Chat expanded to handle ALL topics: crypto, business, technology, science, education, cooking, travel, entertainment, and everyday questions
+- ✅ General category configured for comprehensive assistance beyond crypto/business topics
+- ✅ Enhanced AI system prompt supports both specialized crypto/DeFi expertise and general knowledge assistance

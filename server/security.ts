@@ -165,7 +165,11 @@ export const chatValidation = [
   body('category')
     .optional()
     .isIn(['crypto', 'research', 'learn', 'general'])
-    .withMessage('Invalid category')
+    .withMessage('Invalid category'),
+  body('conversationHistory')
+    .optional()
+    .isArray()
+    .withMessage('Conversation history must be an array')
 ];
 
 // Validation error handler
