@@ -481,13 +481,13 @@ export default function AiChat() {
       <Navigation />
       
       <div className="flex-1 flex pt-16 relative">
-        {/* Mobile Sidebar Toggle - Simple positioning */}
+        {/* Mobile Sidebar Toggle */}
         {!showSidebar && (
           <Button
             onClick={() => setShowSidebar(true)}
             size="sm"
             variant="ghost"
-            className="fixed top-20 left-4 z-50 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm"
+            className="fixed top-20 left-3 z-50 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm border border-gray-600"
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -495,7 +495,7 @@ export default function AiChat() {
 
         {/* Mobile Sidebar */}
         {showSidebar && (
-          <div className="w-80 bg-gray-900/95 backdrop-blur-sm border-r border-gray-700 flex flex-col fixed md:relative h-full z-10 md:bg-gray-900">
+          <div className="w-full md:w-80 bg-gray-900/95 backdrop-blur-sm border-r border-gray-700 flex flex-col fixed md:relative h-full z-50 md:bg-gray-900">
             {/* Sidebar Header */}
             <div className="p-3 border-b border-gray-700">
               <div className="flex items-center justify-between mb-3">
