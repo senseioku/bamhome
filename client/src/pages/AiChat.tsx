@@ -495,7 +495,7 @@ export default function AiChat() {
 
         {/* Mobile Sidebar */}
         {showSidebar && (
-          <div className="w-full md:w-80 bg-gray-900/95 backdrop-blur-sm border-r border-gray-700 flex flex-col fixed md:relative h-full z-10 md:bg-gray-900">
+          <div className="w-80 bg-gray-900/95 backdrop-blur-sm border-r border-gray-700 flex flex-col fixed md:relative h-full z-10 md:bg-gray-900">
             {/* Sidebar Header */}
             <div className="p-3 border-b border-gray-700">
               <div className="flex items-center justify-between mb-3">
@@ -656,23 +656,23 @@ export default function AiChat() {
           </div>
         )}
 
-        {/* Main Chat Area - Clean layout with minimal margin adjustment */}
-        <div className={`flex-1 flex flex-col relative z-20 ${!showSidebar ? 'ml-12 md:ml-0' : ''}`}>
+        {/* Main Chat Area - Clean layout */}
+        <div className="flex-1 flex flex-col relative z-20">
           {!selectedConversation ? (
-            // Welcome Screen - Clean responsive layout
+            // Welcome Screen - Perfect mobile layout
             <div className="flex-1 flex flex-col">
-              <div className="flex-1 flex items-center justify-center p-2 min-h-0 relative z-30">
+              <div className="flex-1 flex items-center justify-center p-4 min-h-0">
                 <div className="text-center max-w-sm w-full">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Brain className="w-5 h-5 text-white" />
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Brain className="w-6 h-6 text-white" />
                   </div>
-                  <h2 className="text-lg font-bold mb-2">Welcome to BAM AIChat</h2>
-                  <p className="text-gray-400 text-xs mb-4 leading-relaxed">
+                  <h2 className="text-xl font-bold mb-2">Welcome to BAM AIChat</h2>
+                  <p className="text-gray-400 text-sm mb-6 leading-relaxed">
                     AI companion for crypto, business, and general knowledge. From DeFi to cooking recipes - ask anything!
                   </p>
                   
-                  {/* Quick Actions - Simple 2x2 Grid */}
-                  <div className="grid grid-cols-2 gap-2 mb-4">
+                  {/* Quick Actions - Clean 2x2 Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
                     {categories.slice(0, 4).map((category) => (
                       <Button
                         key={category.id}
@@ -681,12 +681,12 @@ export default function AiChat() {
                           handleNewConversation();
                         }}
                         variant="outline"
-                        className="p-2 h-auto border-gray-600 hover:bg-gray-800"
+                        className="p-3 h-auto border-gray-600 hover:bg-gray-800 rounded-lg"
                         size="sm"
                       >
-                        <div className="flex flex-col items-center gap-1">
-                          <category.icon className="w-3 h-3 text-purple-400" />
-                          <div className="font-medium text-xs leading-tight">{category.name}</div>
+                        <div className="flex flex-col items-center gap-2">
+                          <category.icon className="w-4 h-4 text-purple-400" />
+                          <div className="font-medium text-xs text-center">{category.name}</div>
                         </div>
                       </Button>
                     ))}
@@ -695,14 +695,14 @@ export default function AiChat() {
               </div>
               
               {/* Fixed Chat Input at Bottom */}
-              <div className="p-2 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm relative z-30">
-                <div className="max-w-md mx-auto">
-                  <div className="flex gap-1.5">
+              <div className="p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+                <div className="max-w-2xl mx-auto">
+                  <div className="flex gap-3">
                     <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
                       placeholder="Ask anything - crypto, business, cooking..."
-                      className="flex-1 bg-gray-800 border-gray-600 text-white text-sm py-2"
+                      className="flex-1 bg-gray-800 border-gray-600 text-white py-3 text-base"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -719,13 +719,13 @@ export default function AiChat() {
                         }
                       }}
                       disabled={!messageInput.trim()}
-                      className="bg-purple-600 hover:bg-purple-700 px-2"
-                      size="sm"
+                      className="bg-purple-600 hover:bg-purple-700 px-4"
+                      size="lg"
                     >
-                      <Send className="w-3 h-3" />
+                      <Send className="w-4 h-4" />
                     </Button>
                   </div>
-                  <div className="text-xs text-gray-400 mt-1 text-center">
+                  <div className="text-sm text-gray-400 mt-2 text-center">
                     Start by asking about crypto, business, DeFi, or wealth building
                   </div>
                 </div>
