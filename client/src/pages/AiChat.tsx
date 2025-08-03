@@ -774,18 +774,52 @@ export default function AiChat() {
                           }`}
                         >
                           <div className="whitespace-pre-wrap text-sm leading-relaxed max-w-none">
-                            {message.content
-                              .replace(/^# /gm, '🔷 ') // Convert H1 to diamond bullet
-                              .replace(/^## /gm, '◆ ') // Convert H2 to diamond bullet
-                              .replace(/^### /gm, '▪ ') // Convert H3 to small bullet
-                              .replace(/^- /gm, '🔹 ') // Convert bullets to blue diamonds
-                              .replace(/^\* /gm, '🔹 ') // Convert asterisk bullets to blue diamonds
-                              .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markers but keep text
-                              .replace(/\*(.*?)\*/g, '$1') // Remove italic markers but keep text
-                              .replace(/\n{3,}/g, '\n\n') // Reduce excessive line breaks
-                              .replace(/\n\n\s*\n/g, '\n\n') // Clean up spaced breaks
-                              .trim()
-                            }
+                            {(() => {
+                              let content = message.content;
+                              
+                              // Smart emoji replacement based on content
+                              content = content
+                                // Crypto/Finance related
+                                .replace(/^# (.*(?:crypto|bitcoin|ethereum|defi|token|trading|investment|financial|market|portfolio|wallet).*)/gmi, '💎 $1')
+                                .replace(/^## (.*(?:crypto|bitcoin|ethereum|defi|token|trading|investment|financial|market|portfolio|wallet).*)/gmi, '🪙 $1')
+                                .replace(/^- (.*(?:crypto|bitcoin|ethereum|defi|token|trading|investment|financial|market|portfolio|wallet).*)/gmi, '📈 $1')
+                                
+                                // Business/Strategy related
+                                .replace(/^# (.*(?:business|strategy|growth|revenue|profit|success|goal|plan|entrepreneur|startup).*)/gmi, '🎯 $1')
+                                .replace(/^## (.*(?:business|strategy|growth|revenue|profit|success|goal|plan|entrepreneur|startup).*)/gmi, '💼 $1')
+                                .replace(/^- (.*(?:business|strategy|growth|revenue|profit|success|goal|plan|entrepreneur|startup).*)/gmi, '🚀 $1')
+                                
+                                // Education/Learning related
+                                .replace(/^# (.*(?:learn|education|guide|tutorial|basics|foundation|understanding|knowledge).*)/gmi, '📚 $1')
+                                .replace(/^## (.*(?:learn|education|guide|tutorial|basics|foundation|understanding|knowledge).*)/gmi, '🎓 $1')
+                                .replace(/^- (.*(?:learn|education|guide|tutorial|basics|foundation|understanding|knowledge).*)/gmi, '💡 $1')
+                                
+                                // Cooking/Food related
+                                .replace(/^# (.*(?:cook|recipe|food|ingredient|dish|meal|kitchen|bake|cuisine).*)/gmi, '👨‍🍳 $1')
+                                .replace(/^## (.*(?:cook|recipe|food|ingredient|dish|meal|kitchen|bake|cuisine).*)/gmi, '🍽️ $1')
+                                .replace(/^- (.*(?:cook|recipe|food|ingredient|dish|meal|kitchen|bake|cuisine).*)/gmi, '🥘 $1')
+                                
+                                // Technology/Tech related
+                                .replace(/^# (.*(?:tech|technology|software|code|programming|development|ai|algorithm).*)/gmi, '💻 $1')
+                                .replace(/^## (.*(?:tech|technology|software|code|programming|development|ai|algorithm).*)/gmi, '⚙️ $1')
+                                .replace(/^- (.*(?:tech|technology|software|code|programming|development|ai|algorithm).*)/gmi, '🔧 $1')
+                                
+                                // Default fallbacks for any remaining headers/bullets
+                                .replace(/^# /gm, '🔷 ')
+                                .replace(/^## /gm, '◆ ')
+                                .replace(/^### /gm, '▪ ')
+                                .replace(/^- /gm, '🔹 ')
+                                .replace(/^\* /gm, '🔹 ')
+                                
+                                // Clean up markdown formatting
+                                .replace(/\*\*(.*?)\*\*/g, '$1')
+                                .replace(/\*(.*?)\*/g, '$1')
+                                .replace(/\n{3,}/g, '\n\n')
+                                .replace(/\n\n\s*\n/g, '\n\n')
+                                .trim();
+                              
+                              return content;
+                            })()}
                           </div>
                           <div className="text-xs opacity-70 mt-1">
                             {new Date(message.createdAt).toLocaleTimeString([], { 
