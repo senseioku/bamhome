@@ -30,7 +30,11 @@ import {
   Clock,
   Star,
   User,
-  Settings
+  Settings,
+  LogOut,
+  ChevronDown,
+  Copy,
+  Check
 } from 'lucide-react';
 
 interface Message {
@@ -88,6 +92,8 @@ export default function AiChat() {
   const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [showWalletMenu, setShowWalletMenu] = useState(false);
+  const [addressCopied, setAddressCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -191,6 +197,34 @@ export default function AiChat() {
       });
     } catch (error) {
       console.error('Username creation failed:', error);
+    }
+  };
+
+  const handleDisconnectWallet = async () => {
+    try {
+      // Clear wallet session
+      walletSecurity.clearSession();
+      
+      // Reset state
+      setIsVerified(false);
+      setWalletAddress('');
+      setShowWalletMenu(false);
+      setShowVerificationDialog(true);
+      
+      // Clear any cached data
+      queryClient.clear();
+    } catch (error) {
+      console.error('Error disconnecting wallet:', error);
+    }
+  };
+
+  const copyAddressToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(walletAddress);
+      setAddressCopied(true);
+      setTimeout(() => setAddressCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy address:', error);
     }
   };
 
@@ -374,7 +408,7 @@ export default function AiChat() {
                 <Brain className="w-6 h-6 text-white" />
               </div>
               <h2 className="text-lg font-bold text-white mb-1">BAM AIChat</h2>
-              <p className="text-sm text-gray-400">AI-powered crypto companion</p>
+              <p className="text-sm text-gray-400">AI-powered crypto and growth companion</p>
             </div>
 
             {/* Requirements Card */}
@@ -552,22 +586,67 @@ export default function AiChat() {
               </div>
             </ScrollArea>
 
-            {/* Quick Info */}
+            {/* Wallet & User Info */}
             <div className="p-4 border-t border-gray-700">
-              <div className="text-xs text-gray-400 space-y-1">
-                <div className="flex items-center gap-2">
-                  <Wallet className="w-3 h-3" />
-                  <span>Verified: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+              <div className="space-y-3">
+                {/* Wallet Connection Status */}
+                <div className="relative">
+                  <Button
+                    onClick={() => setShowWalletMenu(!showWalletMenu)}
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-gray-600 hover:bg-gray-800 text-xs justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Wallet className="w-3 h-3" />
+                      <span>{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+                    </div>
+                    <ChevronDown className="w-3 h-3" />
+                  </Button>
+                  
+                  {/* Wallet Menu Dropdown */}
+                  {showWalletMenu && (
+                    <div className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">
+                      <div className="p-3 border-b border-gray-700">
+                        <div className="text-xs text-gray-400 mb-1">Connected Wallet</div>
+                        <div className="text-xs font-mono text-white">{walletAddress}</div>
+                      </div>
+                      <div className="p-1">
+                        <Button
+                          onClick={copyAddressToClipboard}
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-xs hover:bg-gray-700"
+                        >
+                          {addressCopied ? <Check className="w-3 h-3 mr-2" /> : <Copy className="w-3 h-3 mr-2" />}
+                          {addressCopied ? 'Copied!' : 'Copy Address'}
+                        </Button>
+                        <Button
+                          onClick={handleDisconnectWallet}
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-xs hover:bg-gray-700 text-red-400 hover:text-red-300"
+                        >
+                          <LogOut className="w-3 h-3 mr-2" />
+                          Disconnect
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
+
+                {/* AI Info */}
+                <div className="flex items-center gap-2 text-xs text-gray-400">
                   <Zap className="w-3 h-3" />
                   <span>Claude 4.0 Sonnet</span>
                 </div>
+
+                {/* Username Creation */}
                 <Button
                   onClick={() => setShowUsernameDialog(true)}
                   size="sm"
                   variant="outline"
-                  className="w-full mt-2 text-xs border-gray-600 hover:bg-gray-800"
+                  className="w-full text-xs border-gray-600 hover:bg-gray-800"
                 >
                   <User className="w-3 h-3 mr-1" />
                   Create Username
@@ -589,7 +668,7 @@ export default function AiChat() {
                   </div>
                   <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Welcome to BAM AIChat</h2>
                   <p className="text-gray-400 text-sm md:text-base mb-6">
-                    AI-powered crypto companion for insights and DeFi education.
+                    AI-powered crypto companion for insights, DeFi education for building business and wealth multiplication. Anything from business, crypto and growth BAM AIChat will help you grow.
                   </p>
                   
                   {/* Quick Actions - Compact Mobile Grid */}
@@ -627,7 +706,7 @@ export default function AiChat() {
                     <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
-                      placeholder="Ask about crypto, DeFi, or start a conversation..."
+                      placeholder="Ask about crypto, DeFi, business, wealth building..."
                       className="flex-1 bg-gray-800 border-gray-600 text-white text-sm"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
@@ -652,7 +731,7 @@ export default function AiChat() {
                     </Button>
                   </div>
                   <div className="text-xs text-gray-400 mt-2 text-center">
-                    Start by typing a question or select a category above
+                    Start by asking about crypto, business, DeFi, or wealth building
                   </div>
                 </div>
               </div>
@@ -733,7 +812,7 @@ export default function AiChat() {
                     <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
-                      placeholder="Ask about crypto, DeFi, or anything else..."
+                      placeholder="Ask about crypto, DeFi, business, wealth building..."
                       className="flex-1 bg-gray-800 border-gray-600 text-white text-sm"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
