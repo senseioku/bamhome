@@ -481,17 +481,7 @@ export default function AiChat() {
       <Navigation />
       
       <div className="flex-1 flex pt-16 relative">
-        {/* Mobile Sidebar Toggle - Positioned to not overlap content */}
-        {!showSidebar && (
-          <Button
-            onClick={() => setShowSidebar(true)}
-            size="sm"
-            variant="ghost"
-            className="fixed top-[4.5rem] left-1 z-50 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm border border-gray-600"
-          >
-            <ChevronLeft className="w-3 h-3" />
-          </Button>
-        )}
+
 
         {/* Mobile Sidebar - Full screen on mobile */}
         {showSidebar && (
@@ -656,8 +646,8 @@ export default function AiChat() {
           </div>
         )}
 
-        {/* Main Chat Area - Adjusted for sidebar toggle */}
-        <div className={`flex-1 flex flex-col relative z-20 ${!showSidebar ? 'ml-8 md:ml-0' : ''}`}>
+        {/* Main Chat Area - Clean full width */}
+        <div className="flex-1 flex flex-col relative z-20">
           {!selectedConversation ? (
             // Welcome Screen - Perfect mobile layout
             <div className="flex-1 flex flex-col">
