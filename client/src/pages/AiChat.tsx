@@ -28,7 +28,9 @@ import {
   Shield,
   AlertTriangle,
   Clock,
-  Star
+  Star,
+  User,
+  Settings
 } from 'lucide-react';
 
 interface Message {
@@ -47,6 +49,31 @@ interface Conversation {
   lastMessageAt: string;
 }
 
+// Enhanced content formatting function
+const formatMessageContent = (content: string) => {
+  // Remove markdown-style formatting that looks unprofessional
+  const formatted = content
+    // Replace ### with proper headers
+    .replace(/^### (.+)$/gm, '<h3 class="text-base font-semibold text-white mb-2 mt-4">$1</h3>')
+    // Replace ## with slightly larger headers  
+    .replace(/^## (.+)$/gm, '<h2 class="text-lg font-semibold text-white mb-3 mt-4">$1</h2>')
+    // Replace # with main headers
+    .replace(/^# (.+)$/gm, '<h1 class="text-xl font-bold text-white mb-3 mt-4">$1</h1>')
+    // Clean up ** bold formatting to be more subtle
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-white">$1</strong>')
+    // Clean up * italic formatting
+    .replace(/\*(.+?)\*/g, '<em class="italic text-gray-300">$1</em>')
+    // Replace bullet points with clean list items
+    .replace(/^- (.+)$/gm, '<div class="flex items-start gap-2 my-1"><span class="text-purple-400 mt-1">•</span><span>$1</span></div>')
+    // Replace numbered lists
+    .replace(/^(\d+)\. (.+)$/gm, '<div class="flex items-start gap-2 my-1"><span class="text-purple-400 font-medium">$1.</span><span>$2</span></div>')
+    // Clean line breaks
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+
+  return <div dangerouslySetInnerHTML={{ __html: formatted }} />;
+};
+
 export default function AiChat() {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState('');
@@ -57,6 +84,10 @@ export default function AiChat() {
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [walletAddress, setWalletAddress] = useState('');
+  const [showUsernameDialog, setShowUsernameDialog] = useState(false);
+  const [username, setUsername] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [usernameError, setUsernameError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -118,6 +149,50 @@ export default function AiChat() {
 
     checkVerification();
   }, []);
+
+  // Username creation mutation
+  const createUsernameMutation = useMutation({
+    mutationFn: async ({ username, displayName }: { username: string; displayName?: string }) => {
+      const response = await fetch('/api/user/username', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, displayName })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create username');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      setShowUsernameDialog(false);
+      setUsername('');
+      setDisplayName('');
+      setUsernameError(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+    onError: (error: any) => {
+      setUsernameError(error.message || 'Failed to create username');
+    }
+  });
+
+  const handleCreateUsername = async () => {
+    if (!username.trim()) return;
+    
+    setUsernameError(null);
+    try {
+      await createUsernameMutation.mutateAsync({
+        username: username.trim(),
+        displayName: displayName.trim() || undefined
+      });
+    } catch (error) {
+      console.error('Username creation failed:', error);
+    }
+  };
 
   const handleWalletVerification = async () => {
     setVerificationLoading(true);
@@ -488,6 +563,15 @@ export default function AiChat() {
                   <Zap className="w-3 h-3" />
                   <span>Claude 4.0 Sonnet</span>
                 </div>
+                <Button
+                  onClick={() => setShowUsernameDialog(true)}
+                  size="sm"
+                  variant="outline"
+                  className="w-full mt-2 text-xs border-gray-600 hover:bg-gray-800"
+                >
+                  <User className="w-3 h-3 mr-1" />
+                  Create Username
+                </Button>
               </div>
             </div>
           </div>
@@ -576,19 +660,19 @@ export default function AiChat() {
           ) : (
             // Chat Interface
             <>
-              {/* Chat Header - Compact Mobile */}
+              {/* Chat Header - Fixed Mobile Layout */}
               <div className="p-3 md:p-4 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Button
                     onClick={() => setShowSidebar(true)}
                     size="sm"
                     variant="ghost"
-                    className="md:hidden p-1"
+                    className="md:hidden p-1 flex-shrink-0"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm md:text-base truncate">
+                  <div className="flex-1 min-w-0 mr-2">
+                    <h3 className="font-semibold text-sm md:text-base truncate pr-2">
                       {conversationData?.conversation?.title || 'Loading...'}
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
@@ -625,7 +709,9 @@ export default function AiChat() {
                               : 'bg-gray-800 text-gray-100'
                           }`}
                         >
-                          <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed prose prose-sm prose-invert max-w-none">
+                            {formatMessageContent(message.content)}
+                          </div>
                           <div className="text-xs opacity-70 mt-1">
                             {new Date(message.createdAt).toLocaleTimeString([], { 
                               hour: '2-digit', 
@@ -678,6 +764,62 @@ export default function AiChat() {
           )}
         </div>
       </div>
+
+      {/* Username Creation Dialog */}
+      <Dialog open={showUsernameDialog} onOpenChange={setShowUsernameDialog}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold">Create Username</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Create a unique username for your BAM AIChat profile
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-300">Username</label>
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                placeholder="e.g. crypto_trader"
+                className="mt-1 bg-gray-800 border-gray-600 text-white"
+                maxLength={20}
+              />
+              <div className="text-xs text-gray-400 mt-1">
+                3-20 characters, letters, numbers, and underscores only
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-300">Display Name (Optional)</label>
+              <Input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="e.g. Crypto Trader"
+                className="mt-1 bg-gray-800 border-gray-600 text-white"
+                maxLength={30}
+              />
+            </div>
+            {usernameError && (
+              <div className="text-red-400 text-sm">{usernameError}</div>
+            )}
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setShowUsernameDialog(false)}
+                variant="outline"
+                className="flex-1 border-gray-600 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreateUsername}
+                disabled={!username.trim() || username.length < 3 || createUsernameMutation.isPending}
+                className="flex-1 bg-purple-600 hover:bg-purple-700"
+              >
+                {createUsernameMutation.isPending ? 'Creating...' : 'Create'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

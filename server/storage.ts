@@ -25,8 +25,10 @@ export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
   getUserByWallet(walletAddress: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserActivity(userId: string): Promise<void>;
+  createUsername(walletAddress: string, username: string, displayName?: string): Promise<User>;
   
   // Conversation operations
   getConversations(userId: string): Promise<Conversation[]>;
@@ -69,6 +71,30 @@ export class DatabaseStorage implements IStorage {
   async getUserByWallet(walletAddress: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.walletAddress, walletAddress));
     return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async createUsername(walletAddress: string, username: string, displayName?: string): Promise<User> {
+    const existingUser = await this.getUserByWallet(walletAddress);
+    if (!existingUser) {
+      throw new Error('User not found');
+    }
+
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        username,
+        displayName: displayName || username,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.walletAddress, walletAddress))
+      .returning();
+
+    return updatedUser;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {

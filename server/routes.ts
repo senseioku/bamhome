@@ -22,6 +22,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Username management routes
+  app.post('/api/user/username', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { username, displayName } = req.body;
+
+      if (!username || username.length < 3 || username.length > 20) {
+        return res.status(400).json({ message: "Username must be 3-20 characters" });
+      }
+
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser && existingUser.id !== userId) {
+        return res.status(409).json({ message: "Username already taken" });
+      }
+
+      // Get user by wallet address from session
+      const user = await storage.getUser(userId);
+      if (!user?.walletAddress) {
+        return res.status(400).json({ message: "Wallet address not found" });
+      }
+
+      const updatedUser = await storage.createUsername(user.walletAddress, username, displayName);
+      res.json(updatedUser);
+    } catch (error: unknown) {
+      console.error("Error creating username:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to create username";
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
+  app.get('/api/user/username/check/:username', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const user = await storage.getUserByUsername(username);
+      res.json({ available: !user });
+    } catch (error: unknown) {
+      console.error("Error checking username:", error);
+      res.status(500).json({ message: "Failed to check username" });
+    }
+  });
+
   // Chat routes
   app.post('/api/chat/conversations', isAuthenticated, async (req: any, res) => {
     try {
