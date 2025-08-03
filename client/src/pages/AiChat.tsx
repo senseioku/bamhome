@@ -34,7 +34,10 @@ import {
   LogOut,
   ChevronDown,
   Copy,
-  Check
+  Check,
+  MessageSquare,
+  BarChart3,
+  Coins
 } from 'lucide-react';
 
 interface Message {
@@ -555,19 +558,48 @@ export default function AiChat() {
                         if (window.innerWidth < 768) setShowSidebar(false);
                       }}
                       variant={selectedConversation === conv.id ? 'default' : 'ghost'}
-                      className={`w-full justify-start text-left h-auto p-2 ${
+                      className={`group w-full justify-start text-left h-auto p-2 transition-all duration-300 ${
                         selectedConversation === conv.id
                           ? 'bg-purple-600/20 border-purple-500/30'
                           : 'hover:bg-gray-800'
                       }`}
                     >
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-xs truncate">{conv.title}</div>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <Badge className="bg-gray-700 text-gray-300 text-xs px-1.5 py-0.5">
-                            {conv.category}
-                          </Badge>
-                          <span className="text-xs text-gray-400">{conv.messageCount} msgs</span>
+                      <div className="flex items-start gap-2 w-full">
+                        <div className="flex-shrink-0 relative mt-0.5">
+                          <MessageSquare className={`w-3.5 h-3.5 transition-all duration-300 ${
+                            selectedConversation === conv.id 
+                              ? 'text-purple-300' 
+                              : 'text-purple-400 group-hover:text-purple-300 group-hover:scale-110'
+                          }`} />
+                          {selectedConversation !== conv.id && (
+                            <div className="absolute -inset-1 bg-purple-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className={`font-medium text-xs truncate transition-colors duration-300 ${
+                            selectedConversation === conv.id 
+                              ? 'text-white' 
+                              : 'group-hover:text-purple-300'
+                          }`}>
+                            {conv.title}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <Badge className={`text-xs px-1.5 py-0.5 transition-all duration-300 ${
+                              selectedConversation === conv.id
+                                ? 'bg-purple-500/30 text-purple-200'
+                                : 'bg-gray-700 text-gray-300 group-hover:bg-gray-600 group-hover:text-gray-200'
+                            }`}>
+                              {conv.category}
+                            </Badge>
+                            <span className={`text-xs transition-colors duration-300 inline-flex items-center gap-1 ${
+                              selectedConversation === conv.id
+                                ? 'text-purple-200'
+                                : 'text-gray-400 group-hover:text-gray-300'
+                            }`}>
+                              <BarChart3 className="w-3 h-3" />
+                              {conv.messageCount} msgs
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </Button>
@@ -585,13 +617,18 @@ export default function AiChat() {
                     onClick={() => setShowWalletMenu(!showWalletMenu)}
                     variant="outline"
                     size="sm"
-                    className="w-full border-gray-600 hover:bg-gray-800 text-xs justify-between"
+                    className="group w-full border-gray-600 hover:bg-gray-800 hover:border-green-500 text-xs justify-between transition-all duration-300"
                   >
                     <div className="flex items-center gap-2">
-                      <Wallet className="w-3 h-3" />
-                      <span>{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+                      <div className="relative">
+                        <Wallet className="w-3 h-3 group-hover:text-green-400 transition-all duration-300" />
+                        <div className="absolute -inset-1 bg-green-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                      </div>
+                      <span className="group-hover:text-green-300 transition-colors duration-300">
+                        {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                      </span>
                     </div>
-                    <ChevronDown className="w-3 h-3" />
+                    <ChevronDown className="w-3 h-3 group-hover:text-green-400 group-hover:rotate-180 transition-all duration-300" />
                   </Button>
                   
                   {/* Wallet Menu Dropdown */}
@@ -626,9 +663,12 @@ export default function AiChat() {
                 </div>
 
                 {/* AI Status */}
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <Zap className="w-3 h-3" />
-                  <span>AI Powered</span>
+                <div className="group flex items-center gap-2 text-xs text-gray-400 hover:text-purple-400 transition-all duration-300 cursor-default">
+                  <div className="relative">
+                    <Zap className="w-3 h-3 group-hover:text-purple-400 group-hover:animate-pulse transition-all duration-300" />
+                    <Sparkles className="absolute -top-0.5 -right-0.5 w-2 h-2 text-purple-400 opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-all duration-300" />
+                  </div>
+                  <span className="group-hover:text-purple-300 transition-colors duration-300">AI Powered</span>
                 </div>
 
                 {/* Username Creation */}
@@ -636,10 +676,13 @@ export default function AiChat() {
                   onClick={() => setShowUsernameDialog(true)}
                   size="sm"
                   variant="outline"
-                  className="w-full text-xs border-gray-600 hover:bg-gray-800"
+                  className="group w-full text-xs border-gray-600 hover:bg-gray-800 hover:border-purple-500 transition-all duration-300"
                 >
-                  <User className="w-3 h-3 mr-1" />
-                  Create Username
+                  <div className="relative mr-1">
+                    <User className="w-3 h-3 group-hover:text-purple-400 group-hover:scale-110 transition-all duration-300" />
+                    <div className="absolute -inset-1 bg-purple-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                  </div>
+                  <span className="group-hover:text-purple-300 transition-colors duration-300">Create Username</span>
                 </Button>
               </div>
             </div>
