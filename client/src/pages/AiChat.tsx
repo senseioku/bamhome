@@ -481,21 +481,21 @@ export default function AiChat() {
       <Navigation />
       
       <div className="flex-1 flex pt-16 relative">
-        {/* Mobile Sidebar Toggle */}
+        {/* Mobile Sidebar Toggle - Positioned to not overlap content */}
         {!showSidebar && (
           <Button
             onClick={() => setShowSidebar(true)}
             size="sm"
             variant="ghost"
-            className="fixed top-20 left-3 z-50 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm border border-gray-600"
+            className="fixed top-[4.5rem] left-1 z-50 md:hidden bg-gray-800/90 hover:bg-gray-700 backdrop-blur-sm border border-gray-600"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3 h-3" />
           </Button>
         )}
 
-        {/* Mobile Sidebar */}
+        {/* Mobile Sidebar - Full screen on mobile */}
         {showSidebar && (
-          <div className="w-full md:w-80 bg-gray-900/95 backdrop-blur-sm border-r border-gray-700 flex flex-col fixed md:relative h-full z-50 md:bg-gray-900">
+          <div className="w-full h-full md:w-80 bg-gray-900 border-r border-gray-700 flex flex-col fixed md:relative z-50 md:bg-gray-900">
             {/* Sidebar Header */}
             <div className="p-3 border-b border-gray-700">
               <div className="flex items-center justify-between mb-3">
@@ -656,8 +656,8 @@ export default function AiChat() {
           </div>
         )}
 
-        {/* Main Chat Area - Clean layout */}
-        <div className="flex-1 flex flex-col relative z-20">
+        {/* Main Chat Area - Adjusted for sidebar toggle */}
+        <div className={`flex-1 flex flex-col relative z-20 ${!showSidebar ? 'ml-8 md:ml-0' : ''}`}>
           {!selectedConversation ? (
             // Welcome Screen - Perfect mobile layout
             <div className="flex-1 flex flex-col">
