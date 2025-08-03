@@ -773,12 +773,15 @@ export default function AiChat() {
                               : 'bg-gray-800 text-gray-100'
                           }`}
                         >
-                          <div className="whitespace-pre-wrap text-sm leading-snug prose prose-sm prose-invert max-w-none">
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed max-w-none">
                             {message.content
-                              .replace(/^#+\s*/gm, '') // Remove markdown headers
-                              .replace(/^\*+\s*/gm, '') // Remove bullet points  
-                              .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markers
-                              .replace(/\*(.*?)\*/g, '$1') // Remove italic markers
+                              .replace(/^# /gm, '🔷 ') // Convert H1 to diamond bullet
+                              .replace(/^## /gm, '◆ ') // Convert H2 to diamond bullet
+                              .replace(/^### /gm, '▪ ') // Convert H3 to small bullet
+                              .replace(/^- /gm, '🔹 ') // Convert bullets to blue diamonds
+                              .replace(/^\* /gm, '🔹 ') // Convert asterisk bullets to blue diamonds
+                              .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markers but keep text
+                              .replace(/\*(.*?)\*/g, '$1') // Remove italic markers but keep text
                               .replace(/\n{3,}/g, '\n\n') // Reduce excessive line breaks
                               .replace(/\n\n\s*\n/g, '\n\n') // Clean up spaced breaks
                               .trim()
