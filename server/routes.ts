@@ -5,8 +5,34 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { aiService } from "./ai";
 import { cryptoService } from "./cryptoService";
 import { z } from "zod";
+import {
+  generalRateLimit,
+  authRateLimit,
+  chatRateLimit,
+  usernameRateLimit,
+  progressiveSlowDown,
+  securityHeaders,
+  corsOptions,
+  usernameValidation,
+  chatValidation,
+  handleValidationErrors,
+  sanitizeInput,
+  securityLogger,
+  enhancedAuth,
+  abuseDetection,
+  walletValidation
+} from "./security";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Apply enterprise security middleware
+  app.use(securityHeaders);
+  app.use(corsOptions);
+  app.use(securityLogger);
+  app.use(abuseDetection);
+  app.use(progressiveSlowDown);
+  app.use(generalRateLimit);
+  app.use(sanitizeInput);
+
   // Auth middleware
   await setupAuth(app);
 
@@ -23,7 +49,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Username management routes
-  app.post('/api/user/username', isAuthenticated, async (req: any, res) => {
+  app.post('/api/user/username', 
+    usernameRateLimit,
+    enhancedAuth,
+    isAuthenticated, 
+    usernameValidation,
+    handleValidationErrors,
+    async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { username, displayName } = req.body;
@@ -65,7 +97,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat routes
-  app.post('/api/chat/conversations', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/conversations', 
+    chatRateLimit,
+    enhancedAuth,
+    isAuthenticated,
+    chatValidation,
+    handleValidationErrors,
+    async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const { title, category = 'general' } = req.body;
@@ -263,7 +301,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Wallet verification route for BAM AIChat
-  app.post('/api/wallet/verify', async (req, res) => {
+  app.post('/api/wallet/verify',
+    authRateLimit,
+    enhancedAuth,
+    walletValidation,
+    handleValidationErrors,
+    async (req, res) => {
     try {
       const { address, signature, message } = req.body;
 
@@ -342,7 +385,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // AI chat route
-  app.post('/api/ai', async (req, res) => {
+  app.post('/api/ai',
+    chatRateLimit,
+    enhancedAuth,
+    chatValidation,
+    handleValidationErrors,
+    async (req, res) => {
     try {
       const { message, conversationHistory = [] } = req.body;
 
