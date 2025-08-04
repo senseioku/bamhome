@@ -12,16 +12,21 @@ export const generalRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Conservative limit - 100 requests per 15 minutes per IP
   message: {
-    error: 'Too many requests from this IP, please try again later.',
-    retryAfter: '15 minutes'
+    error: 'Request limit reached',
+    message: 'You\'ve reached the request limit to help keep our service running smoothly. Please wait 15 minutes before trying again.',
+    retryAfter: '15 minutes',
+    nextAttempt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString()
   },
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req: Request, res: Response) => {
+    const nextAttempt = new Date(Date.now() + 15 * 60 * 1000);
     res.status(429).json({
-      error: 'Rate limit exceeded',
-      message: 'Too many requests from this IP, please try again later.',
-      retryAfter: '15 minutes'
+      error: 'Request limit reached',
+      message: `You've reached the request limit to help keep our service running smoothly. Please try again after ${nextAttempt.toLocaleTimeString()}.`,
+      retryAfter: '15 minutes',
+      nextAttempt: nextAttempt.toISOString(),
+      tip: 'Take a break and come back in 15 minutes - your conversations will be waiting for you!'
     });
   }
 });
@@ -30,15 +35,19 @@ export const authRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // Limit each IP to 5 auth requests per windowMs
   message: {
-    error: 'Too many authentication attempts, please try again later.',
+    error: 'Authentication limit reached',
+    message: 'For security, we limit authentication attempts. Please wait 15 minutes before trying to connect your wallet again.',
     retryAfter: '15 minutes'
   },
   skipSuccessfulRequests: true,
   handler: (req: Request, res: Response) => {
+    const nextAttempt = new Date(Date.now() + 15 * 60 * 1000);
     res.status(429).json({
-      error: 'Authentication rate limit exceeded',
-      message: 'Too many authentication attempts from this IP, please try again later.',
-      retryAfter: '15 minutes'
+      error: 'Authentication limit reached',
+      message: `For security, we limit authentication attempts. Please try connecting your wallet again after ${nextAttempt.toLocaleTimeString()}.`,
+      retryAfter: '15 minutes',
+      nextAttempt: nextAttempt.toISOString(),
+      tip: 'This helps protect your wallet and our platform from unauthorized access attempts.'
     });
   }
 });
@@ -47,15 +56,18 @@ export const chatRateLimit = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 3, // Conservative limit - 3 chat messages per minute to protect API credits
   message: {
-    error: 'Chat rate limit exceeded',
-    message: 'Too many chat messages, please slow down to preserve API resources.',
+    error: 'Slow down a bit!',
+    message: 'You\'re creating conversations quickly! Please wait 1 minute before starting another chat.',
     retryAfter: '1 minute'
   },
   handler: (req: Request, res: Response) => {
+    const nextAttempt = new Date(Date.now() + 60 * 1000);
     res.status(429).json({
-      error: 'Chat rate limit exceeded',
-      message: 'Too many chat messages, please slow down to preserve API resources.',
-      retryAfter: '1 minute'
+      error: 'Slow down a bit!',
+      message: `You're creating conversations quickly! Please wait until ${nextAttempt.toLocaleTimeString()} before starting another chat.`,
+      retryAfter: '1 minute',
+      nextAttempt: nextAttempt.toISOString(),
+      tip: 'Use this time to continue your current conversation or review your chat history!'
     });
   }
 });
@@ -65,15 +77,18 @@ export const aiApiRateLimit = rateLimit({
   windowMs: 60 * 1000, // 1 minute  
   max: 2, // Very conservative - only 2 AI API calls per minute per IP
   message: {
-    error: 'AI API rate limit exceeded',
-    message: 'Please wait before sending another message to preserve API credits.',
+    error: 'AI chat cooling down',
+    message: 'Our AI needs a moment to recharge! Please wait 1 minute before sending another message.',
     retryAfter: '1 minute'
   },
   handler: (req: Request, res: Response) => {
+    const nextAttempt = new Date(Date.now() + 60 * 1000);
     res.status(429).json({
-      error: 'AI API rate limit exceeded', 
-      message: 'Please wait before sending another message to preserve API credits.',
-      retryAfter: '1 minute'
+      error: 'AI chat cooling down',
+      message: `Our AI needs a moment to recharge! Please try sending your next message after ${nextAttempt.toLocaleTimeString()}.`,
+      retryAfter: '1 minute',
+      nextAttempt: nextAttempt.toISOString(),
+      tip: 'This helps us provide quality responses while managing our AI service costs.'
     });
   }
 });
@@ -83,15 +98,21 @@ export const dailyAiRateLimit = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24 hours
   max: 50, // Maximum 50 AI messages per day per IP
   message: {
-    error: 'Daily AI limit reached',
-    message: 'Daily AI message limit reached. Please try again tomorrow.',
+    error: 'Daily AI chat limit reached',
+    message: 'You\'ve had a great chat session today! Your daily AI message limit has been reached.',
     retryAfter: '24 hours'
   },
   handler: (req: Request, res: Response) => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
     res.status(429).json({
-      error: 'Daily AI limit reached',
-      message: 'Daily AI message limit reached. Please try again tomorrow.',
-      retryAfter: '24 hours'
+      error: 'Daily AI chat limit reached',
+      message: `You've had a great chat session today! Your daily AI message limit has been reached. Come back tomorrow at ${tomorrow.toLocaleDateString()} for more conversations.`,
+      retryAfter: '24 hours',
+      nextAttempt: tomorrow.toISOString(),
+      tip: 'You can still browse your chat history and manage conversations - just no new AI messages until tomorrow!'
     });
   }
 });
@@ -100,15 +121,18 @@ export const usernameRateLimit = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 3, // 3 username creation attempts per hour
   message: {
-    error: 'Username creation rate limit exceeded',
-    message: 'Too many username creation attempts, please try again later.',
+    error: 'Username creation limit reached',
+    message: 'Take your time choosing the perfect username! Please wait 1 hour before trying again.',
     retryAfter: '1 hour'
   },
   handler: (req: Request, res: Response) => {
+    const nextAttempt = new Date(Date.now() + 60 * 60 * 1000);
     res.status(429).json({
-      error: 'Username creation rate limit exceeded',
-      message: 'Too many username creation attempts, please try again later.',
-      retryAfter: '1 hour'
+      error: 'Username creation limit reached',
+      message: `Take your time choosing the perfect username! Please try again after ${nextAttempt.toLocaleTimeString()}.`,
+      retryAfter: '1 hour',
+      nextAttempt: nextAttempt.toISOString(),
+      tip: 'Use this time to think of a unique username that represents you in the BAM community!'
     });
   }
 });

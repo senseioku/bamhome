@@ -112,3 +112,6 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 - ✅ Conservative API rate limiting implemented to protect Claude API credits
 - ✅ Multi-tier rate limiting: 2 AI calls/minute, 50 AI calls/day, 100 general requests/15min
 - ✅ Tiered protection system prevents API credit exhaustion while maintaining user experience
+- ✅ User-friendly rate limit messages with specific wait times and helpful tips
+- ✅ Enhanced error handling provides clear guidance on when users can retry actions
+- ✅ Rate limit messages include context about service preservation and next attempt times

@@ -195,6 +195,13 @@ export default function AiChat() {
       
       if (!response.ok) {
         const error = await response.json();
+        
+        // Handle rate limiting with friendly messages
+        if (response.status === 429) {
+          const friendlyMessage = error.tip ? `${error.message} ${error.tip}` : error.message;
+          throw new Error(friendlyMessage || 'Please wait before trying again');
+        }
+        
         throw new Error(error.message || 'Failed to create username');
       }
       
@@ -216,7 +223,18 @@ export default function AiChat() {
       });
     },
     onError: (error: any) => {
+      // Enhanced error message for rate limits
+      const isRateLimit = error.message?.includes('limit') || error.message?.includes('wait') || error.message?.includes('time');
       setUsernameError(error.message || 'Failed to create username');
+      
+      if (isRateLimit) {
+        toast({
+          title: "Rate Limit Reached",
+          description: error.message,
+          variant: "destructive",
+          duration: 6000
+        });
+      }
     }
   });
 
