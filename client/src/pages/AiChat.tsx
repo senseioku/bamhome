@@ -1071,8 +1071,8 @@ export default function AiChat() {
         <div className="flex-1 flex flex-col">
           {!selectedConversation ? (
             // Welcome Screen - DeepSeek Style
-            <div className="flex-1 flex flex-col">
-              <div className="flex-1 flex items-center justify-center p-8">
+            <div className="flex-1 flex flex-col h-screen">
+              <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto">
                 <div className="text-center max-w-2xl w-full">
                   <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <Brain className="w-8 h-8 text-white" />
@@ -1104,15 +1104,15 @@ export default function AiChat() {
                 </div>
               </div>
               
-              {/* Chat Input - DeepSeek Style */}
-              <div className="p-6 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+              {/* Chat Input - Sticky at Bottom */}
+              <div className="sticky bottom-0 left-0 right-0 p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0 z-10">
                 <div className="max-w-4xl mx-auto">
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
                     <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
                       placeholder="Message BAM AIChat"
-                      className="flex-1 bg-gray-800 border-gray-600 text-white py-4 px-4 text-base rounded-xl"
+                      className="flex-1 bg-gray-800 border-gray-600 text-white text-base py-3 px-4 rounded-xl min-h-[48px]"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -1129,23 +1129,23 @@ export default function AiChat() {
                         }
                       }}
                       disabled={!messageInput.trim()}
-                      className="bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-xl"
+                      className="bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-xl flex-shrink-0"
                       size="lg"
                     >
                       <Send className="w-5 h-5" />
                     </Button>
                   </div>
-                  <div className="text-sm text-gray-500 mt-3 text-center">
-                    AI generated for reference only
+                  <div className="text-sm text-gray-500 mt-2 text-center">
+                    BAM AIChat can make mistakes. Check important info.
                   </div>
                 </div>
               </div>
             </div>
           ) : (
             // Chat Interface
-            <>
+            <div className="flex-1 flex flex-col h-screen">
               {/* Chat Header - DeepSeek Style */}
-              <div className="p-4 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+              <div className="p-4 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0">
                 <div className="flex items-center gap-3">
                   <Button
                     onClick={() => setShowSidebar(true)}
@@ -1172,7 +1172,7 @@ export default function AiChat() {
               </div>
 
               {/* Messages - DeepSeek Style */}
-              <ScrollArea className="flex-1 p-6">
+              <ScrollArea className="flex-1 p-6 overflow-y-auto" style={{ height: "calc(100vh - 200px)" }}>
                 <div className="max-w-4xl mx-auto space-y-6">
                   {loadingConversation ? (
                     <div className="flex items-center justify-center py-4">
@@ -1255,15 +1255,15 @@ export default function AiChat() {
                 </div>
               </ScrollArea>
 
-              {/* Message Input - DeepSeek Style */}
-              <div className="p-6 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+              {/* Message Input - Sticky at Bottom */}
+              <div className="sticky bottom-0 left-0 right-0 p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0 z-10">
                 <div className="max-w-4xl mx-auto">
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
                     <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
                       placeholder="Message BAM AIChat"
-                      className="flex-1 bg-gray-800 border-gray-600 text-white text-base py-4 px-4 rounded-xl"
+                      className="flex-1 bg-gray-800 border-gray-600 text-white text-base py-3 px-4 rounded-xl min-h-[48px]"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -1274,7 +1274,7 @@ export default function AiChat() {
                     <Button
                       onClick={handleSendMessage}
                       disabled={!messageInput.trim() || sendMessageMutation.isPending}
-                      className="bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-xl"
+                      className="bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-xl flex-shrink-0"
                       size="lg"
                     >
                       {sendMessageMutation.isPending ? (
@@ -1284,12 +1284,12 @@ export default function AiChat() {
                       )}
                     </Button>
                   </div>
-                  <div className="text-sm text-gray-500 mt-3 text-center">
-                    AI generated for reference only
+                  <div className="text-sm text-gray-500 mt-2 text-center">
+                    BAM AIChat can make mistakes. Check important info.
                   </div>
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
