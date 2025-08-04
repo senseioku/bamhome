@@ -86,7 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     handleValidationErrors,
     async (req: any, res: any) => {
     try {
-      const { username, displayName, walletAddress } = req.body;
+      const { username, displayName, email, country, walletAddress } = req.body;
 
       if (!isValidWalletAddress(walletAddress)) {
         return res.status(400).json({ message: "Valid wallet address is required" });
@@ -105,7 +105,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(409).json({ message: "Username already taken" });
       }
 
-      const updatedUser = await storage.createUsername(normalizedWallet, username, displayName);
+      if (!email || !country) {
+        return res.status(400).json({ message: "Email and country are required" });
+      }
+
+      const updatedUser = await storage.createUsername(normalizedWallet, username, displayName, email, country);
       res.json(updatedUser);
     } catch (error: unknown) {
       console.error("Error creating username:", error);
@@ -132,7 +136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     handleValidationErrors,
     async (req: any, res: any) => {
     try {
-      const { username, displayName, walletAddress } = req.body;
+      const { username, displayName, email, country, walletAddress } = req.body;
 
       if (!isValidWalletAddress(walletAddress)) {
         return res.status(400).json({ message: "Valid wallet address is required" });
@@ -178,6 +182,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedUser = await storage.updateUserProfile(normalizedWallet, {
         username: username || currentUser.username,
         displayName: displayName || currentUser.displayName,
+        ...(email && { email }),
+        ...(country && { country }),
         // Only update lastUsernameChange if username actually changed
         ...(username && username !== currentUser.username && { lastUsernameChange: new Date() })
       });

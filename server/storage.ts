@@ -83,7 +83,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async createUsername(walletAddress: string, username: string, displayName?: string): Promise<User> {
+  async createUsername(walletAddress: string, username: string, displayName?: string, email?: string, country?: string): Promise<User> {
     // Normalize wallet address for consistency
     const normalizedWallet = walletAddress.toLowerCase();
     
@@ -94,11 +94,12 @@ export class DatabaseStorage implements IStorage {
       existingUser = await this.upsertUser({
         id: normalizedWallet,
         walletAddress: normalizedWallet,
-        email: null,
+        email: email || `${normalizedWallet}@temp.local`,
         firstName: null,
         lastName: null,
         username: null,
         displayName: null,
+        country: country || 'US',
         profileImageUrl: null
       });
     }
@@ -108,6 +109,8 @@ export class DatabaseStorage implements IStorage {
       .set({
         username,
         displayName: displayName || username,
+        ...(email && { email }),
+        ...(country && { country }),
         lastUsernameChange: new Date(), // Track when username was first created
         updatedAt: new Date(),
       })
@@ -117,8 +120,8 @@ export class DatabaseStorage implements IStorage {
     return updatedUser;
   }
 
-  async updateUserProfile(walletAddress: string, updates: { username?: string; displayName?: string; lastUsernameChange?: Date }): Promise<User> {
-    const normalizedWallet = normalizeWalletAddress(walletAddress);
+  async updateUserProfile(walletAddress: string, updates: { username?: string; displayName?: string; email?: string; country?: string; lastUsernameChange?: Date }): Promise<User> {
+    const normalizedWallet = walletAddress.toLowerCase();
     
     const [user] = await db
       .update(users)

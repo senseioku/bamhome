@@ -28,13 +28,14 @@ export const sessions = pgTable(
 // Users table
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique(),
+  email: varchar("email").unique().notNull(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   walletAddress: varchar("wallet_address").unique(),
   username: varchar("username").unique(),
   displayName: varchar("display_name"),
+  country: varchar("country").notNull(),
   isVerified: boolean("is_verified").default(false),
   bamTokenBalance: varchar("bam_token_balance").default("0"),
   lastUsernameChange: timestamp("last_username_change"),

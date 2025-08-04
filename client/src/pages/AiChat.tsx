@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from "@/hooks/use-toast";
 import { walletSecurity, type WalletVerification } from '@/lib/walletSecurity';
+import { countries, searchCountries, getCountryByCode } from '@/lib/countries';
 import Navigation from '@/components/navigation';
 import { 
   MessageCircle, 
@@ -98,12 +99,18 @@ export default function AiChat() {
   const [showUsernameDialog, setShowUsernameDialog] = useState(false);
   const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
+  const [country, setCountry] = useState('');
+  const [countrySearch, setCountrySearch] = useState('');
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [showWalletMenu, setShowWalletMenu] = useState(false);
   const [addressCopied, setAddressCopied] = useState(false);
   const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
   const [editUsername, setEditUsername] = useState('');
   const [editDisplayName, setEditDisplayName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editCountry, setEditCountry] = useState('');
+  const [editCountrySearch, setEditCountrySearch] = useState('');
   const [editProfileError, setEditProfileError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
@@ -184,7 +191,7 @@ export default function AiChat() {
 
   // Username creation mutation
   const createUsernameMutation = useMutation({
-    mutationFn: async ({ username, displayName }: { username: string; displayName?: string }) => {
+    mutationFn: async ({ username, displayName, email, country }: { username: string; displayName?: string; email: string; country: string }) => {
       const response = await fetch('/api/user/username', {
         method: 'POST',
         headers: {
@@ -193,6 +200,8 @@ export default function AiChat() {
         body: JSON.stringify({ 
           username, 
           displayName, 
+          email,
+          country,
           walletAddress 
         })
       });
@@ -215,6 +224,9 @@ export default function AiChat() {
       setShowUsernameDialog(false);
       setUsername('');
       setDisplayName('');
+      setEmail('');
+      setCountry('');
+      setCountrySearch('');
       setUsernameError(null);
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
@@ -244,7 +256,7 @@ export default function AiChat() {
 
   // Update profile mutation
   const updateProfileMutation = useMutation({
-    mutationFn: async ({ username, displayName }: { username?: string; displayName?: string }) => {
+    mutationFn: async ({ username, displayName, email, country }: { username?: string; displayName?: string; email?: string; country?: string }) => {
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: {
@@ -252,7 +264,9 @@ export default function AiChat() {
         },
         body: JSON.stringify({ 
           username, 
-          displayName, 
+          displayName,
+          email,
+          country,
           walletAddress 
         })
       });
@@ -302,13 +316,33 @@ export default function AiChat() {
   });
 
   const handleCreateUsername = async () => {
-    if (!username.trim()) return;
+    if (!username.trim()) {
+      setUsernameError('Username is required');
+      return;
+    }
+
+    if (!email.trim()) {
+      setUsernameError('Email address is required');
+      return;
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+      setUsernameError('Please enter a valid email address');
+      return;
+    }
+
+    if (!country) {
+      setUsernameError('Please select your country');
+      return;
+    }
     
     setUsernameError(null);
     try {
       await createUsernameMutation.mutateAsync({
         username: username.trim(),
-        displayName: displayName.trim() || undefined
+        displayName: displayName.trim() || undefined,
+        email: email.trim(),
+        country: country
       });
     } catch (error) {
       console.error('Username creation failed:', error);
@@ -337,6 +371,9 @@ export default function AiChat() {
     // Pre-fill with current profile data
     setEditUsername(userProfile?.username || '');
     setEditDisplayName(userProfile?.displayName || '');
+    setEditEmail(userProfile?.email || '');
+    setEditCountry(userProfile?.country || '');
+    setEditCountrySearch(getCountryByCode(userProfile?.country || '')?.name || '');
     setEditProfileError(null);
     setShowEditProfileDialog(true);
     setShowWalletMenu(false);
@@ -378,7 +415,9 @@ export default function AiChat() {
     try {
       await updateProfileMutation.mutateAsync({
         username: editUsername.trim(),
-        displayName: editDisplayName.trim() || undefined
+        displayName: editDisplayName.trim() || undefined,
+        email: editEmail.trim() || undefined,
+        country: editCountry || undefined
       });
     } catch (error) {
       console.error('Profile update failed:', error);
@@ -1267,6 +1306,54 @@ export default function AiChat() {
                 maxLength={30}
               />
             </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-300">Email Address *</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="mt-1 bg-gray-800 border-gray-600 text-white"
+              />
+              <div className="text-xs text-gray-400 mt-1">
+                Required for account security and updates
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-300">Country *</label>
+              <div className="relative">
+                <Input
+                  value={countrySearch}
+                  onChange={(e) => {
+                    setCountrySearch(e.target.value);
+                    setCountry('');
+                  }}
+                  placeholder="Search for your country..."
+                  className="mt-1 bg-gray-800 border-gray-600 text-white"
+                />
+                {countrySearch && (
+                  <div className="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md mt-1 max-h-48 overflow-y-auto">
+                    {searchCountries(countrySearch).slice(0, 10).map((c) => (
+                      <div
+                        key={c.code}
+                        className="px-3 py-2 hover:bg-gray-700 cursor-pointer text-white"
+                        onClick={() => {
+                          setCountry(c.code);
+                          setCountrySearch(c.name);
+                        }}
+                      >
+                        {c.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="text-xs text-gray-400 mt-1">
+                Required for compliance and regional support
+              </div>
+            </div>
             {usernameError && (
               <div className="text-red-400 text-sm">{usernameError}</div>
             )}
@@ -1280,7 +1367,7 @@ export default function AiChat() {
               </Button>
               <Button
                 onClick={handleCreateUsername}
-                disabled={!username.trim() || username.length < 3 || createUsernameMutation.isPending}
+                disabled={!username.trim() || username.length < 3 || !email.trim() || !country || createUsernameMutation.isPending}
                 className="flex-1 bg-purple-600 hover:bg-purple-700"
               >
                 {createUsernameMutation.isPending ? 'Creating...' : 'Create'}
@@ -1331,6 +1418,50 @@ export default function AiChat() {
                   maxLength={50}
                 />
                 <div className="text-xs text-gray-500">How others see your name</div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Email Address</label>
+                <Input
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                />
+                <div className="text-xs text-gray-500">For account security and updates</div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Country</label>
+                <div className="relative">
+                  <Input
+                    value={editCountrySearch}
+                    onChange={(e) => {
+                      setEditCountrySearch(e.target.value);
+                      setEditCountry('');
+                    }}
+                    placeholder="Search for your country..."
+                    className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                  />
+                  {editCountrySearch && (
+                    <div className="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md mt-1 max-h-48 overflow-y-auto">
+                      {searchCountries(editCountrySearch).slice(0, 10).map((c) => (
+                        <div
+                          key={c.code}
+                          className="px-3 py-2 hover:bg-gray-700 cursor-pointer text-white"
+                          onClick={() => {
+                            setEditCountry(c.code);
+                            setEditCountrySearch(c.name);
+                          }}
+                        >
+                          {c.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500">For compliance and regional support</div>
               </div>
               
               {editProfileError && (
