@@ -85,7 +85,7 @@ export default function AiChat() {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('general');
-  const [showSidebar, setShowSidebar] = useState(window.innerWidth >= 768);
+  const [showSidebar, setShowSidebar] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [showVerificationDialog, setShowVerificationDialog] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(false);
@@ -103,8 +103,10 @@ export default function AiChat() {
   // Check window size for responsive sidebar
   useEffect(() => {
     const handleResize = () => {
-      setShowSidebar(window.innerWidth >= 768);
+      const isDesktop = window.innerWidth >= 1024;
+      setShowSidebar(isDesktop);
     };
+    handleResize(); // Call on mount
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -486,17 +488,16 @@ export default function AiChat() {
       <div className="flex-1 flex pt-16 relative">
 
 
-        {/* Mobile Sidebar - Full screen on mobile */}
+        {/* Responsive Sidebar - Better mobile/desktop layout */}
         {showSidebar && (
-          <div className="w-full h-full md:w-80 bg-gray-900 border-r border-gray-700 flex flex-col fixed md:relative z-50 md:bg-gray-900">
-            {/* Sidebar Header */}
+          <div className="w-full h-full lg:w-72 xl:w-80 bg-gray-900 border-r border-gray-700 flex flex-col fixed lg:relative z-50">
+            {/* Sidebar Header - Compact */}
             <div className="p-3 border-b border-gray-700">
               <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-purple-400" />
-                  <h1 className="text-lg font-bold">BAM AIChat</h1>
-                  <Badge className="bg-purple-600 text-white text-xs px-1.5 py-0.5">
-                    <Sparkles className="w-2.5 h-2.5 mr-0.5" />
+                <div className="flex items-center gap-2 min-w-0">
+                  <Brain className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                  <h1 className="text-base font-bold truncate">BAM AIChat</h1>
+                  <Badge className="bg-purple-600 text-white text-xs px-1 py-0.5 flex-shrink-0">
                     AI
                   </Badge>
                 </div>
@@ -504,49 +505,49 @@ export default function AiChat() {
                   onClick={() => setShowSidebar(false)}
                   size="sm"
                   variant="ghost"
-                  className="md:hidden p-1"
+                  className="lg:hidden p-1 flex-shrink-0"
                 >
-                  <ChevronLeft className="w-3 h-3" />
+                  <ChevronLeft className="w-4 h-4" />
                 </Button>
               </div>
 
-              {/* Category Selection */}
-              <div className="grid grid-cols-2 gap-1.5">
+              {/* Category Selection - Compact */}
+              <div className="grid grid-cols-2 gap-1">
                 {categories.map((category) => (
                   <Button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
                     variant={selectedCategory === category.id ? 'default' : 'outline'}
                     size="sm"
-                    className={`text-xs ${
+                    className={`text-xs h-8 ${
                       selectedCategory === category.id
                         ? 'bg-purple-600 hover:bg-purple-700'
                         : 'border-gray-600 hover:bg-gray-800'
                     }`}
                   >
                     <category.icon className="w-3 h-3 mr-1" />
-                    {category.name}
+                    <span className="truncate">{category.name}</span>
                   </Button>
                 ))}
               </div>
 
               <Button
                 onClick={handleNewConversation}
-                className="w-full mt-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 py-2"
+                className="w-full mt-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-8"
                 size="sm"
               >
                 <Plus className="w-3 h-3 mr-1" />
-                <span className="text-sm">New Chat</span>
+                <span className="text-xs">New Chat</span>
               </Button>
             </div>
 
-            {/* Conversations List */}
-            <ScrollArea className="flex-1 p-2">
+            {/* Conversations List - Better spacing */}
+            <ScrollArea className="flex-1 p-2 min-h-0">
               <div className="space-y-1">
                 {conversations.length === 0 ? (
-                  <div className="text-center py-4 text-gray-400">
-                    <MessageCircle className="w-6 h-6 mx-auto mb-1 opacity-50" />
-                    <p className="text-xs">No conversations yet</p>
+                  <div className="text-center py-8 text-gray-400">
+                    <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm font-medium">No conversations yet</p>
                     <p className="text-xs">Start a new chat above</p>
                   </div>
                 ) : (
@@ -555,49 +556,44 @@ export default function AiChat() {
                       key={conv.id}
                       onClick={() => {
                         setSelectedConversation(conv.id);
-                        if (window.innerWidth < 768) setShowSidebar(false);
+                        if (window.innerWidth < 1024) setShowSidebar(false);
                       }}
                       variant={selectedConversation === conv.id ? 'default' : 'ghost'}
-                      className={`group w-full justify-start text-left h-auto p-2 transition-all duration-300 ${
+                      className={`group w-full justify-start text-left h-auto p-2 rounded-lg ${
                         selectedConversation === conv.id
-                          ? 'bg-purple-600/20 border-purple-500/30'
-                          : 'hover:bg-gray-800'
+                          ? 'bg-purple-600/20 border border-purple-500/30'
+                          : 'hover:bg-gray-800 border border-transparent'
                       }`}
                     >
-                      <div className="flex items-start gap-2 w-full">
-                        <div className="flex-shrink-0 relative mt-0.5">
-                          <MessageSquare className={`w-3.5 h-3.5 transition-all duration-300 ${
-                            selectedConversation === conv.id 
-                              ? 'text-purple-300' 
-                              : 'text-purple-400 group-hover:text-purple-300 group-hover:scale-110'
-                          }`} />
-                          {selectedConversation !== conv.id && (
-                            <div className="absolute -inset-1 bg-purple-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                          )}
-                        </div>
+                      <div className="flex items-start gap-2 w-full min-w-0">
+                        <MessageSquare className={`w-3 h-3 flex-shrink-0 mt-0.5 ${
+                          selectedConversation === conv.id 
+                            ? 'text-purple-300' 
+                            : 'text-purple-400'
+                        }`} />
                         <div className="flex-1 min-w-0">
-                          <div className={`font-medium text-xs truncate transition-colors duration-300 ${
+                          <div className={`font-medium text-xs truncate ${
                             selectedConversation === conv.id 
                               ? 'text-white' 
-                              : 'group-hover:text-purple-300'
+                              : 'text-gray-200'
                           }`}>
                             {conv.title}
                           </div>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <Badge className={`text-xs px-1.5 py-0.5 transition-all duration-300 ${
+                          <div className="flex items-center gap-1 mt-1">
+                            <Badge className={`text-xs px-1 py-0.5 ${
                               selectedConversation === conv.id
                                 ? 'bg-purple-500/30 text-purple-200'
-                                : 'bg-gray-700 text-gray-300 group-hover:bg-gray-600 group-hover:text-gray-200'
+                                : 'bg-gray-700 text-gray-300'
                             }`}>
                               {conv.category}
                             </Badge>
-                            <span className={`text-xs transition-colors duration-300 inline-flex items-center gap-1 ${
+                            <span className={`text-xs flex items-center gap-1 ${
                               selectedConversation === conv.id
                                 ? 'text-purple-200'
-                                : 'text-gray-400 group-hover:text-gray-300'
+                                : 'text-gray-400'
                             }`}>
-                              <BarChart3 className="w-3 h-3" />
-                              {conv.messageCount} msgs
+                              <BarChart3 className="w-2.5 h-2.5" />
+                              {conv.messageCount}
                             </span>
                           </div>
                         </div>
@@ -608,53 +604,50 @@ export default function AiChat() {
               </div>
             </ScrollArea>
 
-            {/* Wallet & User Info */}
-            <div className="p-2 border-t border-gray-700">
-              <div className="space-y-2">
-                {/* Wallet Connection Status */}
+            {/* Wallet & User Info - Compact bottom section */}
+            <div className="p-2 border-t border-gray-700 flex-shrink-0">
+              <div className="space-y-1.5">
+                {/* Wallet Connection Status - Compact */}
                 <div className="relative">
                   <Button
                     onClick={() => setShowWalletMenu(!showWalletMenu)}
                     variant="outline"
                     size="sm"
-                    className="group w-full border-gray-600 hover:bg-gray-800 hover:border-green-500 text-xs justify-between transition-all duration-300"
+                    className="w-full border-gray-600 hover:bg-gray-800 hover:border-green-500 text-xs justify-between h-7"
                   >
-                    <div className="flex items-center gap-2">
-                      <div className="relative">
-                        <Wallet className="w-3 h-3 group-hover:text-green-400 transition-all duration-300" />
-                        <div className="absolute -inset-1 bg-green-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                      </div>
-                      <span className="group-hover:text-green-300 transition-colors duration-300">
-                        {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Wallet className="w-3 h-3 text-green-400 flex-shrink-0" />
+                      <span className="truncate text-green-300 text-xs">
+                        {walletAddress.slice(0, 4)}...{walletAddress.slice(-3)}
                       </span>
                     </div>
-                    <ChevronDown className="w-3 h-3 group-hover:text-green-400 group-hover:rotate-180 transition-all duration-300" />
+                    <ChevronDown className="w-3 h-3 text-green-400 flex-shrink-0" />
                   </Button>
                   
-                  {/* Wallet Menu Dropdown */}
+                  {/* Wallet Menu Dropdown - Better positioned */}
                   {showWalletMenu && (
-                    <div className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">
-                      <div className="p-3 border-b border-gray-700">
+                    <div className="absolute bottom-full left-0 right-0 mb-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
+                      <div className="p-2 border-b border-gray-700">
                         <div className="text-xs text-gray-400 mb-1">Connected Wallet</div>
-                        <div className="text-xs font-mono text-white">{walletAddress}</div>
+                        <div className="text-xs font-mono text-white break-all">{walletAddress}</div>
                       </div>
                       <div className="p-1">
                         <Button
                           onClick={copyAddressToClipboard}
                           variant="ghost"
                           size="sm"
-                          className="w-full justify-start text-xs hover:bg-gray-700"
+                          className="w-full justify-start text-xs hover:bg-gray-700 h-7"
                         >
-                          {addressCopied ? <Check className="w-3 h-3 mr-2" /> : <Copy className="w-3 h-3 mr-2" />}
+                          {addressCopied ? <Check className="w-3 h-3 mr-1.5" /> : <Copy className="w-3 h-3 mr-1.5" />}
                           {addressCopied ? 'Copied!' : 'Copy Address'}
                         </Button>
                         <Button
                           onClick={handleDisconnectWallet}
                           variant="ghost"
                           size="sm"
-                          className="w-full justify-start text-xs hover:bg-gray-700 text-red-400 hover:text-red-300"
+                          className="w-full justify-start text-xs hover:bg-gray-700 text-red-400 hover:text-red-300 h-7"
                         >
-                          <LogOut className="w-3 h-3 mr-2" />
+                          <LogOut className="w-3 h-3 mr-1.5" />
                           Disconnect
                         </Button>
                       </div>
@@ -662,28 +655,22 @@ export default function AiChat() {
                   )}
                 </div>
 
-                {/* AI Status */}
-                <div className="group flex items-center gap-2 text-xs text-gray-400 hover:text-purple-400 transition-all duration-300 cursor-default">
-                  <div className="relative">
-                    <Zap className="w-3 h-3 group-hover:text-purple-400 group-hover:animate-pulse transition-all duration-300" />
-                    <Sparkles className="absolute -top-0.5 -right-0.5 w-2 h-2 text-purple-400 opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-all duration-300" />
-                  </div>
-                  <span className="group-hover:text-purple-300 transition-colors duration-300">AI Powered</span>
-                </div>
-
-                {/* Username Creation */}
+                {/* Username Creation - Better mobile layout */}
                 <Button
                   onClick={() => setShowUsernameDialog(true)}
                   size="sm"
                   variant="outline"
-                  className="group w-full text-xs border-gray-600 hover:bg-gray-800 hover:border-purple-500 transition-all duration-300"
+                  className="w-full text-xs border-gray-600 hover:bg-gray-800 hover:border-purple-500 h-7"
                 >
-                  <div className="relative mr-1">
-                    <User className="w-3 h-3 group-hover:text-purple-400 group-hover:scale-110 transition-all duration-300" />
-                    <div className="absolute -inset-1 bg-purple-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                  </div>
-                  <span className="group-hover:text-purple-300 transition-colors duration-300">Create Username</span>
+                  <User className="w-3 h-3 mr-1.5 text-purple-400" />
+                  <span className="truncate">Create Username</span>
                 </Button>
+
+                {/* AI Status - Simplified */}
+                <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400 py-1">
+                  <Zap className="w-3 h-3 text-purple-400" />
+                  <span>AI Powered</span>
+                </div>
               </div>
             </div>
           </div>
@@ -774,7 +761,7 @@ export default function AiChat() {
                     onClick={() => setShowSidebar(true)}
                     size="sm"
                     variant="ghost"
-                    className="md:hidden p-1 flex-shrink-0"
+                    className="lg:hidden p-1 flex-shrink-0"
                   >
                     <ChevronLeft className="w-3 h-3" />
                   </Button>
