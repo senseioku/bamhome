@@ -9,7 +9,7 @@ const clientDir = path.join(__dirname, 'client');
 console.log('Building from:', clientDir);
 
 // Change to client directory and build with specific config
-execSync(`cd ${clientDir} && npx vite build --outDir ../dist/public --emptyOutDir`, { 
+execSync(`npx vite build --config ../vite.build.config.ts`, { 
   stdio: 'inherit',
   cwd: clientDir
 });
