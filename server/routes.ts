@@ -31,6 +31,7 @@ import {
   securityHeaders,
   corsOptions,
   usernameValidation,
+  conversationValidation,
   chatValidation,
   handleValidationErrors,
   sanitizeInput,
@@ -190,7 +191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Chat routes (simplified wallet-based auth)
   app.post('/api/chat/conversations', 
     conversationRateLimit,
-    chatValidation,
+    conversationValidation,
     handleValidationErrors,
     async (req: any, res: any) => {
     try {

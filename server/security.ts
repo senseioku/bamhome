@@ -251,6 +251,23 @@ export const usernameValidation = [
     .withMessage('Valid wallet address is required')
 ];
 
+export const conversationValidation = [
+  body('title')
+    .optional()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Title must be 1-200 characters')
+    .trim(),
+  body('category')
+    .optional()
+    .isIn(['general', 'crypto', 'defi', 'trading', 'technology'])
+    .withMessage('Invalid category'),
+  body('walletAddress')
+    .isLength({ min: 42, max: 42 })
+    .withMessage('Valid wallet address is required')
+    .matches(/^0x[a-fA-F0-9]{40}$/)
+    .withMessage('Invalid wallet address format')
+];
+
 export const chatValidation = [
   body('message')
     .isLength({ min: 1, max: 4000 })
