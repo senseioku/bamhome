@@ -172,7 +172,11 @@ export default function AiChat() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, displayName })
+        body: JSON.stringify({ 
+          username, 
+          displayName, 
+          walletAddress 
+        })
       });
       
       if (!response.ok) {

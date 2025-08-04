@@ -77,17 +77,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Username management routes
+  // Username management routes (simplified wallet-based auth)
   app.post('/api/user/username', 
     usernameRateLimit,
-    enhancedAuth,
-    isAuthenticated, 
     usernameValidation,
     handleValidationErrors,
     async (req: any, res: any) => {
     try {
-      const userId = req.user.claims.sub;
-      const { username, displayName } = req.body;
+      const { username, displayName, walletAddress } = req.body;
+
+      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+        return res.status(400).json({ message: "Valid wallet address is required" });
+      }
 
       if (!username || username.length < 3 || username.length > 20) {
         return res.status(400).json({ message: "Username must be 3-20 characters" });
@@ -95,17 +96,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if username already exists
       const existingUser = await storage.getUserByUsername(username);
-      if (existingUser && existingUser.id !== userId) {
+      if (existingUser && existingUser.walletAddress !== walletAddress) {
         return res.status(409).json({ message: "Username already taken" });
       }
 
-      // Get user by wallet address from session
-      const user = await storage.getUser(userId);
-      if (!user?.walletAddress) {
-        return res.status(400).json({ message: "Wallet address not found" });
-      }
-
-      const updatedUser = await storage.createUsername(user.walletAddress, username, displayName);
+      const updatedUser = await storage.createUsername(walletAddress, username, displayName);
       res.json(updatedUser);
     } catch (error: unknown) {
       console.error("Error creating username:", error);
@@ -125,20 +120,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Chat routes
+  // Chat routes (simplified wallet-based auth)
   app.post('/api/chat/conversations', 
     chatRateLimit,
-    enhancedAuth,
-    isAuthenticated,
     chatValidation,
     handleValidationErrors,
     async (req: any, res: any) => {
     try {
-      const userId = req.user.claims.sub;
-      const { title, category = 'general' } = req.body;
+      const { title, category = 'general', walletAddress } = req.body;
+
+      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+        return res.status(400).json({ message: "Valid wallet address is required" });
+      }
+
+      // Get or create user by wallet address
+      let user = await storage.getUserByWallet(walletAddress);
+      if (!user) {
+        user = await storage.upsertUser({
+          id: walletAddress,
+          walletAddress,
+          email: null,
+          firstName: null,
+          lastName: null,
+          username: null,
+          displayName: null,
+          profileImageUrl: null
+        });
+      }
 
       const conversation = await storage.createConversation({
-        userId,
+        userId: user.id,
         title: title || 'New Conversation',
         category,
       });
@@ -150,15 +161,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/conversations', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/conversations', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const { walletAddress } = req.query;
+      
+      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress as string)) {
+        return res.status(400).json({ message: "Valid wallet address is required" });
+      }
+
+      const user = await storage.getUserByWallet(walletAddress as string);
+      if (!user) {
+        return res.json([]); // Return empty array for new users
+      }
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       
       const conversations = await queryOptimizer.cachedQuery(
-        `conversations:${userId}:${page}:${limit}`,
-        () => storage.getConversations(userId)
+        `conversations:${user.id}:${page}:${limit}`,
+        () => storage.getConversations(user.id)
       );
       
       const paginatedResult = ResponseOptimizer.paginate(conversations, page, limit);
@@ -171,13 +192,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/conversations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/conversations/:id', async (req: any, res) => {
     try {
       const { id } = req.params;
+      const { walletAddress } = req.query;
+      
+      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress as string)) {
+        return res.status(400).json({ message: "Valid wallet address is required" });
+      }
+
       const conversation = await storage.getConversation(id);
       
       if (!conversation) {
         return res.status(404).json({ message: 'Conversation not found' });
+      }
+
+      // Verify user owns this conversation
+      const user = await storage.getUserByWallet(walletAddress as string);
+      if (!user || conversation.userId !== user.id) {
+        return res.status(403).json({ message: 'Access denied' });
       }
 
       const messages = await storage.getMessages(id);
@@ -188,11 +221,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/messages', async (req: any, res) => {
     try {
       const { id } = req.params;
-      const { content } = req.body;
-      const userId = req.user.claims.sub;
+      const { content, walletAddress } = req.body;
+
+      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+        return res.status(400).json({ message: "Valid wallet address is required" });
+      }
 
       if (!content?.trim()) {
         return res.status(400).json({ message: 'Message content is required' });
@@ -201,6 +237,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const conversation = await storage.getConversation(id);
       if (!conversation) {
         return res.status(404).json({ message: 'Conversation not found' });
+      }
+
+      // Verify user owns this conversation
+      const user = await storage.getUserByWallet(walletAddress);
+      if (!user || conversation.userId !== user.id) {
+        return res.status(403).json({ message: 'Access denied' });
       }
 
       // Create user message
@@ -234,9 +276,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Update user activity
-      await storage.updateUserActivity(userId);
+      await storage.updateUserActivity(user.id);
       await storage.logUserActivity({
-        userId,
+        userId: user.id,
         action: 'chat',
         metadata: { conversationId: id, category: conversation.category }
       });
@@ -252,9 +294,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/chat/conversations/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/chat/conversations/:id', async (req: any, res) => {
     try {
       const { id } = req.params;
+      const { walletAddress } = req.body;
+      
+      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+        return res.status(400).json({ message: "Valid wallet address is required" });
+      }
+
+      const conversation = await storage.getConversation(id);
+      if (!conversation) {
+        return res.status(404).json({ message: 'Conversation not found' });
+      }
+
+      // Verify user owns this conversation
+      const user = await storage.getUserByWallet(walletAddress);
+      if (!user || conversation.userId !== user.id) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
       await storage.deleteConversation(id);
       res.json({ success: true });
     } catch (error) {
