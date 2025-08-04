@@ -54,7 +54,7 @@ export const authRateLimit = rateLimit({
 
 export const aiChatRateLimit = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 20, // Allow 20 AI messages per minute
+  max: 100, // Allow 100 AI messages per minute (increased from 20)
   message: {
     error: 'AI Rate Limit',
     message: 'Please wait a moment before sending another message to help preserve our AI service.',
@@ -74,7 +74,7 @@ export const aiChatRateLimit = rateLimit({
 
 export const conversationRateLimit = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 10, // Allow 10 new conversations per 5 minutes
+  max: 25, // Allow 25 new conversations per 5 minutes (increased from 10)
   message: {
     error: 'Conversation Limit',
     message: 'Please wait before creating another conversation.',
@@ -95,7 +95,7 @@ export const conversationRateLimit = rateLimit({
 // Separate, more restrictive rate limit specifically for AI API calls
 export const aiApiRateLimit = rateLimit({
   windowMs: 60 * 1000, // 1 minute  
-  max: 2, // Very conservative - only 2 AI API calls per minute per IP
+  max: 10, // Increased to 10 AI API calls per minute per IP (from 2)
   message: {
     error: 'AI chat cooling down',
     message: 'Our AI needs a moment to recharge! Please wait 1 minute before sending another message.',
@@ -113,29 +113,7 @@ export const aiApiRateLimit = rateLimit({
   }
 });
 
-// Daily rate limit for AI API calls to prevent credit exhaustion
-export const dailyAiRateLimit = rateLimit({
-  windowMs: 24 * 60 * 60 * 1000, // 24 hours
-  max: 50, // Maximum 50 AI messages per day per IP
-  message: {
-    error: 'Daily AI chat limit reached',
-    message: 'You\'ve had a great chat session today! Your daily AI message limit has been reached.',
-    retryAfter: '24 hours'
-  },
-  handler: (req: Request, res: Response) => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    
-    res.status(429).json({
-      error: 'Daily AI chat limit reached',
-      message: `You've had a great chat session today! Your daily AI message limit has been reached. Come back tomorrow at ${tomorrow.toLocaleDateString()} for more conversations.`,
-      retryAfter: '24 hours',
-      nextAttempt: tomorrow.toISOString(),
-      tip: 'You can still browse your chat history and manage conversations - just no new AI messages until tomorrow!'
-    });
-  }
-});
+
 
 export const usernameRateLimit = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour

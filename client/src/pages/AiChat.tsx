@@ -114,6 +114,7 @@ export default function AiChat() {
   const [editCountrySearch, setEditCountrySearch] = useState('');
   const [showEditCountryDropdown, setShowEditCountryDropdown] = useState(false);
   const [editProfileError, setEditProfileError] = useState<string | null>(null);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const countryDropdownRef = useRef<HTMLDivElement>(null);
   const editCountryDropdownRef = useRef<HTMLDivElement>(null);
@@ -468,6 +469,28 @@ export default function AiChat() {
       setTimeout(() => setAddressCopied(false), 2000);
     } catch (error) {
       console.error('Failed to copy address:', error);
+    }
+  };
+
+  // Copy message to clipboard
+  const copyMessageToClipboard = async (messageId: string, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(messageId);
+      toast({
+        title: "Copied to clipboard",
+        description: "Message copied successfully",
+        duration: 2000
+      });
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy message:', error);
+      toast({
+        title: "Copy failed",
+        description: "Unable to copy message to clipboard",
+        variant: "destructive",
+        duration: 3000
+      });
     }
   };
 
@@ -1245,7 +1268,7 @@ export default function AiChat() {
                     conversationData?.messages?.map((message: any) => (
                       <div
                         key={message.id}
-                        className={`flex gap-1 ${
+                        className={`group relative flex gap-1 ${
                           message.role === 'user' ? 'justify-end' : 'justify-start'
                         }`}
                       >
@@ -1256,6 +1279,20 @@ export default function AiChat() {
                               : 'bg-gray-800 text-gray-100'
                           }`}
                         >
+                          {/* Copy button - appears on hover */}
+                          <button
+                            onClick={() => copyMessageToClipboard(message.id, message.content)}
+                            className={`absolute ${
+                              message.role === 'user' ? '-left-8' : '-right-8'
+                            } top-2 w-6 h-6 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 border border-gray-600`}
+                            title="Copy message"
+                          >
+                            {copiedMessageId === message.id ? (
+                              <Check className="w-3 h-3 text-green-400" />
+                            ) : (
+                              <Copy className="w-3 h-3 text-gray-300" />
+                            )}
+                          </button>
                           <div className="whitespace-pre-wrap text-base leading-relaxed max-w-none">
                             {(() => {
                               let content = message.content;

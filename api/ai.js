@@ -105,7 +105,7 @@ RESPONSE STYLE:
     
     const response = await client.messages.create({
       model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 2000,
+      max_tokens: 2500, // Increased from 2000 for longer responses
       temperature: 0.3,
       messages: messages.slice(1), // Remove system message as it's passed separately
       system: systemPrompt
