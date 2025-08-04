@@ -69,7 +69,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByWallet(walletAddress: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.walletAddress, walletAddress));
+    // Normalize wallet address to lowercase for consistent lookups
+    const normalizedWallet = walletAddress.toLowerCase();
+    const [user] = await db.select().from(users).where(eq(users.walletAddress, normalizedWallet));
     return user;
   }
 
@@ -79,9 +81,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUsername(walletAddress: string, username: string, displayName?: string): Promise<User> {
-    const existingUser = await this.getUserByWallet(walletAddress);
+    // Normalize wallet address for consistency
+    const normalizedWallet = walletAddress.toLowerCase();
+    
+    let existingUser = await this.getUserByWallet(normalizedWallet);
     if (!existingUser) {
-      throw new Error('User not found');
+      // Create user if they don't exist
+      console.log(`Creating new user for wallet: ${normalizedWallet}`);
+      existingUser = await this.upsertUser({
+        id: normalizedWallet,
+        walletAddress: normalizedWallet,
+        email: null,
+        firstName: null,
+        lastName: null,
+        username: null,
+        displayName: null,
+        profileImageUrl: null
+      });
     }
 
     const [updatedUser] = await db
@@ -91,7 +107,7 @@ export class DatabaseStorage implements IStorage {
         displayName: displayName || username,
         updatedAt: new Date(),
       })
-      .where(eq(users.walletAddress, walletAddress))
+      .where(eq(users.walletAddress, normalizedWallet))
       .returning();
 
     return updatedUser;

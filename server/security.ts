@@ -247,10 +247,27 @@ export const enhancedAuth = (req: Request, res: Response, next: NextFunction) =>
   next();
 };
 
-// Wallet address validation
+// Enhanced wallet address validation helper
+export const isValidWalletAddress = (address: string): boolean => {
+  if (!address) return false;
+  const normalized = address.toLowerCase();
+  return /^0x[a-f0-9]{40}$/.test(normalized);
+};
+
+// Normalize wallet address to lowercase
+export const normalizeWalletAddress = (address: string): string => {
+  return address?.toLowerCase() || '';
+};
+
+// Enhanced wallet address validation - accepts both uppercase and lowercase
 export const walletValidation = [
   body('walletAddress')
-    .matches(/^0x[a-fA-F0-9]{40}$/)
+    .custom((value) => {
+      if (!isValidWalletAddress(value)) {
+        throw new Error('Invalid wallet address format');
+      }
+      return true;
+    })
     .withMessage('Invalid wallet address format')
 ];
 

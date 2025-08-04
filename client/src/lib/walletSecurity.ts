@@ -58,15 +58,17 @@ export class WalletSecurityManager {
       }
 
       const currentAddress = accounts[0].toLowerCase();
-      if (currentAddress !== expectedAddress.toLowerCase()) {
+      const normalizedExpected = expectedAddress.toLowerCase();
+      
+      if (currentAddress !== normalizedExpected) {
         return {
           isValid: false,
           error: 'Connected wallet address does not match expected address.'
         };
       }
 
-      // Verify BAM token balance
-      const bamBalance = await this.getBAMBalance(expectedAddress);
+      // Verify BAM token balance using normalized address
+      const bamBalance = await this.getBAMBalance(normalizedExpected);
       const balanceInTokens = parseFloat(bamBalance);
       
       if (balanceInTokens < parseFloat(this.MIN_BAM_REQUIREMENT)) {
@@ -96,7 +98,7 @@ By signing this message, I acknowledge and accept:
 I FULLY UNDERSTAND AND ACCEPT ALL RISKS INVOLVED.
 I CONFIRM THAT I AM INVESTING ONLY WHAT I CAN AFFORD TO LOSE.
 
-Address: ${expectedAddress}
+Address: ${normalizedExpected}
 Timestamp: ${timestamp}
 
 This signature verifies wallet ownership and does not authorize any transactions.`;
@@ -105,7 +107,7 @@ This signature verifies wallet ownership and does not authorize any transactions
         console.log('🔐 Requesting wallet signature for security verification...');
         const signature = await (window as any).ethereum.request({
           method: 'personal_sign',
-          params: [message, expectedAddress],
+          params: [message, currentAddress],
         });
         
         if (!signature) {
@@ -120,15 +122,15 @@ This signature verifies wallet ownership and does not authorize any transactions
         // Skip backend verification for now - use direct client-side verification
         console.log('✅ Client-side verification successful, skipping backend API call');
         
-        // Store verified session
-        this.verifiedSessions.set(sessionKey, {
+        // Store verified session with normalized address
+        this.verifiedSessions.set(normalizedExpected, {
           timestamp: Date.now(),
-          address: expectedAddress
+          address: normalizedExpected
         });
 
         return {
           isValid: true,
-          address: expectedAddress,
+          address: normalizedExpected,
           bamBalance
         };
 
@@ -141,12 +143,12 @@ This signature verifies wallet ownership and does not authorize any transactions
         } else if (signError.message?.includes('watch') || signError.message?.includes('readonly')) {
           return {
             isValid: false,
-            error: 'Watch-only wallets cannot access BAM AIChat. Please use a wallet with signing capabilities.'
+            error: 'Watch-only wallets are strictly prohibited. Only authentic wallet owners with signing capabilities can access BAM AIChat.'
           };
         } else {
           return {
             isValid: false,
-            error: 'Failed to verify wallet ownership. Please ensure you have a signing-capable wallet.'
+            error: 'Cryptographic signature verification failed. Only authentic wallet owners can access the system.'
           };
         }
       }

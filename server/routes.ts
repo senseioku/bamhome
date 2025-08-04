@@ -37,7 +37,9 @@ import {
   securityLogger,
   enhancedAuth,
   abuseDetection,
-  walletValidation
+  walletValidation,
+  isValidWalletAddress,
+  normalizeWalletAddress
 } from "./security";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -86,9 +88,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { username, displayName, walletAddress } = req.body;
 
-      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      if (!isValidWalletAddress(walletAddress)) {
         return res.status(400).json({ message: "Valid wallet address is required" });
       }
+      
+      // Normalize wallet address for consistency
+      const normalizedWallet = normalizeWalletAddress(walletAddress);
 
       if (!username || username.length < 3 || username.length > 20) {
         return res.status(400).json({ message: "Username must be 3-20 characters" });
@@ -96,11 +101,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if username already exists
       const existingUser = await storage.getUserByUsername(username);
-      if (existingUser && existingUser.walletAddress !== walletAddress) {
+      if (existingUser && existingUser.walletAddress !== normalizedWallet) {
         return res.status(409).json({ message: "Username already taken" });
       }
 
-      const updatedUser = await storage.createUsername(walletAddress, username, displayName);
+      const updatedUser = await storage.createUsername(normalizedWallet, username, displayName);
       res.json(updatedUser);
     } catch (error: unknown) {
       console.error("Error creating username:", error);
@@ -129,16 +134,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { title, category = 'general', walletAddress } = req.body;
 
-      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      if (!isValidWalletAddress(walletAddress)) {
         return res.status(400).json({ message: "Valid wallet address is required" });
       }
+      
+      // Normalize wallet address for consistency
+      const normalizedWallet = normalizeWalletAddress(walletAddress);
 
-      // Get or create user by wallet address
-      let user = await storage.getUserByWallet(walletAddress);
+      // Get or create user by normalized wallet address
+      let user = await storage.getUserByWallet(normalizedWallet);
       if (!user) {
         user = await storage.upsertUser({
-          id: walletAddress,
-          walletAddress,
+          id: normalizedWallet,
+          walletAddress: normalizedWallet,
           email: null,
           firstName: null,
           lastName: null,
@@ -165,11 +173,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { walletAddress } = req.query;
       
-      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress as string)) {
+      if (!isValidWalletAddress(walletAddress as string)) {
         return res.status(400).json({ message: "Valid wallet address is required" });
       }
 
-      const user = await storage.getUserByWallet(walletAddress as string);
+      const normalizedWallet = normalizeWalletAddress(walletAddress as string);
+      const user = await storage.getUserByWallet(normalizedWallet);
       if (!user) {
         return res.json([]); // Return empty array for new users
       }
@@ -197,10 +206,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { walletAddress } = req.query;
       
-      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress as string)) {
+      if (!isValidWalletAddress(walletAddress as string)) {
         return res.status(400).json({ message: "Valid wallet address is required" });
       }
 
+      const normalizedWallet = normalizeWalletAddress(walletAddress as string);
       const conversation = await storage.getConversation(id);
       
       if (!conversation) {
@@ -208,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify user owns this conversation
-      const user = await storage.getUserByWallet(walletAddress as string);
+      const user = await storage.getUserByWallet(normalizedWallet);
       if (!user || conversation.userId !== user.id) {
         return res.status(403).json({ message: 'Access denied' });
       }
@@ -226,7 +236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { content, walletAddress } = req.body;
 
-      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      if (!isValidWalletAddress(walletAddress)) {
         return res.status(400).json({ message: "Valid wallet address is required" });
       }
 
@@ -234,13 +244,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Message content is required' });
       }
 
+      const normalizedWallet = normalizeWalletAddress(walletAddress);
       const conversation = await storage.getConversation(id);
       if (!conversation) {
         return res.status(404).json({ message: 'Conversation not found' });
       }
 
       // Verify user owns this conversation
-      const user = await storage.getUserByWallet(walletAddress);
+      const user = await storage.getUserByWallet(normalizedWallet);
       if (!user || conversation.userId !== user.id) {
         return res.status(403).json({ message: 'Access denied' });
       }
@@ -299,17 +310,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { walletAddress } = req.body;
       
-      if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      if (!isValidWalletAddress(walletAddress)) {
         return res.status(400).json({ message: "Valid wallet address is required" });
       }
 
+      const normalizedWallet = normalizeWalletAddress(walletAddress);
       const conversation = await storage.getConversation(id);
       if (!conversation) {
         return res.status(404).json({ message: 'Conversation not found' });
       }
 
       // Verify user owns this conversation
-      const user = await storage.getUserByWallet(walletAddress);
+      const user = await storage.getUserByWallet(normalizedWallet);
       if (!user || conversation.userId !== user.id) {
         return res.status(403).json({ message: 'Access denied' });
       }
