@@ -501,96 +501,143 @@ export default function AiChat() {
     }
   };
 
-  // For static deployment, we'll use local state instead of API calls
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [conversationData, setConversationData] = useState<{ conversation: Conversation; messages: Message[] } | undefined>();
-  const [loadingConversation, setLoadingConversation] = useState(false);
+  // Fetch conversations from database
+  const conversationsQuery = useQuery({
+    queryKey: ['/api/chat/conversations', walletAddress],
+    queryFn: async () => {
+      if (!walletAddress) return [];
+      
+      console.log('🔄 Fetching conversations for wallet:', walletAddress);
+      const response = await fetch(`/api/chat/conversations?walletAddress=${walletAddress}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.log('📭 No conversations found for wallet');
+          return [];
+        }
+        console.error('❌ Failed to fetch conversations:', response.status);
+        throw new Error('Failed to fetch conversations');
+      }
+      const data = await response.json();
+      console.log('✅ Conversations fetched:', data);
+      return data;
+    },
+    enabled: !!walletAddress && isVerified,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 0
+  });
+
+  const conversations = conversationsQuery.data || [];
+
+  // Fetch specific conversation data
+  const conversationQuery = useQuery({
+    queryKey: ['/api/chat/conversations', selectedConversation, walletAddress],
+    queryFn: async () => {
+      if (!selectedConversation || !walletAddress) return undefined;
+      
+      console.log('🔄 Fetching conversation:', selectedConversation);
+      const response = await fetch(`/api/chat/conversations/${selectedConversation}?walletAddress=${walletAddress}`);
+      if (!response.ok) {
+        console.error('❌ Failed to fetch conversation:', response.status);
+        throw new Error('Failed to fetch conversation');
+      }
+      const data = await response.json();
+      console.log('✅ Conversation data fetched:', data);
+      return data;
+    },
+    enabled: !!selectedConversation && !!walletAddress && isVerified,
+    refetchOnWindowFocus: false,
+    staleTime: 30000
+  });
+
+  const conversationData = conversationQuery.data;
+  const loadingConversation = conversationQuery.isLoading;
   const [highlights] = useState<any[]>([]); // Placeholder for crypto highlights
 
-  // Create new conversation (local state for static deployment)
+  // Create new conversation with database persistence
   const createConversationMutation = useMutation({
     mutationFn: async ({ title, category }: { title: string; category: string }) => {
-      const newConversation = {
-        id: Date.now().toString(),
-        userId: null,
-        title,
-        category,
-        isActive: true,
-        messageCount: 0,
-        lastMessageAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      } as unknown as Conversation;
+      console.log('🔄 Creating new conversation:', { title, category, walletAddress });
+      const response = await fetch('/api/chat/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          title, 
+          category, 
+          walletAddress 
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Failed to create conversation' }));
+        console.error('❌ Failed to create conversation:', error);
+        throw new Error(error.message || 'Failed to create conversation');
+      }
+      
+      const newConversation = await response.json();
+      console.log('✅ Conversation created successfully:', newConversation);
       return newConversation;
     },
     onSuccess: (conversation: Conversation) => {
-      setConversations(prev => [conversation, ...prev]);
-      setConversationData({
-        conversation,
-        messages: []
-      });
+      // Refresh conversations list
+      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', walletAddress] });
       setSelectedConversation(conversation.id);
     }
   });
 
-  // Send message using AI API
+  // Send message using database API
   const sendMessageMutation = useMutation({
     mutationFn: async ({ content }: { content: string }) => {
-      const response = await fetch('/api/ai', {
+      if (!selectedConversation || !walletAddress) {
+        throw new Error('No conversation selected or wallet not connected');
+      }
+
+      console.log('🔄 Sending message to conversation:', selectedConversation);
+      const response = await fetch(`/api/chat/conversations/${selectedConversation}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: content,
-          conversationHistory: conversationData?.messages || []
+          content: content.trim(),
+          walletAddress
         })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        const error = await response.json().catch(() => ({ message: 'Failed to send message' }));
+        console.error('❌ Failed to send message:', error);
+        throw new Error(error.message || 'Failed to send message');
       }
 
-      return response.json();
+      const result = await response.json();
+      console.log('✅ Message sent successfully:', result);
+      return result;
     },
-    onSuccess: (aiResponse) => {
-      // Add user message and AI response to conversation
-      if (conversationData) {
-        const userMessage = {
-          id: Date.now().toString(),
-          conversationId: selectedConversation || null,
-          role: 'user',
-          content: messageInput.trim(),
-          metadata: null,
-          tokens: null,
-          createdAt: new Date()
-        } as unknown as Message;
-        
-        const aiMessage = {
-          id: (Date.now() + 1).toString(),
-          conversationId: selectedConversation || null,
-          role: 'assistant',
-          content: aiResponse.response,
-          metadata: null,
-          tokens: null,
-          createdAt: new Date()
-        } as unknown as Message;
-
-        setConversationData(prev => ({
-          ...prev!,
-          messages: [...(prev?.messages || []), userMessage, aiMessage]
-        }));
-
-        // Update conversation count
-        setConversations(prev => 
-          prev.map(conv => 
-            conv.id === selectedConversation 
-              ? { ...conv, messageCount: conv.messageCount + 2 }
-              : conv
-          )
-        );
-      }
+    onSuccess: (result) => {
+      // Clear message input
       setMessageInput('');
+      
+      // Refresh the conversation data to show new messages
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/chat/conversations', selectedConversation, walletAddress] 
+      });
+      
+      // Also refresh conversations list to update message count and timestamp
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/chat/conversations', walletAddress] 
+      });
+    },
+    onError: (error: any) => {
+      console.error('Send message error:', error);
+      toast({
+        title: "Failed to send message",
+        description: error.message || "Please try again",
+        variant: "destructive",
+        duration: 5000
+      });
     }
   });
 
@@ -1201,46 +1248,58 @@ export default function AiChat() {
                             {(() => {
                               let content = message.content;
                               
-                              // Smart emoji replacement based on content
+                              // Preserve code blocks first
+                              const codeBlocks: string[] = [];
+                              content = content.replace(/```[\s\S]*?```/g, (match, index) => {
+                                const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`;
+                                codeBlocks.push(match);
+                                return placeholder;
+                              });
+                              
+                              // Preserve inline code
+                              const inlineCodes: string[] = [];
+                              content = content.replace(/`([^`]+)`/g, (match, code) => {
+                                const placeholder = `__INLINE_CODE_${inlineCodes.length}__`;
+                                inlineCodes.push(match);
+                                return placeholder;
+                              });
+                              
+                              // Format headers and lists with contextual emojis (only if not in code)
                               content = content
-                                // Crypto/Finance related
-                                .replace(/^# (.*(?:crypto|bitcoin|ethereum|defi|token|trading|investment|financial|market|portfolio|wallet).*)/gmi, '💎 $1')
-                                .replace(/^## (.*(?:crypto|bitcoin|ethereum|defi|token|trading|investment|financial|market|portfolio|wallet).*)/gmi, '🪙 $1')
-                                .replace(/^- (.*(?:crypto|bitcoin|ethereum|defi|token|trading|investment|financial|market|portfolio|wallet).*)/gmi, '📈 $1')
+                                // Headers
+                                .replace(/^# (.+)/gm, '🔷 $1')
+                                .replace(/^## (.+)/gm, '◆ $1')
+                                .replace(/^### (.+)/gm, '▪ $1')
+                                // Lists
+                                .replace(/^- (.+)/gm, '• $1')
+                                .replace(/^\* (.+)/gm, '• $1')
+                                .replace(/^\d+\. (.+)/gm, '🔹 $1')
                                 
-                                // Business/Strategy related
-                                .replace(/^# (.*(?:business|strategy|growth|revenue|profit|success|goal|plan|entrepreneur|startup).*)/gmi, '🎯 $1')
-                                .replace(/^## (.*(?:business|strategy|growth|revenue|profit|success|goal|plan|entrepreneur|startup).*)/gmi, '💼 $1')
-                                .replace(/^- (.*(?:business|strategy|growth|revenue|profit|success|goal|plan|entrepreneur|startup).*)/gmi, '🚀 $1')
+                                // Bold formatting
+                                .replace(/\*\*([^*]+)\*\*/g, '$1')
+                                .replace(/\*([^*]+)\*/g, '$1')
                                 
-                                // Education/Learning related
-                                .replace(/^# (.*(?:learn|education|guide|tutorial|basics|foundation|understanding|knowledge).*)/gmi, '📚 $1')
-                                .replace(/^## (.*(?:learn|education|guide|tutorial|basics|foundation|understanding|knowledge).*)/gmi, '🎓 $1')
-                                .replace(/^- (.*(?:learn|education|guide|tutorial|basics|foundation|understanding|knowledge).*)/gmi, '💡 $1')
-                                
-                                // Cooking/Food related
-                                .replace(/^# (.*(?:cook|recipe|food|ingredient|dish|meal|kitchen|bake|cuisine).*)/gmi, '👨‍🍳 $1')
-                                .replace(/^## (.*(?:cook|recipe|food|ingredient|dish|meal|kitchen|bake|cuisine).*)/gmi, '🍽️ $1')
-                                .replace(/^- (.*(?:cook|recipe|food|ingredient|dish|meal|kitchen|bake|cuisine).*)/gmi, '🥘 $1')
-                                
-                                // Technology/Tech related
-                                .replace(/^# (.*(?:tech|technology|software|code|programming|development|ai|algorithm).*)/gmi, '💻 $1')
-                                .replace(/^## (.*(?:tech|technology|software|code|programming|development|ai|algorithm).*)/gmi, '⚙️ $1')
-                                .replace(/^- (.*(?:tech|technology|software|code|programming|development|ai|algorithm).*)/gmi, '🔧 $1')
-                                
-                                // Default fallbacks for any remaining headers/bullets
-                                .replace(/^# /gm, '🔷 ')
-                                .replace(/^## /gm, '◆ ')
-                                .replace(/^### /gm, '▪ ')
-                                .replace(/^- /gm, '🔹 ')
-                                .replace(/^\* /gm, '🔹 ')
-                                
-                                // Clean up markdown formatting
-                                .replace(/\*\*(.*?)\*\*/g, '$1')
-                                .replace(/\*(.*?)\*/g, '$1')
+                                // Clean up extra newlines
                                 .replace(/\n{3,}/g, '\n\n')
-                                .replace(/\n\n\s*\n/g, '\n\n')
                                 .trim();
+                              
+                              // Restore code blocks with proper formatting
+                              codeBlocks.forEach((block, index) => {
+                                const formatted = block
+                                  .replace(/^```(\w+)?\n?/, '') // Remove opening ```
+                                  .replace(/\n?```$/, '') // Remove closing ```
+                                  .trim();
+                                
+                                content = content.replace(
+                                  `__CODE_BLOCK_${index}__`,
+                                  `\n\n💻 Code:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${formatted}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
+                                );
+                              });
+                              
+                              // Restore inline code
+                              inlineCodes.forEach((code, index) => {
+                                content = content.replace(`__INLINE_CODE_${index}__`, code.replace(/`/g, ''));
+                              });
                               
                               return content;
                             })()}
