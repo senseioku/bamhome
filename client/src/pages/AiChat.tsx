@@ -527,7 +527,7 @@ export default function AiChat() {
     staleTime: 0
   });
 
-  const conversations = conversationsQuery.data || [];
+  const conversations = Array.isArray(conversationsQuery?.data) ? conversationsQuery.data : [];
 
   // Fetch specific conversation data
   const conversationQuery = useQuery({
@@ -818,7 +818,7 @@ export default function AiChat() {
           {/* Conversations List - Full height scrollable */}
           {!sidebarCollapsed && (
             <ScrollArea className="flex-1 px-4 py-2">
-              {conversations.length === 0 ? (
+              {!Array.isArray(conversations) || conversations.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
                   <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p className="text-base font-medium mb-2">No conversations yet</p>
@@ -831,11 +831,11 @@ export default function AiChat() {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide">Recent Chats</h3>
                       <div className="text-xs text-gray-500">
-                        {conversations.length}/10 limit
+                        {Array.isArray(conversations) ? conversations.length : 0}/10 limit
                       </div>
                     </div>
                     <div className="space-y-1">
-                      {conversations.slice(0, 5).map((conv: any) => (
+                      {Array.isArray(conversations) && conversations.slice(0, 5).map((conv: any) => (
                         <Button
                           key={conv.id}
                           onClick={() => {
@@ -878,7 +878,7 @@ export default function AiChat() {
                   </div>
 
                   {/* Older Conversations */}
-                  {conversations.length > 5 && (
+                  {Array.isArray(conversations) && conversations.length > 5 && (
                     <div>
                       <h3 className="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wide">Earlier</h3>
                       <div className="space-y-1">
@@ -933,7 +933,7 @@ export default function AiChat() {
           {sidebarCollapsed && (
             <ScrollArea className="flex-1 px-2 py-2">
               <div className="space-y-1">
-                {conversations.slice(0, 10).map((conv: any) => (
+                {Array.isArray(conversations) && conversations.slice(0, 10).map((conv: any) => (
                   <Button
                     key={conv.id}
                     onClick={() => {
