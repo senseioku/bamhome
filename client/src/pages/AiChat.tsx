@@ -1076,18 +1076,18 @@ export default function AiChat() {
           {!selectedConversation ? (
             // Welcome Screen - DeepSeek Style
             <div className="flex-1 flex flex-col">
-              <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
+              <div className="flex-1 flex items-center justify-center p-3 sm:p-8">
                 <div className="text-center max-w-2xl w-full">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <Brain className="w-8 h-8 text-white" />
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                    <Brain className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                   </div>
-                  <h2 className="text-3xl font-bold mb-4">Welcome to BAM AIChat</h2>
-                  <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Welcome to BAM AIChat</h2>
+                  <p className="text-gray-400 text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed px-2">
                     AI companion for crypto, business, and general knowledge. From DeFi to cooking recipes - ask anything!
                   </p>
                   
-                  {/* Quick Actions - DeepSeek Style Grid */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                  {/* Quick Actions - Compact Mobile Grid */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
                     {categories.map((category) => (
                       <Button
                         key={category.id}
@@ -1096,11 +1096,11 @@ export default function AiChat() {
                           handleNewConversation();
                         }}
                         variant="outline"
-                        className="p-6 h-auto border-gray-600 hover:bg-gray-800 hover:border-purple-500 rounded-xl transition-all"
+                        className="p-4 sm:p-6 h-auto border-gray-600 hover:bg-gray-800 hover:border-purple-500 rounded-xl transition-all"
                       >
-                        <div className="flex flex-col items-center gap-3">
-                          <category.icon className="w-8 h-8 text-purple-400" />
-                          <div className="font-medium text-sm text-center">{category.name}</div>
+                        <div className="flex flex-col items-center gap-2 sm:gap-3">
+                          <category.icon className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
+                          <div className="font-medium text-xs sm:text-sm text-center leading-tight">{category.name}</div>
                         </div>
                       </Button>
                     ))}
@@ -1108,15 +1108,15 @@ export default function AiChat() {
                 </div>
               </div>
               
-              {/* Chat Input - Sticky at Bottom */}
-              <div className="sticky bottom-0 left-0 right-0 p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0 z-10">
+              {/* Chat Input - Sticky at Bottom - Compact Mobile */}
+              <div className="sticky bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0 z-10">
                 <div className="max-w-4xl mx-auto">
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 sm:gap-3">
                     <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
                       placeholder="Message BAM AIChat"
-                      className="flex-1 bg-gray-800 border-gray-600 text-white text-base py-3 px-4 rounded-xl min-h-[48px]"
+                      className="flex-1 bg-gray-800 border-gray-600 text-white text-sm sm:text-base py-3 px-3 sm:px-4 rounded-xl min-h-[44px] sm:min-h-[48px]"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -1133,13 +1133,13 @@ export default function AiChat() {
                         }
                       }}
                       disabled={!messageInput.trim()}
-                      className="bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-xl flex-shrink-0"
+                      className="bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-3 rounded-xl flex-shrink-0"
                       size="lg"
                     >
-                      <Send className="w-5 h-5" />
+                      <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Button>
                   </div>
-                  <div className="text-sm text-gray-500 mt-2 text-center">
+                  <div className="text-xs sm:text-sm text-gray-500 mt-2 text-center">
                     BAM AIChat can make mistakes. Check important info.
                   </div>
                 </div>
