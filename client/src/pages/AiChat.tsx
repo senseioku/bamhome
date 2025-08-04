@@ -105,6 +105,18 @@ export default function AiChat() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // Query user profile
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile', walletAddress],
+    queryFn: async () => {
+      if (!walletAddress) return null;
+      const response = await fetch(`/api/user/profile?walletAddress=${walletAddress}`);
+      if (!response.ok) return null;
+      return response.json();
+    },
+    enabled: !!walletAddress && isVerified,
+  });
+
   // Check window size for responsive sidebar
   useEffect(() => {
     const handleResize = () => {
@@ -701,15 +713,17 @@ export default function AiChat() {
 
               {/* User Actions */}
               <div className="space-y-2">
-                {/* Username Creation */}
-                <Button
-                  onClick={() => setShowUsernameDialog(true)}
-                  variant="outline"
-                  className="w-full border-gray-600 hover:bg-gray-800 hover:border-purple-500 py-2"
-                >
-                  <User className="w-4 h-4 mr-2 text-purple-400" />
-                  <span className="text-sm">Create Username</span>
-                </Button>
+                {/* Username Creation - Show only if no profile */}
+                {!userProfile && (
+                  <Button
+                    onClick={() => setShowUsernameDialog(true)}
+                    variant="outline"
+                    className="w-full border-gray-600 hover:bg-gray-800 hover:border-purple-500 py-2"
+                  >
+                    <User className="w-4 h-4 mr-2 text-purple-400" />
+                    <span className="text-sm">Create Username</span>
+                  </Button>
+                )}
 
                 {/* Wallet Connection */}
                 <div className="relative">
@@ -719,9 +733,9 @@ export default function AiChat() {
                     className="w-full border-gray-600 hover:bg-gray-800 hover:border-green-500 py-2 justify-between"
                   >
                     <div className="flex items-center gap-2">
-                      <Wallet className="w-4 h-4 text-green-400" />
+                      <User className="w-4 h-4 text-green-400" />
                       <span className="text-sm text-green-300">
-                        {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                        {userProfile ? userProfile.username : `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
                       </span>
                     </div>
                     <ChevronDown className="w-4 h-4 text-green-400" />
@@ -731,8 +745,19 @@ export default function AiChat() {
                   {showWalletMenu && (
                     <div className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
                       <div className="p-3 border-b border-gray-700">
-                        <div className="text-xs text-gray-400 mb-1">Connected Wallet</div>
-                        <div className="text-sm font-mono text-white break-all">{walletAddress}</div>
+                        {userProfile ? (
+                          <>
+                            <div className="text-xs text-gray-400 mb-1">Profile</div>
+                            <div className="text-sm font-semibold text-white">{userProfile.displayName || userProfile.username}</div>
+                            <div className="text-xs text-gray-400 mb-2">@{userProfile.username}</div>
+                            <div className="text-xs text-gray-500 font-mono break-all">{walletAddress}</div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="text-xs text-gray-400 mb-1">Connected Wallet</div>
+                            <div className="text-sm font-mono text-white break-all">{walletAddress}</div>
+                          </>
+                        )}
                       </div>
                       <div className="p-1">
                         <Button

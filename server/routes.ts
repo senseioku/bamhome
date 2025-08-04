@@ -415,6 +415,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user profile by wallet address
+  app.get('/api/user/profile', async (req: any, res) => {
+    try {
+      const { walletAddress } = req.query;
+      
+      if (!walletAddress || !isValidWalletAddress(walletAddress)) {
+        return res.status(400).json({ message: "Valid wallet address is required" });
+      }
+
+      const normalizedWallet = normalizeWalletAddress(walletAddress);
+      const user = await storage.getUserByWallet(normalizedWallet);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User profile not found' });
+      }
+
+      // Return user profile data
+      res.json({
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        walletAddress: user.walletAddress,
+        createdAt: user.createdAt
+      });
+    } catch (error) {
+      console.error('Get user profile error:', error);
+      res.status(500).json({ message: 'Failed to get user profile' });
+    }
+  });
+
   // Wallet verification route for BAM AIChat
   app.post('/api/wallet/verify',
     authRateLimit,
