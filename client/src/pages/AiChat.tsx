@@ -488,16 +488,16 @@ export default function AiChat() {
       <div className="flex-1 flex pt-16 relative">
 
 
-        {/* Responsive Sidebar - Better mobile/desktop layout */}
+        {/* Left Sidebar - DeepSeek Style */}
         {showSidebar && (
-          <div className="w-full h-full lg:w-72 xl:w-80 bg-gray-900 border-r border-gray-700 flex flex-col fixed lg:relative z-50">
-            {/* Sidebar Header - Compact */}
-            <div className="p-3 border-b border-gray-700">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Brain className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                  <h1 className="text-base font-bold truncate">BAM AIChat</h1>
-                  <Badge className="bg-purple-600 text-white text-xs px-1 py-0.5 flex-shrink-0">
+          <div className="w-full h-full lg:w-80 xl:w-96 bg-gray-900 border-r border-gray-700 flex flex-col fixed lg:relative z-50">
+            {/* Sidebar Header */}
+            <div className="p-4 border-b border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <Brain className="w-6 h-6 text-purple-400" />
+                  <h1 className="text-xl font-bold">BAM AIChat</h1>
+                  <Badge className="bg-purple-600 text-white text-sm px-2 py-1">
                     AI
                   </Badge>
                 </div>
@@ -505,171 +505,190 @@ export default function AiChat() {
                   onClick={() => setShowSidebar(false)}
                   size="sm"
                   variant="ghost"
-                  className="lg:hidden p-1 flex-shrink-0"
+                  className="lg:hidden"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-5 h-5" />
                 </Button>
               </div>
 
-              {/* Category Selection - Compact */}
-              <div className="grid grid-cols-2 gap-1">
-                {categories.map((category) => (
-                  <Button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
-                    variant={selectedCategory === category.id ? 'default' : 'outline'}
-                    size="sm"
-                    className={`text-xs h-8 ${
-                      selectedCategory === category.id
-                        ? 'bg-purple-600 hover:bg-purple-700'
-                        : 'border-gray-600 hover:bg-gray-800'
-                    }`}
-                  >
-                    <category.icon className="w-3 h-3 mr-1" />
-                    <span className="truncate">{category.name}</span>
-                  </Button>
-                ))}
-              </div>
-
+              {/* New Chat Button - Prominent like DeepSeek */}
               <Button
                 onClick={handleNewConversation}
-                className="w-full mt-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-8"
-                size="sm"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg"
+                size="lg"
               >
-                <Plus className="w-3 h-3 mr-1" />
-                <span className="text-xs">New Chat</span>
+                <Plus className="w-5 h-5 mr-2" />
+                <span className="text-base font-medium">New chat</span>
               </Button>
             </div>
 
-            {/* Conversations List - Better spacing */}
-            <ScrollArea className="flex-1 p-2 min-h-0">
-              <div className="space-y-1">
-                {conversations.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
-                    <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm font-medium">No conversations yet</p>
-                    <p className="text-xs">Start a new chat above</p>
+            {/* Conversations List - DeepSeek Style */}
+            <ScrollArea className="flex-1 px-4 py-2">
+              {conversations.length === 0 ? (
+                <div className="text-center py-12 text-gray-400">
+                  <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-base font-medium mb-2">No conversations yet</p>
+                  <p className="text-sm">Start a new chat to get going</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {/* Recent Section */}
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wide">Recent</h3>
+                    <div className="space-y-1">
+                      {conversations.slice(0, 5).map((conv) => (
+                        <Button
+                          key={conv.id}
+                          onClick={() => {
+                            setSelectedConversation(conv.id);
+                            if (window.innerWidth < 1024) setShowSidebar(false);
+                          }}
+                          variant="ghost"
+                          className={`w-full justify-start text-left py-3 px-3 rounded-lg transition-colors ${
+                            selectedConversation === conv.id
+                              ? 'bg-gray-800 text-white'
+                              : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                          }`}
+                        >
+                          <div className="w-full">
+                            <div className={`font-medium text-sm truncate mb-1 ${
+                              selectedConversation === conv.id ? 'text-white' : 'text-gray-200'
+                            }`}>
+                              {conv.title}
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <Badge className="bg-gray-700 text-gray-300 px-2 py-0.5">
+                                {conv.category}
+                              </Badge>
+                              <span>{conv.messageCount} messages</span>
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
                   </div>
-                ) : (
-                  conversations.map((conv) => (
-                    <Button
-                      key={conv.id}
-                      onClick={() => {
-                        setSelectedConversation(conv.id);
-                        if (window.innerWidth < 1024) setShowSidebar(false);
-                      }}
-                      variant={selectedConversation === conv.id ? 'default' : 'ghost'}
-                      className={`group w-full justify-start text-left h-auto p-2 rounded-lg ${
-                        selectedConversation === conv.id
-                          ? 'bg-purple-600/20 border border-purple-500/30'
-                          : 'hover:bg-gray-800 border border-transparent'
-                      }`}
-                    >
-                      <div className="flex items-start gap-2 w-full min-w-0">
-                        <MessageSquare className={`w-3 h-3 flex-shrink-0 mt-0.5 ${
-                          selectedConversation === conv.id 
-                            ? 'text-purple-300' 
-                            : 'text-purple-400'
-                        }`} />
-                        <div className="flex-1 min-w-0">
-                          <div className={`font-medium text-xs truncate ${
-                            selectedConversation === conv.id 
-                              ? 'text-white' 
-                              : 'text-gray-200'
-                          }`}>
-                            {conv.title}
-                          </div>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Badge className={`text-xs px-1 py-0.5 ${
+
+                  {/* Older Conversations */}
+                  {conversations.length > 5 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wide">Earlier</h3>
+                      <div className="space-y-1">
+                        {conversations.slice(5).map((conv) => (
+                          <Button
+                            key={conv.id}
+                            onClick={() => {
+                              setSelectedConversation(conv.id);
+                              if (window.innerWidth < 1024) setShowSidebar(false);
+                            }}
+                            variant="ghost"
+                            className={`w-full justify-start text-left py-3 px-3 rounded-lg transition-colors ${
                               selectedConversation === conv.id
-                                ? 'bg-purple-500/30 text-purple-200'
-                                : 'bg-gray-700 text-gray-300'
-                            }`}>
-                              {conv.category}
-                            </Badge>
-                            <span className={`text-xs flex items-center gap-1 ${
-                              selectedConversation === conv.id
-                                ? 'text-purple-200'
-                                : 'text-gray-400'
-                            }`}>
-                              <BarChart3 className="w-2.5 h-2.5" />
-                              {conv.messageCount}
-                            </span>
-                          </div>
-                        </div>
+                                ? 'bg-gray-800 text-white'
+                                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                            }`}
+                          >
+                            <div className="w-full">
+                              <div className={`font-medium text-sm truncate mb-1 ${
+                                selectedConversation === conv.id ? 'text-white' : 'text-gray-200'
+                              }`}>
+                                {conv.title}
+                              </div>
+                              <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <Badge className="bg-gray-700 text-gray-300 px-2 py-0.5">
+                                  {conv.category}
+                                </Badge>
+                                <span>{conv.messageCount} messages</span>
+                              </div>
+                            </div>
+                          </Button>
+                        ))}
                       </div>
-                    </Button>
-                  ))
-                )}
-              </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </ScrollArea>
 
-            {/* Wallet & User Info - Compact bottom section */}
-            <div className="p-2 border-t border-gray-700 flex-shrink-0">
-              <div className="space-y-1.5">
-                {/* Wallet Connection Status - Compact */}
+            {/* Bottom User Section - DeepSeek Style */}
+            <div className="p-4 border-t border-gray-700 space-y-3">
+              {/* Category Selection */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-400 mb-2">Chat Categories</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {categories.map((category) => (
+                    <Button
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.id)}
+                      variant={selectedCategory === category.id ? 'default' : 'outline'}
+                      size="sm"
+                      className={`text-xs py-2 ${
+                        selectedCategory === category.id
+                          ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                          : 'border-gray-600 hover:bg-gray-800 text-gray-300'
+                      }`}
+                    >
+                      <category.icon className="w-4 h-4 mr-1" />
+                      {category.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* User Actions */}
+              <div className="space-y-2">
+                {/* Username Creation */}
+                <Button
+                  onClick={() => setShowUsernameDialog(true)}
+                  variant="outline"
+                  className="w-full border-gray-600 hover:bg-gray-800 hover:border-purple-500 py-2"
+                >
+                  <User className="w-4 h-4 mr-2 text-purple-400" />
+                  <span className="text-sm">Create Username</span>
+                </Button>
+
+                {/* Wallet Connection */}
                 <div className="relative">
                   <Button
                     onClick={() => setShowWalletMenu(!showWalletMenu)}
                     variant="outline"
-                    size="sm"
-                    className="w-full border-gray-600 hover:bg-gray-800 hover:border-green-500 text-xs justify-between h-7"
+                    className="w-full border-gray-600 hover:bg-gray-800 hover:border-green-500 py-2 justify-between"
                   >
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <Wallet className="w-3 h-3 text-green-400 flex-shrink-0" />
-                      <span className="truncate text-green-300 text-xs">
-                        {walletAddress.slice(0, 4)}...{walletAddress.slice(-3)}
+                    <div className="flex items-center gap-2">
+                      <Wallet className="w-4 h-4 text-green-400" />
+                      <span className="text-sm text-green-300">
+                        {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                       </span>
                     </div>
-                    <ChevronDown className="w-3 h-3 text-green-400 flex-shrink-0" />
+                    <ChevronDown className="w-4 h-4 text-green-400" />
                   </Button>
                   
-                  {/* Wallet Menu Dropdown - Better positioned */}
+                  {/* Wallet Menu */}
                   {showWalletMenu && (
-                    <div className="absolute bottom-full left-0 right-0 mb-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
-                      <div className="p-2 border-b border-gray-700">
+                    <div className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
+                      <div className="p-3 border-b border-gray-700">
                         <div className="text-xs text-gray-400 mb-1">Connected Wallet</div>
-                        <div className="text-xs font-mono text-white break-all">{walletAddress}</div>
+                        <div className="text-sm font-mono text-white break-all">{walletAddress}</div>
                       </div>
                       <div className="p-1">
                         <Button
                           onClick={copyAddressToClipboard}
                           variant="ghost"
-                          size="sm"
-                          className="w-full justify-start text-xs hover:bg-gray-700 h-7"
+                          className="w-full justify-start text-sm hover:bg-gray-700 py-2"
                         >
-                          {addressCopied ? <Check className="w-3 h-3 mr-1.5" /> : <Copy className="w-3 h-3 mr-1.5" />}
+                          {addressCopied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
                           {addressCopied ? 'Copied!' : 'Copy Address'}
                         </Button>
                         <Button
                           onClick={handleDisconnectWallet}
                           variant="ghost"
-                          size="sm"
-                          className="w-full justify-start text-xs hover:bg-gray-700 text-red-400 hover:text-red-300 h-7"
+                          className="w-full justify-start text-sm hover:bg-gray-700 text-red-400 hover:text-red-300 py-2"
                         >
-                          <LogOut className="w-3 h-3 mr-1.5" />
+                          <LogOut className="w-4 h-4 mr-2" />
                           Disconnect
                         </Button>
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* Username Creation - Better mobile layout */}
-                <Button
-                  onClick={() => setShowUsernameDialog(true)}
-                  size="sm"
-                  variant="outline"
-                  className="w-full text-xs border-gray-600 hover:bg-gray-800 hover:border-purple-500 h-7"
-                >
-                  <User className="w-3 h-3 mr-1.5 text-purple-400" />
-                  <span className="truncate">Create Username</span>
-                </Button>
-
-                {/* AI Status - Simplified */}
-                <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400 py-1">
-                  <Zap className="w-3 h-3 text-purple-400" />
-                  <span>AI Powered</span>
                 </div>
               </div>
             </div>
@@ -679,21 +698,21 @@ export default function AiChat() {
         {/* Main Chat Area - Clean full width */}
         <div className="flex-1 flex flex-col relative z-20">
           {!selectedConversation ? (
-            // Welcome Screen - Perfect mobile layout
+            // Welcome Screen - DeepSeek Style
             <div className="flex-1 flex flex-col">
-              <div className="flex-1 flex items-center justify-center p-4 min-h-0">
-                <div className="text-center max-w-sm w-full">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Brain className="w-6 h-6 text-white" />
+              <div className="flex-1 flex items-center justify-center p-8">
+                <div className="text-center max-w-2xl w-full">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Brain className="w-8 h-8 text-white" />
                   </div>
-                  <h2 className="text-xl font-bold mb-2">Welcome to BAM AIChat</h2>
-                  <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+                  <h2 className="text-3xl font-bold mb-4">Welcome to BAM AIChat</h2>
+                  <p className="text-gray-400 text-lg mb-8 leading-relaxed">
                     AI companion for crypto, business, and general knowledge. From DeFi to cooking recipes - ask anything!
                   </p>
                   
-                  {/* Quick Actions - Clean 2x2 Grid */}
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    {categories.slice(0, 4).map((category) => (
+                  {/* Quick Actions - DeepSeek Style Grid */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    {categories.map((category) => (
                       <Button
                         key={category.id}
                         onClick={() => {
@@ -701,12 +720,11 @@ export default function AiChat() {
                           handleNewConversation();
                         }}
                         variant="outline"
-                        className="p-3 h-auto border-gray-600 hover:bg-gray-800 rounded-lg"
-                        size="sm"
+                        className="p-6 h-auto border-gray-600 hover:bg-gray-800 hover:border-purple-500 rounded-xl transition-all"
                       >
-                        <div className="flex flex-col items-center gap-2">
-                          <category.icon className="w-4 h-4 text-purple-400" />
-                          <div className="font-medium text-xs text-center">{category.name}</div>
+                        <div className="flex flex-col items-center gap-3">
+                          <category.icon className="w-8 h-8 text-purple-400" />
+                          <div className="font-medium text-sm text-center">{category.name}</div>
                         </div>
                       </Button>
                     ))}
@@ -714,15 +732,15 @@ export default function AiChat() {
                 </div>
               </div>
               
-              {/* Fixed Chat Input at Bottom */}
-              <div className="p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
-                <div className="max-w-2xl mx-auto">
-                  <div className="flex gap-3">
+              {/* Chat Input - DeepSeek Style */}
+              <div className="p-6 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+                <div className="max-w-4xl mx-auto">
+                  <div className="flex gap-4">
                     <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
-                      placeholder="Ask anything - crypto, business, cooking..."
-                      className="flex-1 bg-gray-800 border-gray-600 text-white py-3 text-base"
+                      placeholder="Message BAM AIChat"
+                      className="flex-1 bg-gray-800 border-gray-600 text-white py-4 px-4 text-base rounded-xl"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -739,14 +757,14 @@ export default function AiChat() {
                         }
                       }}
                       disabled={!messageInput.trim()}
-                      className="bg-purple-600 hover:bg-purple-700 px-4"
+                      className="bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-xl"
                       size="lg"
                     >
-                      <Send className="w-4 h-4" />
+                      <Send className="w-5 h-5" />
                     </Button>
                   </div>
-                  <div className="text-sm text-gray-400 mt-2 text-center">
-                    Start by asking about crypto, business, DeFi, or wealth building
+                  <div className="text-sm text-gray-500 mt-3 text-center">
+                    AI generated for reference only
                   </div>
                 </div>
               </div>
@@ -754,36 +772,36 @@ export default function AiChat() {
           ) : (
             // Chat Interface
             <>
-              {/* Chat Header - Clean Mobile Layout */}
-              <div className="p-2 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
+              {/* Chat Header - DeepSeek Style */}
+              <div className="p-4 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+                <div className="flex items-center gap-3">
                   <Button
                     onClick={() => setShowSidebar(true)}
                     size="sm"
                     variant="ghost"
-                    className="lg:hidden p-1 flex-shrink-0"
+                    className="lg:hidden p-2"
                   >
-                    <ChevronLeft className="w-3 h-3" />
+                    <ChevronLeft className="w-5 h-5" />
                   </Button>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm truncate">
-                      {conversationData?.conversation?.title || 'Loading...'}
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg truncate">
+                      {conversationData?.conversation?.title || 'New Conversation'}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <Badge className="bg-purple-600 text-white text-xs px-1.5 py-0.5">
+                    <div className="flex items-center gap-3 mt-1">
+                      <Badge className="bg-purple-600 text-white text-sm px-2 py-1">
                         {conversationData?.conversation?.category || selectedCategory}
                       </Badge>
-                      <span className="text-xs text-gray-400">
-                        {conversationData?.messages?.length || 0} msgs
+                      <span className="text-sm text-gray-400">
+                        {conversationData?.messages?.length || 0} messages
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Messages - Clean Mobile Layout */}
-              <ScrollArea className="flex-1 p-2">
-                <div className="max-w-4xl mx-auto space-y-1.5">
+              {/* Messages - DeepSeek Style */}
+              <ScrollArea className="flex-1 p-6">
+                <div className="max-w-4xl mx-auto space-y-6">
                   {loadingConversation ? (
                     <div className="flex items-center justify-center py-4">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-400" />
@@ -797,13 +815,13 @@ export default function AiChat() {
                         }`}
                       >
                         <div
-                          className={`max-w-[90%] rounded-lg p-2 ${
+                          className={`max-w-[85%] rounded-2xl p-4 ${
                             message.role === 'user'
-                              ? 'bg-purple-600 text-white'
+                              ? 'bg-blue-600 text-white'
                               : 'bg-gray-800 text-gray-100'
                           }`}
                         >
-                          <div className="whitespace-pre-wrap text-sm leading-relaxed max-w-none">
+                          <div className="whitespace-pre-wrap text-base leading-relaxed max-w-none">
                             {(() => {
                               let content = message.content;
                               
@@ -851,7 +869,7 @@ export default function AiChat() {
                               return content;
                             })()}
                           </div>
-                          <div className="text-xs opacity-70 mt-1">
+                          <div className="text-sm opacity-70 mt-2">
                             {new Date(message.createdAt).toLocaleTimeString([], { 
                               hour: '2-digit', 
                               minute: '2-digit' 
@@ -865,15 +883,15 @@ export default function AiChat() {
                 </div>
               </ScrollArea>
 
-              {/* Message Input - Clean Bottom */}
-              <div className="p-2 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
+              {/* Message Input - DeepSeek Style */}
+              <div className="p-6 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm">
                 <div className="max-w-4xl mx-auto">
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-4">
                     <Input
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
-                      placeholder="Ask anything - crypto, business, cooking..."
-                      className="flex-1 bg-gray-800 border-gray-600 text-white text-sm py-2"
+                      placeholder="Message BAM AIChat"
+                      className="flex-1 bg-gray-800 border-gray-600 text-white text-base py-4 px-4 rounded-xl"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -884,18 +902,18 @@ export default function AiChat() {
                     <Button
                       onClick={handleSendMessage}
                       disabled={!messageInput.trim() || sendMessageMutation.isPending}
-                      className="bg-purple-600 hover:bg-purple-700 px-2"
-                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-xl"
+                      size="lg"
                     >
                       {sendMessageMutation.isPending ? (
-                        <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
-                        <Send className="w-3 h-3" />
+                        <Send className="w-5 h-5" />
                       )}
                     </Button>
                   </div>
-                  <div className="text-xs text-gray-400 mt-1 text-center">
-                    Press Enter to send
+                  <div className="text-sm text-gray-500 mt-3 text-center">
+                    AI generated for reference only
                   </div>
                 </div>
               </div>
