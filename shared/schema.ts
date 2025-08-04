@@ -37,6 +37,7 @@ export const users = pgTable("users", {
   displayName: varchar("display_name"),
   isVerified: boolean("is_verified").default(false),
   bamTokenBalance: varchar("bam_token_balance").default("0"),
+  lastUsernameChange: timestamp("last_username_change"),
   lastActive: timestamp("last_active").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

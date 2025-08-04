@@ -119,3 +119,7 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 - ✅ Edit Profile button added to wallet menu for authenticated users with existing profiles
 - ✅ Profile update system includes rate limiting protection and friendly error messages
 - ✅ Username availability checking prevents conflicts during profile updates
+- ✅ 30-day username change restriction implemented to maintain community stability
+- ✅ Frontend validation shows users exactly when they can change username again
+- ✅ Database schema updated with lastUsernameChange timestamp tracking
+- ✅ Friendly error messages inform users about the 30-day waiting period

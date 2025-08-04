@@ -29,7 +29,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserActivity(userId: string): Promise<void>;
   createUsername(walletAddress: string, username: string, displayName?: string): Promise<User>;
-  updateUserProfile(walletAddress: string, updates: { username?: string; displayName?: string }): Promise<User>;
+  updateUserProfile(walletAddress: string, updates: { username?: string; displayName?: string; lastUsernameChange?: Date }): Promise<User>;
   
   // Conversation operations
   getConversations(userId: string): Promise<Conversation[]>;
@@ -108,6 +108,7 @@ export class DatabaseStorage implements IStorage {
       .set({
         username,
         displayName: displayName || username,
+        lastUsernameChange: new Date(), // Track when username was first created
         updatedAt: new Date(),
       })
       .where(eq(users.walletAddress, normalizedWallet))
@@ -116,7 +117,7 @@ export class DatabaseStorage implements IStorage {
     return updatedUser;
   }
 
-  async updateUserProfile(walletAddress: string, updates: { username?: string; displayName?: string }): Promise<User> {
+  async updateUserProfile(walletAddress: string, updates: { username?: string; displayName?: string; lastUsernameChange?: Date }): Promise<User> {
     const normalizedWallet = normalizeWalletAddress(walletAddress);
     
     const [user] = await db

@@ -342,6 +342,35 @@ export default function AiChat() {
     setShowWalletMenu(false);
   };
 
+  // Check if username can be changed (30-day restriction)
+  const canChangeUsername = () => {
+    if (!userProfile?.lastUsernameChange) return true;
+    
+    const daysSinceLastChange = Math.floor(
+      (Date.now() - new Date(userProfile.lastUsernameChange).getTime()) / (1000 * 60 * 60 * 24)
+    );
+    
+    return daysSinceLastChange >= 30;
+  };
+
+  const getNextUsernameChangeDate = () => {
+    if (!userProfile?.lastUsernameChange) return null;
+    
+    const nextChangeDate = new Date(userProfile.lastUsernameChange);
+    nextChangeDate.setDate(nextChangeDate.getDate() + 30);
+    return nextChangeDate;
+  };
+
+  const getDaysUntilUsernameChange = () => {
+    if (!userProfile?.lastUsernameChange) return 0;
+    
+    const daysSinceLastChange = Math.floor(
+      (Date.now() - new Date(userProfile.lastUsernameChange).getTime()) / (1000 * 60 * 60 * 24)
+    );
+    
+    return Math.max(0, 30 - daysSinceLastChange);
+  };
+
   const handleUpdateProfile = async () => {
     if (!editUsername.trim()) return;
     
@@ -1281,8 +1310,15 @@ export default function AiChat() {
                   placeholder="Enter username"
                   className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
                   maxLength={20}
+                  disabled={!canChangeUsername()}
                 />
-                <div className="text-xs text-gray-500">3-20 characters</div>
+                {canChangeUsername() ? (
+                  <div className="text-xs text-gray-500">3-20 characters</div>
+                ) : (
+                  <div className="text-xs text-amber-400">
+                    Username can be changed again in {getDaysUntilUsernameChange()} days ({getNextUsernameChangeDate()?.toLocaleDateString()})
+                  </div>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -1316,8 +1352,8 @@ export default function AiChat() {
                 </Button>
                 <Button
                   onClick={handleUpdateProfile}
-                  disabled={updateProfileMutation.isPending || !editUsername.trim()}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+                  disabled={updateProfileMutation.isPending || !editUsername.trim() || (!canChangeUsername() && editUsername !== userProfile?.username)}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50"
                 >
                   {updateProfileMutation.isPending ? (
                     <div className="flex items-center gap-2">

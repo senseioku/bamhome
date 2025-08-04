@@ -148,6 +148,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if new username is available (if different from current)
       if (username && username !== currentUser.username) {
+        // Check 30-day restriction for username changes
+        if (currentUser.lastUsernameChange) {
+          const daysSinceLastChange = Math.floor(
+            (Date.now() - new Date(currentUser.lastUsernameChange).getTime()) / (1000 * 60 * 60 * 24)
+          );
+          
+          if (daysSinceLastChange < 30) {
+            const daysRemaining = 30 - daysSinceLastChange;
+            const nextChangeDate = new Date(currentUser.lastUsernameChange);
+            nextChangeDate.setDate(nextChangeDate.getDate() + 30);
+            
+            return res.status(429).json({
+              error: "Username change limit reached",
+              message: `You can change your username again in ${daysRemaining} days (${nextChangeDate.toLocaleDateString()}).`,
+              retryAfter: `${daysRemaining} days`,
+              nextAttempt: nextChangeDate.toISOString(),
+              tip: "Username changes are limited to once every 30 days to maintain community stability."
+            });
+          }
+        }
+
         const existingUser = await storage.getUserByUsername(username);
         if (existingUser && existingUser.walletAddress !== normalizedWallet) {
           return res.status(409).json({ message: "Username already taken" });
@@ -156,7 +177,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const updatedUser = await storage.updateUserProfile(normalizedWallet, {
         username: username || currentUser.username,
-        displayName: displayName || currentUser.displayName
+        displayName: displayName || currentUser.displayName,
+        // Only update lastUsernameChange if username actually changed
+        ...(username && username !== currentUser.username && { lastUsernameChange: new Date() })
       });
       
       res.json(updatedUser);
