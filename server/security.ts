@@ -214,7 +214,21 @@ export const usernameValidation = [
     .isLength({ max: 30 })
     .withMessage('Display name must be less than 30 characters')
     .trim()
-    .escape()
+    .escape(),
+  body('email')
+    .optional()
+    .isEmail()
+    .withMessage('Please provide a valid email address')
+    .normalizeEmail(),
+  body('country')
+    .optional()
+    .isLength({ min: 2, max: 3 })
+    .withMessage('Please select a valid country')
+    .matches(/^[A-Z]{2,3}$/)
+    .withMessage('Country must be a valid country code'),
+  body('walletAddress')
+    .isEthereumAddress()
+    .withMessage('Valid wallet address is required')
 ];
 
 export const chatValidation = [
