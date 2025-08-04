@@ -168,6 +168,11 @@ export default function AiChat() {
   // Check if wallet verification needed - improved compatibility with BAM Swap
   useEffect(() => {
     const checkVerification = async () => {
+      if (typeof window === 'undefined') {
+        // Server-side rendering - defer verification
+        return;
+      }
+
       if (!(window as any).ethereum) {
         setShowVerificationDialog(true);
         return;
@@ -196,6 +201,7 @@ export default function AiChat() {
                 setVerificationError(verification.error || 'Wallet verification required');
               }
             } catch (error) {
+              console.error('Wallet verification error:', error);
               setShowVerificationDialog(true);
             }
           }
@@ -203,11 +209,17 @@ export default function AiChat() {
           setShowVerificationDialog(true);
         }
       } catch (error) {
+        console.error('Wallet access error:', error);
         setShowVerificationDialog(true);
       }
     };
 
-    checkVerification();
+    // Add delay to ensure DOM is ready in production
+    const timer = setTimeout(() => {
+      checkVerification();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Username creation mutation

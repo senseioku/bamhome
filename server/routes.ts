@@ -211,6 +211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: normalizedWallet,
           walletAddress: normalizedWallet,
           email: '',
+          country: '',
           firstName: null,
           lastName: null,
           username: null,
