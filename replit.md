@@ -109,3 +109,6 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 - ✅ Chat conversations display with visible timestamps and organized by recency
 - ✅ Enhanced username profile system with wallet-based authentication and database storage
 - ✅ Conversation management includes soft-deletion of oldest chats when limit exceeded
+- ✅ Conservative API rate limiting implemented to protect Claude API credits
+- ✅ Multi-tier rate limiting: 2 AI calls/minute, 50 AI calls/day, 100 general requests/15min
+- ✅ Tiered protection system prevents API credit exhaustion while maintaining user experience

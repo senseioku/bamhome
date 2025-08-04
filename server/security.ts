@@ -10,7 +10,7 @@ import type { Request, Response, NextFunction } from 'express';
 // Rate limiting configurations
 export const generalRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // Increased for development - 1000 requests per windowMs
+  max: 100, // Conservative limit - 100 requests per 15 minutes per IP
   message: {
     error: 'Too many requests from this IP, please try again later.',
     retryAfter: '15 minutes'
@@ -45,17 +45,53 @@ export const authRateLimit = rateLimit({
 
 export const chatRateLimit = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 10, // 10 chat messages per minute
+  max: 3, // Conservative limit - 3 chat messages per minute to protect API credits
   message: {
     error: 'Chat rate limit exceeded',
-    message: 'Too many chat messages, please slow down.',
+    message: 'Too many chat messages, please slow down to preserve API resources.',
     retryAfter: '1 minute'
   },
   handler: (req: Request, res: Response) => {
     res.status(429).json({
       error: 'Chat rate limit exceeded',
-      message: 'Too many chat messages, please slow down.',
+      message: 'Too many chat messages, please slow down to preserve API resources.',
       retryAfter: '1 minute'
+    });
+  }
+});
+
+// Separate, more restrictive rate limit specifically for AI API calls
+export const aiApiRateLimit = rateLimit({
+  windowMs: 60 * 1000, // 1 minute  
+  max: 2, // Very conservative - only 2 AI API calls per minute per IP
+  message: {
+    error: 'AI API rate limit exceeded',
+    message: 'Please wait before sending another message to preserve API credits.',
+    retryAfter: '1 minute'
+  },
+  handler: (req: Request, res: Response) => {
+    res.status(429).json({
+      error: 'AI API rate limit exceeded', 
+      message: 'Please wait before sending another message to preserve API credits.',
+      retryAfter: '1 minute'
+    });
+  }
+});
+
+// Daily rate limit for AI API calls to prevent credit exhaustion
+export const dailyAiRateLimit = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000, // 24 hours
+  max: 50, // Maximum 50 AI messages per day per IP
+  message: {
+    error: 'Daily AI limit reached',
+    message: 'Daily AI message limit reached. Please try again tomorrow.',
+    retryAfter: '24 hours'
+  },
+  handler: (req: Request, res: Response) => {
+    res.status(429).json({
+      error: 'Daily AI limit reached',
+      message: 'Daily AI message limit reached. Please try again tomorrow.',
+      retryAfter: '24 hours'
     });
   }
 });
