@@ -52,22 +52,42 @@ export const authRateLimit = rateLimit({
   }
 });
 
-export const chatRateLimit = rateLimit({
+export const aiChatRateLimit = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 3, // Conservative limit - 3 chat messages per minute to protect API credits
+  max: 10, // Allow 10 AI messages per minute
   message: {
-    error: 'Slow down a bit!',
-    message: 'You\'re creating conversations quickly! Please wait 1 minute before starting another chat.',
+    error: 'AI Rate Limit',
+    message: 'Please wait a moment before sending another message to help preserve our AI service.',
     retryAfter: '1 minute'
   },
   handler: (req: Request, res: Response) => {
     const nextAttempt = new Date(Date.now() + 60 * 1000);
     res.status(429).json({
-      error: 'Slow down a bit!',
-      message: `You're creating conversations quickly! Please wait until ${nextAttempt.toLocaleTimeString()} before starting another chat.`,
+      error: 'AI Rate Limit',
+      message: `Please wait until ${nextAttempt.toLocaleTimeString()} before sending another AI message.`,
       retryAfter: '1 minute',
       nextAttempt: nextAttempt.toISOString(),
-      tip: 'Use this time to continue your current conversation or review your chat history!'
+      tip: 'This helps us maintain quality AI responses for everyone!'
+    });
+  }
+});
+
+export const conversationRateLimit = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 5, // Allow 5 new conversations per 5 minutes
+  message: {
+    error: 'Conversation Limit',
+    message: 'Please wait before creating another conversation.',
+    retryAfter: '5 minutes'
+  },
+  handler: (req: Request, res: Response) => {
+    const nextAttempt = new Date(Date.now() + 5 * 60 * 1000);
+    res.status(429).json({
+      error: 'Conversation Limit',
+      message: `Please wait until ${nextAttempt.toLocaleTimeString()} before creating another conversation.`,
+      retryAfter: '5 minutes',
+      nextAttempt: nextAttempt.toISOString(),
+      tip: 'You can continue chatting in your existing conversations!'
     });
   }
 });

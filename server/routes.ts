@@ -24,20 +24,16 @@ import {
 } from "./scalability";
 import { z } from "zod";
 import {
-  generalRateLimit,
+  aiChatRateLimit,
+  conversationRateLimit,
   authRateLimit,
-  chatRateLimit,
   usernameRateLimit,
-  progressiveSlowDown,
   securityHeaders,
   corsOptions,
   usernameValidation,
   chatValidation,
   handleValidationErrors,
   sanitizeInput,
-  securityLogger,
-  enhancedAuth,
-  abuseDetection,
   walletValidation,
   isValidWalletAddress,
   normalizeWalletAddress
@@ -50,19 +46,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Only essential security for development
   app.use(corsOptions);
   
-  // Disable aggressive rate limiting and abuse detection in development
-  if (process.env.NODE_ENV === 'production') {
-    app.use(securityMiddleware);
-    app.use(timeoutMiddleware(30000));
-    app.use(productionLogger);
-    app.use(autoScaler.middleware());
-    app.use(securityHeaders);
-    app.use(securityLogger);
-    app.use(abuseDetection);
-    app.use(progressiveSlowDown);
-    app.use(generalRateLimit);
-    app.use(sanitizeInput);
-  }
+  // Basic security without rate limiting for general requests
+  app.use(securityHeaders);
+  app.use(sanitizeInput);
   
   // Monitoring and optimization setup
   monitoring.setupMiddleware(app);
@@ -203,7 +189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Chat routes (simplified wallet-based auth)
   app.post('/api/chat/conversations', 
-    chatRateLimit,
+    conversationRateLimit,
     chatValidation,
     handleValidationErrors,
     async (req: any, res: any) => {
@@ -307,7 +293,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/messages', async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/messages', 
+    aiChatRateLimit,
+    async (req: any, res) => {
     try {
       const { id } = req.params;
       const { content, walletAddress } = req.body;
@@ -524,7 +512,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Wallet verification route for BAM AIChat
   app.post('/api/wallet/verify',
     authRateLimit,
-    enhancedAuth,
     walletValidation,
     handleValidationErrors,
     async (req: any, res: any) => {
@@ -607,8 +594,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // AI chat route
   app.post('/api/ai',
-    chatRateLimit,
-    enhancedAuth,
+    aiChatRateLimit,
     chatValidation,
     handleValidationErrors,
     async (req: any, res: any) => {
