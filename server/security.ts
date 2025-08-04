@@ -54,7 +54,7 @@ export const authRateLimit = rateLimit({
 
 export const aiChatRateLimit = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 10, // Allow 10 AI messages per minute
+  max: 20, // Allow 20 AI messages per minute
   message: {
     error: 'AI Rate Limit',
     message: 'Please wait a moment before sending another message to help preserve our AI service.',
@@ -74,7 +74,7 @@ export const aiChatRateLimit = rateLimit({
 
 export const conversationRateLimit = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 5, // Allow 5 new conversations per 5 minutes
+  max: 10, // Allow 10 new conversations per 5 minutes
   message: {
     error: 'Conversation Limit',
     message: 'Please wait before creating another conversation.',

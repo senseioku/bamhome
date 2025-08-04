@@ -129,7 +129,7 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 - ✅ User profile creation requires real email addresses and country selection
 - ✅ Edit profile functionality includes email and country update capabilities
 - ✅ AI-specific rate limiting implemented with user-friendly notifications
-- ✅ Rate limits only apply to AI chat endpoints (10 messages/minute, 5 conversations/5min)
+- ✅ Rate limits only apply to AI chat endpoints (20 messages/minute, 10 conversations/5min)
 - ✅ General site navigation unrestricted - no more 429 errors blocking interface
 - ✅ Friendly rate limit messages show next attempt time and helpful tips
 - ✅ Site remains fully functional with targeted rate limiting for AI usage only
