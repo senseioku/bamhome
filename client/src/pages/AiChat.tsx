@@ -33,11 +33,13 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  ChevronRight,
   Copy,
   Check,
   MessageSquare,
   BarChart3,
-  Coins
+  Coins,
+  X
 } from 'lucide-react';
 
 interface Message {
@@ -86,6 +88,7 @@ export default function AiChat() {
   const [messageInput, setMessageInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('general');
   const [showSidebar, setShowSidebar] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [showVerificationDialog, setShowVerificationDialog] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(false);
@@ -482,47 +485,68 @@ export default function AiChat() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
-      <Navigation />
-      
-      <div className="flex-1 flex pt-16 relative">
-
-
-        {/* Left Sidebar - DeepSeek Style */}
-        {showSidebar && (
-          <div className="w-full h-full lg:w-80 xl:w-96 bg-gray-900 border-r border-gray-700 flex flex-col fixed lg:relative z-50">
-            {/* Sidebar Header */}
-            <div className="p-4 border-b border-gray-700">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
+    <div className="h-screen bg-gray-900 text-white flex">
+      {/* Left Sidebar - Full Height DeepSeek Style */}
+      {showSidebar && (
+        <div className={`${sidebarCollapsed ? 'w-16' : 'w-80 xl:w-96'} bg-gray-900 border-r border-gray-700 flex flex-col fixed lg:relative z-50 h-full transition-all duration-300`}>
+          {/* Sidebar Header */}
+          <div className="p-4 border-b border-gray-700 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <div className={`flex items-center gap-3 ${sidebarCollapsed ? 'justify-center' : ''}`}>
+                {!sidebarCollapsed && (
+                  <>
+                    <Brain className="w-6 h-6 text-purple-400" />
+                    <h1 className="text-xl font-bold">BAM AIChat</h1>
+                    <Badge className="bg-purple-600 text-white text-sm px-2 py-1">AI</Badge>
+                  </>
+                )}
+                {sidebarCollapsed && (
                   <Brain className="w-6 h-6 text-purple-400" />
-                  <h1 className="text-xl font-bold">BAM AIChat</h1>
-                  <Badge className="bg-purple-600 text-white text-sm px-2 py-1">
-                    AI
-                  </Badge>
-                </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  size="sm"
+                  variant="ghost"
+                  className="p-2 hidden lg:flex"
+                >
+                  {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                </Button>
                 <Button
                   onClick={() => setShowSidebar(false)}
                   size="sm"
                   variant="ghost"
-                  className="lg:hidden"
+                  className="lg:hidden p-2"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </Button>
               </div>
+            </div>
 
-              {/* New Chat Button - Prominent like DeepSeek */}
+            {!sidebarCollapsed && (
               <Button
                 onClick={handleNewConversation}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg mt-4"
                 size="lg"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 <span className="text-base font-medium">New chat</span>
               </Button>
-            </div>
+            )}
+            {sidebarCollapsed && (
+              <Button
+                onClick={handleNewConversation}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg mt-4"
+                size="lg"
+              >
+                <Plus className="w-5 h-5" />
+              </Button>
+            )}
+          </div>
 
-            {/* Conversations List - DeepSeek Style */}
+          {/* Conversations List - Full height scrollable */}
+          {!sidebarCollapsed && (
             <ScrollArea className="flex-1 px-4 py-2">
               {conversations.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
@@ -608,9 +632,36 @@ export default function AiChat() {
                 </div>
               )}
             </ScrollArea>
+          )}
 
-            {/* Bottom User Section - DeepSeek Style */}
-            <div className="p-4 border-t border-gray-700 space-y-3">
+          {/* Collapsed sidebar conversations */}
+          {sidebarCollapsed && (
+            <ScrollArea className="flex-1 px-2 py-2">
+              <div className="space-y-1">
+                {conversations.slice(0, 10).map((conv) => (
+                  <Button
+                    key={conv.id}
+                    onClick={() => {
+                      setSelectedConversation(conv.id);
+                      if (window.innerWidth < 1024) setShowSidebar(false);
+                    }}
+                    variant="ghost"
+                    className={`w-full p-3 rounded-lg transition-colors ${
+                      selectedConversation === conv.id
+                        ? 'bg-gray-800 text-white'
+                        : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    }`}
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                  </Button>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
+
+          {/* Bottom User Section - Only in expanded mode */}
+          {!sidebarCollapsed && (
+            <div className="p-4 border-t border-gray-700 space-y-3 flex-shrink-0">
               {/* Category Selection */}
               <div>
                 <h4 className="text-sm font-medium text-gray-400 mb-2">Chat Categories</h4>
@@ -692,11 +743,65 @@ export default function AiChat() {
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Main Chat Area - Clean full width */}
-        <div className="flex-1 flex flex-col relative z-20">
+      {/* Main Chat Area - Full height */}
+      <div className="flex-1 flex flex-col relative">
+        {/* Navigation Bar */}
+        <div className="p-4 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {!showSidebar && (
+                <Button
+                  onClick={() => setShowSidebar(true)}
+                  size="sm"
+                  variant="ghost"
+                  className="p-2"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                </Button>
+              )}
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-sm font-bold">B</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-lg font-bold">BAM</span>
+                  <span className="text-sm text-gray-400">Ecosystem</span>
+                </div>
+              </div>
+            </div>
+            
+            <nav className="hidden md:flex items-center gap-6">
+              <Link href="/" className="text-sm hover:text-purple-400 transition-colors">Home</Link>
+              <Link href="/swap" className="text-sm hover:text-purple-400 transition-colors">Swap</Link>
+              <Link href="/ai-chat" className="text-sm text-purple-400">AI Chat</Link>
+            </nav>
+            
+            <div className="flex items-center gap-3">
+              {!isVerified ? (
+                <Button 
+                  onClick={() => setShowVerificationDialog(true)}
+                  size="sm"
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <Shield className="w-4 h-4 mr-1" />
+                  Connect
+                </Button>
+              ) : (
+                <div className="flex items-center gap-2 text-sm">
+                  <Shield className="w-4 h-4 text-green-400" />
+                  <span className="text-green-400">Verified</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Chat Content Area */}
+        <div className="flex-1 flex flex-col">
           {!selectedConversation ? (
             // Welcome Screen - DeepSeek Style
             <div className="flex-1 flex flex-col">
@@ -921,7 +1026,7 @@ export default function AiChat() {
           )}
         </div>
       </div>
-
+      
       {/* Username Creation Dialog */}
       <Dialog open={showUsernameDialog} onOpenChange={setShowUsernameDialog}>
         <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
