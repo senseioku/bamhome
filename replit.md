@@ -129,7 +129,10 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 - ✅ User profile creation requires real email addresses and country selection
 - ✅ Edit profile functionality includes email and country update capabilities
 - ✅ AI-specific rate limiting implemented with user-friendly notifications
-- ✅ Rate limits only apply to AI chat endpoints (20 messages/minute, 10 conversations/5min)
+- ✅ Rate limits significantly increased (100 messages/minute, 25 conversations/5min, 200 daily)
 - ✅ General site navigation unrestricted - no more 429 errors blocking interface
 - ✅ Friendly rate limit messages show next attempt time and helpful tips
 - ✅ Site remains fully functional with targeted rate limiting for AI usage only
+- ✅ Copy button feature added to all chat messages with hover functionality
+- ✅ Messages can be copied to clipboard with visual feedback and toast notifications
+- ✅ Professional copy icon design matching the DeepSeek-style interface
