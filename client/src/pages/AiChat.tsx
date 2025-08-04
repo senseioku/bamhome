@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { useToast } from "@/hooks/use-toast";
 import { walletSecurity, type WalletVerification } from '@/lib/walletSecurity';
 import Navigation from '@/components/navigation';
 import { 
@@ -102,6 +103,7 @@ export default function AiChat() {
   const [addressCopied, setAddressCopied] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Check window size for responsive sidebar
   useEffect(() => {
@@ -186,12 +188,20 @@ export default function AiChat() {
       
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       setShowUsernameDialog(false);
       setUsername('');
       setDisplayName('');
       setUsernameError(null);
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      
+      // Show success confirmation
+      console.log('✅ Username successfully created and linked to wallet:', data);
+      toast({
+        title: "Username Created Successfully!",
+        description: `Username "${data.username}" is now linked to your wallet address.`,
+        duration: 5000,
+      });
     },
     onError: (error: any) => {
       setUsernameError(error.message || 'Failed to create username');
