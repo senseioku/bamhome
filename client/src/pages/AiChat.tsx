@@ -101,6 +101,10 @@ export default function AiChat() {
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [showWalletMenu, setShowWalletMenu] = useState(false);
   const [addressCopied, setAddressCopied] = useState(false);
+  const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
+  const [editUsername, setEditUsername] = useState('');
+  const [editDisplayName, setEditDisplayName] = useState('');
+  const [editProfileError, setEditProfileError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -238,6 +242,65 @@ export default function AiChat() {
     }
   });
 
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async ({ username, displayName }: { username?: string; displayName?: string }) => {
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          username, 
+          displayName, 
+          walletAddress 
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        
+        // Handle rate limiting with friendly messages
+        if (response.status === 429) {
+          const friendlyMessage = error.tip ? `${error.message} ${error.tip}` : error.message;
+          throw new Error(friendlyMessage || 'Please wait before trying again');
+        }
+        
+        throw new Error(error.message || 'Failed to update profile');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setUserProfile(data);
+      setShowEditProfileDialog(false);
+      setEditUsername('');
+      setEditDisplayName('');
+      setEditProfileError(null);
+      
+      console.log('✅ Profile successfully updated:', data);
+      toast({
+        title: "Profile Updated!",
+        description: `Your profile has been updated successfully.`,
+        duration: 5000,
+      });
+    },
+    onError: (error: any) => {
+      // Enhanced error message for rate limits
+      const isRateLimit = error.message?.includes('limit') || error.message?.includes('wait') || error.message?.includes('time');
+      setEditProfileError(error.message || 'Failed to update profile');
+      
+      if (isRateLimit) {
+        toast({
+          title: "Rate Limit Reached",
+          description: error.message,
+          variant: "destructive",
+          duration: 6000
+        });
+      }
+    }
+  });
+
   const handleCreateUsername = async () => {
     if (!username.trim()) return;
     
@@ -267,6 +330,29 @@ export default function AiChat() {
       queryClient.clear();
     } catch (error) {
       console.error('Error disconnecting wallet:', error);
+    }
+  };
+
+  const handleEditProfile = () => {
+    // Pre-fill with current profile data
+    setEditUsername(userProfile?.username || '');
+    setEditDisplayName(userProfile?.displayName || '');
+    setEditProfileError(null);
+    setShowEditProfileDialog(true);
+    setShowWalletMenu(false);
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!editUsername.trim()) return;
+    
+    setEditProfileError(null);
+    try {
+      await updateProfileMutation.mutateAsync({
+        username: editUsername.trim(),
+        displayName: editDisplayName.trim() || undefined
+      });
+    } catch (error) {
+      console.error('Profile update failed:', error);
     }
   };
 
@@ -803,6 +889,16 @@ export default function AiChat() {
                         )}
                       </div>
                       <div className="p-1">
+                        {userProfile && (
+                          <Button
+                            onClick={handleEditProfile}
+                            variant="ghost"
+                            className="w-full justify-start text-sm hover:bg-gray-700 py-2"
+                          >
+                            <User className="w-4 h-4 mr-2" />
+                            Edit Profile
+                          </Button>
+                        )}
                         <Button
                           onClick={copyAddressToClipboard}
                           variant="ghost"
@@ -1164,6 +1260,79 @@ export default function AiChat() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Profile Dialog */}
+      {showEditProfileDialog && (
+        <Dialog open={showEditProfileDialog} onOpenChange={setShowEditProfileDialog}>
+          <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-semibold flex items-center gap-2">
+                <User className="w-5 h-5 text-purple-400" />
+                Edit Profile
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Username</label>
+                <Input
+                  value={editUsername}
+                  onChange={(e) => setEditUsername(e.target.value)}
+                  placeholder="Enter username"
+                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                  maxLength={20}
+                />
+                <div className="text-xs text-gray-500">3-20 characters</div>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Display Name (Optional)</label>
+                <Input
+                  value={editDisplayName}
+                  onChange={(e) => setEditDisplayName(e.target.value)}
+                  placeholder="Enter display name"
+                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                  maxLength={50}
+                />
+                <div className="text-xs text-gray-500">How others see your name</div>
+              </div>
+              
+              {editProfileError && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                  <div className="flex items-start gap-2 text-red-400">
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">{editProfileError}</span>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex gap-3 pt-2">
+                <Button
+                  onClick={() => setShowEditProfileDialog(false)}
+                  variant="outline"
+                  className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleUpdateProfile}
+                  disabled={updateProfileMutation.isPending || !editUsername.trim()}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  {updateProfileMutation.isPending ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Updating...</span>
+                    </div>
+                  ) : (
+                    'Update Profile'
+                  )}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

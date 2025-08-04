@@ -125,6 +125,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update username/profile route
+  app.put('/api/user/profile', 
+    usernameRateLimit,
+    usernameValidation,
+    handleValidationErrors,
+    async (req: any, res: any) => {
+    try {
+      const { username, displayName, walletAddress } = req.body;
+
+      if (!isValidWalletAddress(walletAddress)) {
+        return res.status(400).json({ message: "Valid wallet address is required" });
+      }
+      
+      const normalizedWallet = normalizeWalletAddress(walletAddress);
+
+      // Get current user
+      const currentUser = await storage.getUserByWallet(normalizedWallet);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if new username is available (if different from current)
+      if (username && username !== currentUser.username) {
+        const existingUser = await storage.getUserByUsername(username);
+        if (existingUser && existingUser.walletAddress !== normalizedWallet) {
+          return res.status(409).json({ message: "Username already taken" });
+        }
+      }
+
+      const updatedUser = await storage.updateUserProfile(normalizedWallet, {
+        username: username || currentUser.username,
+        displayName: displayName || currentUser.displayName
+      });
+      
+      res.json(updatedUser);
+    } catch (error: unknown) {
+      console.error("Error updating profile:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to update profile";
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
   // Chat routes (simplified wallet-based auth)
   app.post('/api/chat/conversations', 
     chatRateLimit,
