@@ -36,6 +36,7 @@ export interface IStorage {
   createConversation(conversation: InsertConversation): Promise<Conversation>;
   updateConversation(id: string, updates: Partial<Conversation>): Promise<Conversation>;
   deleteConversation(id: string): Promise<void>;
+  getConversationCount(userId: string): Promise<number>;
   
   // Message operations
   getMessages(conversationId: string): Promise<Message[]>;
@@ -58,6 +59,7 @@ export interface IStorage {
     totalChats: number;
     totalMessages: number;
     lastActive: Date | null;
+    recentChats: number;
   }>;
 }
 
@@ -135,13 +137,14 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId));
   }
 
-  // Conversation operations
+  // Conversation operations with rate limiting to 10 recent chats
   async getConversations(userId: string): Promise<Conversation[]> {
     return await db
       .select()
       .from(conversations)
       .where(and(eq(conversations.userId, userId), eq(conversations.isActive, true)))
-      .orderBy(desc(conversations.lastMessageAt));
+      .orderBy(desc(conversations.lastMessageAt))
+      .limit(10); // Rate limit to 10 most recent conversations per user
   }
 
   async getConversation(id: string): Promise<Conversation | undefined> {
@@ -153,11 +156,39 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createConversation(conversationData: InsertConversation): Promise<Conversation> {
+    // First, enforce the 10 conversation limit per user
+    if (conversationData.userId) {
+      await this.enforceConversationLimit(conversationData.userId);
+    }
+    
     const [conversation] = await db
       .insert(conversations)
       .values(conversationData)
       .returning();
     return conversation;
+  }
+
+  // Enforce 10 conversation limit per user by soft-deleting oldest conversations
+  private async enforceConversationLimit(userId: string): Promise<void> {
+    const userConversations = await db
+      .select({ id: conversations.id })
+      .from(conversations)
+      .where(and(eq(conversations.userId, userId), eq(conversations.isActive, true)))
+      .orderBy(desc(conversations.lastMessageAt));
+
+    if (userConversations.length >= 10) {
+      // Get conversations to deactivate (keep only 9 most recent, so new one makes 10)
+      const conversationsToDeactivate = userConversations.slice(9);
+      
+      for (const conv of conversationsToDeactivate) {
+        await db
+          .update(conversations)
+          .set({ isActive: false, updatedAt: new Date() })
+          .where(eq(conversations.id, conv.id));
+      }
+      
+      console.log(`Rate limited user ${userId}: deactivated ${conversationsToDeactivate.length} old conversations`);
+    }
   }
 
   async updateConversation(id: string, updates: Partial<Conversation>): Promise<Conversation> {
@@ -290,10 +321,21 @@ export class DatabaseStorage implements IStorage {
     return activity;
   }
 
+  // Get conversation count for debugging
+  async getConversationCount(userId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(conversations)
+      .where(and(eq(conversations.userId, userId), eq(conversations.isActive, true)));
+    
+    return result.count;
+  }
+
   async getUserStats(userId: string): Promise<{
     totalChats: number;
     totalMessages: number;
     lastActive: Date | null;
+    recentChats: number;
   }> {
     const [chatCount] = await db
       .select({ count: count() })
@@ -315,6 +357,7 @@ export class DatabaseStorage implements IStorage {
       totalChats: chatCount.count,
       totalMessages: messageCount.count,
       lastActive: user?.lastActive || null,
+      recentChats: chatCount.count, // Same as totalChats since we only show recent (max 10)
     };
   }
 }

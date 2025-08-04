@@ -584,7 +584,12 @@ export default function AiChat() {
                 <div className="space-y-2">
                   {/* Recent Section */}
                   <div className="mb-4">
-                    <h3 className="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wide">Recent</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide">Recent Chats</h3>
+                      <div className="text-xs text-gray-500">
+                        {conversations.length}/10 limit
+                      </div>
+                    </div>
                     <div className="space-y-1">
                       {conversations.slice(0, 5).map((conv) => (
                         <Button
@@ -606,11 +611,21 @@ export default function AiChat() {
                             }`}>
                               {conv.title}
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <Badge className="bg-gray-700 text-gray-300 px-2 py-0.5">
-                                {conv.category}
-                              </Badge>
-                              <span>{conv.messageCount} messages</span>
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                              <div className="flex items-center gap-2">
+                                <Badge className="bg-gray-700 text-gray-300 px-2 py-0.5">
+                                  {conv.category}
+                                </Badge>
+                                <span>{conv.messageCount} messages</span>
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {new Date(conv.lastMessageAt || conv.createdAt).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </div>
                             </div>
                           </div>
                         </Button>
@@ -643,11 +658,21 @@ export default function AiChat() {
                               }`}>
                                 {conv.title}
                               </div>
-                              <div className="flex items-center gap-2 text-xs text-gray-500">
-                                <Badge className="bg-gray-700 text-gray-300 px-2 py-0.5">
-                                  {conv.category}
-                                </Badge>
-                                <span>{conv.messageCount} messages</span>
+                              <div className="flex items-center justify-between text-xs text-gray-500">
+                                <div className="flex items-center gap-2">
+                                  <Badge className="bg-gray-700 text-gray-300 px-2 py-0.5">
+                                    {conv.category}
+                                  </Badge>
+                                  <span>{conv.messageCount} messages</span>
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {new Date(conv.lastMessageAt || conv.createdAt).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </div>
                               </div>
                             </div>
                           </Button>
