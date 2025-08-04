@@ -307,10 +307,14 @@ export default function AiChat() {
       return response.json();
     },
     onSuccess: (data) => {
-      setUserProfile(data);
+      // Update the user profile data
+      userProfileQuery.refetch();
       setShowEditProfileDialog(false);
       setEditUsername('');
       setEditDisplayName('');
+      setEditEmail('');
+      setEditCountry('');
+      setEditCountrySearch('');
       setEditProfileError(null);
       
       console.log('✅ Profile successfully updated:', data);
@@ -812,7 +816,7 @@ export default function AiChat() {
                                 <span>{conv.messageCount} messages</span>
                               </div>
                               <div className="text-xs text-gray-500">
-                                {new Date(conv.lastMessageAt || conv.createdAt).toLocaleDateString('en-US', { 
+                                {new Date(conv.lastMessageAt || new Date()).toLocaleDateString('en-US', { 
                                   month: 'short', 
                                   day: 'numeric',
                                   hour: '2-digit',
@@ -859,7 +863,7 @@ export default function AiChat() {
                                   <span>{conv.messageCount} messages</span>
                                 </div>
                                 <div className="text-xs text-gray-500">
-                                  {new Date(conv.lastMessageAt || conv.createdAt).toLocaleDateString('en-US', { 
+                                  {new Date(conv.lastMessageAt || new Date()).toLocaleDateString('en-US', { 
                                     month: 'short', 
                                     day: 'numeric',
                                     hour: '2-digit',
@@ -1068,11 +1072,11 @@ export default function AiChat() {
         </div>
 
         {/* Chat Content Area */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0">
           {!selectedConversation ? (
             // Welcome Screen - DeepSeek Style
-            <div className="flex-1 flex flex-col h-screen">
-              <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto">
+            <div className="flex-1 flex flex-col">
+              <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
                 <div className="text-center max-w-2xl w-full">
                   <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <Brain className="w-8 h-8 text-white" />
@@ -1143,7 +1147,7 @@ export default function AiChat() {
             </div>
           ) : (
             // Chat Interface
-            <div className="flex-1 flex flex-col h-screen">
+            <div className="flex-1 flex flex-col min-h-0">
               {/* Chat Header - DeepSeek Style */}
               <div className="p-4 border-b border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0">
                 <div className="flex items-center gap-3">
@@ -1172,7 +1176,7 @@ export default function AiChat() {
               </div>
 
               {/* Messages - DeepSeek Style */}
-              <ScrollArea className="flex-1 p-6 overflow-y-auto" style={{ height: "calc(100vh - 200px)" }}>
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0">
                 <div className="max-w-4xl mx-auto space-y-6">
                   {loadingConversation ? (
                     <div className="flex items-center justify-center py-4">
@@ -1253,7 +1257,7 @@ export default function AiChat() {
                   )}
                   <div ref={messagesEndRef} />
                 </div>
-              </ScrollArea>
+              </div>
 
               {/* Message Input - Sticky at Bottom */}
               <div className="sticky bottom-0 left-0 right-0 p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0 z-10">
