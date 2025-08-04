@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { aiService } from "./ai";
+import { db } from "./db";
 import { cryptoService } from "./cryptoService";
 import { monitoring } from "./monitoring";
 import { 
@@ -43,21 +44,25 @@ import {
 } from "./security";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Production-ready middleware stack
+  // Basic middleware stack for development
   app.use(compressionMiddleware);
-  app.use(securityMiddleware);
-  app.use(timeoutMiddleware(30000));
-  app.use(productionLogger);
-  app.use(autoScaler.middleware());
   
-  // Enterprise security middleware
-  app.use(securityHeaders);
+  // Only essential security for development
   app.use(corsOptions);
-  app.use(securityLogger);
-  app.use(abuseDetection);
-  app.use(progressiveSlowDown);
-  app.use(generalRateLimit);
-  app.use(sanitizeInput);
+  
+  // Disable aggressive rate limiting and abuse detection in development
+  if (process.env.NODE_ENV === 'production') {
+    app.use(securityMiddleware);
+    app.use(timeoutMiddleware(30000));
+    app.use(productionLogger);
+    app.use(autoScaler.middleware());
+    app.use(securityHeaders);
+    app.use(securityLogger);
+    app.use(abuseDetection);
+    app.use(progressiveSlowDown);
+    app.use(generalRateLimit);
+    app.use(sanitizeInput);
+  }
   
   // Monitoring and optimization setup
   monitoring.setupMiddleware(app);
@@ -218,7 +223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = await storage.upsertUser({
           id: normalizedWallet,
           walletAddress: normalizedWallet,
-          email: null,
+          email: '',
           firstName: null,
           lastName: null,
           username: null,

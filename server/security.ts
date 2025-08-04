@@ -10,7 +10,7 @@ import type { Request, Response, NextFunction } from 'express';
 // Rate limiting configurations
 export const generalRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Conservative limit - 100 requests per 15 minutes per IP
+  max: 1000, // Increased limit - 1000 requests per 15 minutes per IP for development
   message: {
     error: 'Request limit reached',
     message: 'You\'ve reached the request limit to help keep our service running smoothly. Please wait 15 minutes before trying again.',

@@ -307,8 +307,8 @@ export default function AiChat() {
       return response.json();
     },
     onSuccess: (data) => {
-      // Update the user profile data
-      userProfileQuery.refetch();
+      // Invalidate and refetch user profile
+      queryClient.invalidateQueries({ queryKey: ['user-profile', walletAddress] });
       setShowEditProfileDialog(false);
       setEditUsername('');
       setEditDisplayName('');
@@ -835,7 +835,7 @@ export default function AiChat() {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      {conversations.slice(0, 5).map((conv) => (
+                      {conversations.slice(0, 5).map((conv: any) => (
                         <Button
                           key={conv.id}
                           onClick={() => {
@@ -882,7 +882,7 @@ export default function AiChat() {
                     <div>
                       <h3 className="text-sm font-medium text-gray-400 mb-3 uppercase tracking-wide">Earlier</h3>
                       <div className="space-y-1">
-                        {conversations.slice(5).map((conv) => (
+                        {conversations.slice(5).map((conv: any) => (
                           <Button
                             key={conv.id}
                             onClick={() => {
@@ -933,7 +933,7 @@ export default function AiChat() {
           {sidebarCollapsed && (
             <ScrollArea className="flex-1 px-2 py-2">
               <div className="space-y-1">
-                {conversations.slice(0, 10).map((conv) => (
+                {conversations.slice(0, 10).map((conv: any) => (
                   <Button
                     key={conv.id}
                     onClick={() => {
@@ -1230,7 +1230,7 @@ export default function AiChat() {
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-400" />
                     </div>
                   ) : (
-                    conversationData?.messages?.map((message) => (
+                    conversationData?.messages?.map((message: any) => (
                       <div
                         key={message.id}
                         className={`flex gap-1 ${
@@ -1250,7 +1250,7 @@ export default function AiChat() {
                               
                               // Preserve code blocks first
                               const codeBlocks: string[] = [];
-                              content = content.replace(/```[\s\S]*?```/g, (match, index) => {
+                              content = content.replace(/```[\s\S]*?```/g, (match: string, index: number) => {
                                 const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`;
                                 codeBlocks.push(match);
                                 return placeholder;
@@ -1258,7 +1258,7 @@ export default function AiChat() {
                               
                               // Preserve inline code
                               const inlineCodes: string[] = [];
-                              content = content.replace(/`([^`]+)`/g, (match, code) => {
+                              content = content.replace(/`([^`]+)`/g, (match: string, code: string) => {
                                 const placeholder = `__INLINE_CODE_${inlineCodes.length}__`;
                                 inlineCodes.push(match);
                                 return placeholder;
