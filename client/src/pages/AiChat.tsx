@@ -102,6 +102,7 @@ export default function AiChat() {
   const [email, setEmail] = useState('');
   const [country, setCountry] = useState('');
   const [countrySearch, setCountrySearch] = useState('');
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [showWalletMenu, setShowWalletMenu] = useState(false);
   const [addressCopied, setAddressCopied] = useState(false);
@@ -111,8 +112,11 @@ export default function AiChat() {
   const [editEmail, setEditEmail] = useState('');
   const [editCountry, setEditCountry] = useState('');
   const [editCountrySearch, setEditCountrySearch] = useState('');
+  const [showEditCountryDropdown, setShowEditCountryDropdown] = useState(false);
   const [editProfileError, setEditProfileError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
+  const editCountryDropdownRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -143,6 +147,23 @@ export default function AiChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [selectedConversation]);
+
+  // Handle clicks outside country dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
+        setShowCountryDropdown(false);
+      }
+      if (editCountryDropdownRef.current && !editCountryDropdownRef.current.contains(event.target as Node)) {
+        setShowEditCountryDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Check if wallet verification needed - improved compatibility with BAM Swap
   useEffect(() => {
@@ -1323,17 +1344,19 @@ export default function AiChat() {
 
             <div>
               <label className="text-sm font-medium text-gray-300">Country *</label>
-              <div className="relative">
+              <div className="relative" ref={countryDropdownRef}>
                 <Input
                   value={countrySearch}
                   onChange={(e) => {
                     setCountrySearch(e.target.value);
                     setCountry('');
+                    setShowCountryDropdown(true);
                   }}
+                  onFocus={() => setShowCountryDropdown(true)}
                   placeholder="Search for your country..."
                   className="mt-1 bg-gray-800 border-gray-600 text-white"
                 />
-                {countrySearch && (
+                {showCountryDropdown && countrySearch && (
                   <div className="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md mt-1 max-h-48 overflow-y-auto">
                     {searchCountries(countrySearch).slice(0, 10).map((c) => (
                       <div
@@ -1342,6 +1365,7 @@ export default function AiChat() {
                         onClick={() => {
                           setCountry(c.code);
                           setCountrySearch(c.name);
+                          setShowCountryDropdown(false);
                         }}
                       >
                         {c.name}
@@ -1434,17 +1458,19 @@ export default function AiChat() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-300">Country</label>
-                <div className="relative">
+                <div className="relative" ref={editCountryDropdownRef}>
                   <Input
                     value={editCountrySearch}
                     onChange={(e) => {
                       setEditCountrySearch(e.target.value);
                       setEditCountry('');
+                      setShowEditCountryDropdown(true);
                     }}
+                    onFocus={() => setShowEditCountryDropdown(true)}
                     placeholder="Search for your country..."
                     className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
                   />
-                  {editCountrySearch && (
+                  {showEditCountryDropdown && editCountrySearch && (
                     <div className="absolute z-10 w-full bg-gray-800 border border-gray-600 rounded-md mt-1 max-h-48 overflow-y-auto">
                       {searchCountries(editCountrySearch).slice(0, 10).map((c) => (
                         <div
@@ -1453,6 +1479,7 @@ export default function AiChat() {
                           onClick={() => {
                             setEditCountry(c.code);
                             setEditCountrySearch(c.name);
+                            setShowEditCountryDropdown(false);
                           }}
                         >
                           {c.name}
