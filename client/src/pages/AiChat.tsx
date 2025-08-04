@@ -1300,13 +1300,14 @@ export default function AiChat() {
       
       {/* Username Creation Dialog */}
       <Dialog open={showUsernameDialog} onOpenChange={setShowUsernameDialog}>
-        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md">
+        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold">Create Username</DialogTitle>
             <DialogDescription className="text-gray-400">
               Create a unique username for your BAM AIChat profile
             </DialogDescription>
           </DialogHeader>
+          
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-gray-300">Username</label>
@@ -1385,22 +1386,31 @@ export default function AiChat() {
             {usernameError && (
               <div className="text-red-400 text-sm">{usernameError}</div>
             )}
-            <div className="flex gap-2">
-              <Button
-                onClick={() => setShowUsernameDialog(false)}
-                variant="outline"
-                className="flex-1 border-gray-600 hover:bg-gray-800"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleCreateUsername}
-                disabled={!username.trim() || username.length < 3 || !email.trim() || !country || createUsernameMutation.isPending}
-                className="flex-1 bg-purple-600 hover:bg-purple-700"
-              >
-                {createUsernameMutation.isPending ? 'Creating...' : 'Create'}
-              </Button>
-            </div>
+          </div>
+          
+          {/* Dialog Footer with buttons */}
+          <div className="flex gap-3 pt-6 border-t border-gray-700 mt-4">
+            <Button
+              onClick={() => {
+                setShowUsernameDialog(false);
+                setUsernameError(null);
+              }}
+              variant="outline"
+              className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateUsername}
+              disabled={!username.trim() || username.length < 3 || !email.trim() || !country || createUsernameMutation.isPending}
+              className="flex-1 bg-purple-600 hover:bg-purple-700"
+            >
+              {createUsernameMutation.isPending ? (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                'Create'
+              )}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
