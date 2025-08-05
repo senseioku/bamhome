@@ -1273,7 +1273,7 @@ export default function AiChat() {
                         }`}
                       >
                         <div
-                          className={`max-w-[85%] rounded-2xl p-4 ${
+                          className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 break-words overflow-hidden ${
                             message.role === 'user'
                               ? 'bg-blue-600 text-white'
                               : 'bg-gray-800 text-gray-100'
@@ -1293,7 +1293,7 @@ export default function AiChat() {
                               <Copy className="w-3 h-3 text-gray-300" />
                             )}
                           </button>
-                          <div className="whitespace-pre-wrap text-base leading-relaxed max-w-none">
+                          <div className="text-base leading-relaxed break-words overflow-hidden">
                             {(() => {
                               let content = message.content;
                               
@@ -1332,25 +1332,37 @@ export default function AiChat() {
                                 .replace(/\n{3,}/g, '\n\n')
                                 .trim();
                               
-                              // Restore code blocks with proper formatting
+                              // Restore code blocks with proper formatting and syntax highlighting
                               codeBlocks.forEach((block, index) => {
+                                const languageMatch = block.match(/^```(\w+)/);
+                                const language = languageMatch ? languageMatch[1] : '';
                                 const formatted = block
                                   .replace(/^```(\w+)?\n?/, '') // Remove opening ```
                                   .replace(/\n?```$/, '') // Remove closing ```
                                   .trim();
                                 
-                                content = content.replace(
-                                  `__CODE_BLOCK_${index}__`,
-                                  `\n\n💻 Code:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${formatted}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
-                                );
+                                const codeElement = `<div class="my-3 rounded-lg overflow-hidden border border-gray-600">
+                                  <div class="bg-gray-700 px-3 py-1 text-xs text-gray-300 flex items-center gap-2">
+                                    <span class="text-blue-400">💻</span>
+                                    <span>${language || 'Code'}</span>
+                                  </div>
+                                  <pre class="bg-gray-900 p-3 overflow-x-auto text-sm"><code class="text-green-400 font-mono whitespace-pre">${formatted.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
+                                </div>`;
+                                
+                                content = content.replace(`__CODE_BLOCK_${index}__`, codeElement);
                               });
                               
-                              // Restore inline code
+                              // Restore inline code with styling
                               inlineCodes.forEach((code, index) => {
-                                content = content.replace(`__INLINE_CODE_${index}__`, code.replace(/`/g, ''));
+                                const cleanCode = code.replace(/`([^`]+)`/, '$1');
+                                const styledCode = `<code class="bg-gray-700 text-blue-300 px-1.5 py-0.5 rounded text-sm font-mono">${cleanCode.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`;
+                                content = content.replace(`__INLINE_CODE_${index}__`, styledCode);
                               });
                               
-                              return content;
+                              // Convert line breaks to HTML
+                              content = content.replace(/\n/g, '<br>');
+                              
+                              return <div dangerouslySetInnerHTML={{ __html: content }} />;
                             })()}
                           </div>
                           <div className="text-sm opacity-70 mt-2">
