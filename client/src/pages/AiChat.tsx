@@ -513,11 +513,13 @@ export default function AiChat() {
       if (verification.isValid) {
         console.log('✅ AIChat wallet verification successful');
         setIsVerified(true);
-        setWalletAddress(address);
+        // Normalize wallet address to lowercase for consistency
+        const normalizedAddress = address.toLowerCase();
+        setWalletAddress(normalizedAddress);
         setShowVerificationDialog(false);
         
         // Create BAM Swap session for compatibility
-        await walletSecurity.createSessionForBamSwap(address);
+        await walletSecurity.createSessionForBamSwap(normalizedAddress);
       } else {
         console.warn('❌ AIChat wallet verification failed:', verification.error);
         setVerificationError(verification.error || 'Verification failed');
@@ -542,8 +544,10 @@ export default function AiChat() {
     queryFn: async () => {
       if (!walletAddress) return [];
       
-      console.log('🔄 Fetching conversations for wallet:', walletAddress);
-      const response = await fetch(`/api/chat/conversations?walletAddress=${walletAddress}`);
+      // Ensure wallet address is normalized before API calls
+      const normalizedWallet = walletAddress.toLowerCase();
+      console.log('🔄 Fetching conversations for normalized wallet:', normalizedWallet);
+      const response = await fetch(`/api/chat/conversations?walletAddress=${normalizedWallet}`);
       if (!response.ok) {
         if (response.status === 404) {
           console.log('📭 No conversations found for wallet');
@@ -601,7 +605,7 @@ export default function AiChat() {
         body: JSON.stringify({ 
           title, 
           category, 
-          walletAddress 
+          walletAddress: walletAddress.toLowerCase() 
         })
       });
       
@@ -637,7 +641,7 @@ export default function AiChat() {
         },
         body: JSON.stringify({
           content: content.trim(),
-          walletAddress
+          walletAddress: walletAddress.toLowerCase()
         })
       });
 
