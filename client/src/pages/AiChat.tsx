@@ -1283,20 +1283,6 @@ export default function AiChat() {
                               : 'bg-gray-800 text-gray-100'
                           }`}
                         >
-                          {/* Copy button - appears on hover */}
-                          <button
-                            onClick={() => copyMessageToClipboard(message.id, message.content)}
-                            className={`absolute ${
-                              message.role === 'user' ? '-left-8' : '-right-8'
-                            } top-2 w-6 h-6 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 border border-gray-600`}
-                            title="Copy message"
-                          >
-                            {copiedMessageId === message.id ? (
-                              <Check className="w-3 h-3 text-green-400" />
-                            ) : (
-                              <Copy className="w-3 h-3 text-gray-300" />
-                            )}
-                          </button>
                           <div className="text-base leading-relaxed break-words overflow-hidden">
                             {(() => {
                               let content = message.content;
@@ -1369,11 +1355,31 @@ export default function AiChat() {
                               return <div dangerouslySetInnerHTML={{ __html: content }} />;
                             })()}
                           </div>
-                          <div className="text-sm opacity-70 mt-2">
-                            {new Date(message.createdAt).toLocaleTimeString([], { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
+                          <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-600/30">
+                            <div className="text-sm opacity-70">
+                              {new Date(message.createdAt).toLocaleTimeString([], { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </div>
+                            {/* Copy button - positioned below message */}
+                            <button
+                              onClick={() => copyMessageToClipboard(message.id, message.content)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1.5 hover:bg-gray-600/50 rounded-md flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-200"
+                              title="Copy message"
+                            >
+                              {copiedMessageId === message.id ? (
+                                <>
+                                  <Check className="w-3 h-3 text-green-400" />
+                                  <span className="text-green-400">Copied</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3" />
+                                  <span>Copy</span>
+                                </>
+                              )}
+                            </button>
                           </div>
                         </div>
                       </div>
