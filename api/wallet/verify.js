@@ -1,12 +1,29 @@
 export default async function handler(req, res) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
+  // Enhanced CORS headers for production with Cloudflare
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'https://bam-ecosystem.com',
+    'https://www.bam-ecosystem.com',
+    'https://bamhome-dffukcgji-bamswaps-projects.vercel.app',
+    'http://localhost:5000',
+    'http://localhost:3000'
+  ];
+  
+  // Allow requests from allowed origins or any origin if not in production
+  if (allowedOrigins.includes(origin) || !origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'https://bam-ecosystem.com');
+  }
+  
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control, X-File-Name');
+  res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
+  
+  // Additional headers for Cloudflare compatibility
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
