@@ -153,7 +153,7 @@ export const securityHeaders = helmet({
       fontSrc: ["'self'", "fonts.gstatic.com"],
       scriptSrc: ["'self'", "'unsafe-eval'"], // Allow eval for production builds
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "wss:", "https:"],
+      connectSrc: ["'self'", "wss:", "https:", "https://bam-ecosystem.com"], // Allow connection to your domain
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
@@ -181,15 +181,31 @@ export const securityHeaders = helmet({
   }
 });
 
-// CORS configuration
+// CORS configuration for Replit deployment with bam-ecosystem.com
 export const corsOptions = cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-domain.com', 'https://www.your-domain.com']
-    : ['http://localhost:3000', 'http://localhost:5000'],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'https://bam-ecosystem.com',
+      'https://www.bam-ecosystem.com',
+      'http://localhost:3000', 
+      'http://localhost:5000'
+    ];
+    
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Cache-Control'],
+  exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'],
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 });
 
 // Input validation schemas
