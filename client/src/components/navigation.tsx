@@ -59,7 +59,7 @@ export default function Navigation() {
                     <ChevronDown className="w-4 h-4" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-gray-900 border-gray-700 min-w-[200px]">
+                <DropdownMenuContent align="end" className="bg-gray-900 border-gray-700 min-w-[200px]">
                   <DropdownMenuItem asChild>
                     <button 
                       onClick={() => scrollToSection('projects')}
