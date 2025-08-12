@@ -49,9 +49,9 @@ const BAMSWAP_V2_ABI = [
 
 // Initialize Web3 with BSC - use multiple RPC endpoints for reliability
 const BSC_RPC_ENDPOINTS = [
+  import.meta.env.VITE_CHAINSTACK_BSC_ENDPOINT || 'https://bsc-dataseed1.binance.org/',
   'https://bsc-dataseed1.binance.org/',
   'https://bsc-dataseed2.binance.org/',
-  'https://bsc-dataseed3.binance.org/',
   'https://rpc.ankr.com/bsc'
 ];
 
@@ -137,7 +137,7 @@ export class BAMSwapV2Utils {
       // Test BAM price
       const bamPrice = await this.getBAMPrice();
       console.log('BAM Price (wei):', bamPrice);
-      console.log('BAM Price (formatted):', this.formatBAMPrice(bamPrice));
+      console.log('BAM Price (formatted):', this.formatBAMPrice(bamPrice || '1000000000000'));
       
       // Test purchase info
       const purchaseInfo = await this.getPurchaseInfo();
@@ -157,7 +157,7 @@ export class BAMSwapV2Utils {
       console.error('Contract test failed:', error);
       return {
         isWorking: false,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       };
     }
   }

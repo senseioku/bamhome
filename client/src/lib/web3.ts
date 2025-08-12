@@ -1,5 +1,5 @@
 // Constants to avoid circular dependency
-const BSC_RPC_URL = "https://rpc.ankr.com/bsc";
+const BSC_RPC_URL = import.meta.env.VITE_CHAINSTACK_BSC_ENDPOINT || "https://rpc.ankr.com/bsc";
 const BSC_CHAIN_ID = 56;
 
 // Browser-based Web3 utilities (no external dependencies)

@@ -33,11 +33,10 @@ const PRICE_FEEDS = {
 
 // BSC RPC endpoints
 const BSC_RPC_URLS = [
+  process.env.CHAINSTACK_BSC_ENDPOINT || 'https://bsc-dataseed1.binance.org',
   'https://bsc-dataseed1.binance.org',
   'https://bsc-dataseed2.binance.org', 
-  'https://bsc-dataseed3.binance.org',
-  'https://bsc-dataseed1.defibit.io',
-  'https://bsc-dataseed2.defibit.io'
+  'https://bsc-dataseed3.binance.org'
 ];
 
 export class ChainlinkPriceService {
