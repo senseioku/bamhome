@@ -188,15 +188,40 @@ interface DailyMotivationProps {
   onClose: () => void;
 }
 
+interface BamHolderData {
+  holderCount: number;
+  isEstimate?: boolean;
+  source?: string;
+  lastUpdated: string;
+}
+
 export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => {
   const [currentMessage, setCurrentMessage] = useState<typeof MOTIVATION_MESSAGES[0] | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [bamHolderData, setBamHolderData] = useState<BamHolderData | null>(null);
+
+  // Fetch BAM holder data
+  const fetchBAMHolderData = async () => {
+    try {
+      const response = await fetch('/api/bam/holders');
+      const data = await response.json();
+      
+      if (data.success) {
+        setBamHolderData(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch BAM holder data:', error);
+    }
+  };
 
   useEffect(() => {
     // Get random message
     const randomIndex = Math.floor(Math.random() * MOTIVATION_MESSAGES.length);
     const selectedMessage = MOTIVATION_MESSAGES[randomIndex];
     setCurrentMessage(selectedMessage);
+    
+    // Fetch holder data
+    fetchBAMHolderData();
     
     // Show animation
     setTimeout(() => setIsVisible(true), 100);
@@ -287,6 +312,29 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
               Close
             </button>
           </div>
+
+          {/* BAM Holder Data Section */}
+          {bamHolderData && (
+            <div className="mt-4 p-3 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg border border-green-500/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Users className="w-4 h-4 text-green-400" />
+                  <span className="text-sm font-semibold text-white">BAM Community</span>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-bold text-green-400">
+                    {bamHolderData.holderCount.toLocaleString()}+
+                  </div>
+                  <div className="text-xs text-green-300">
+                    {bamHolderData.isEstimate ? 'Estimated Holders' : 'Active Holders'}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-2 text-xs text-green-200">
+                Growing community strength • {bamHolderData.source || 'Live BSCScan Data'}
+              </div>
+            </div>
+          )}
 
           {/* Footer */}
           <div className="mt-4 pt-3 border-t border-white/10">

@@ -1891,14 +1891,7 @@ const SwapPage = () => {
                   <Users className="w-4 h-4" />
                   <span className="font-bold">Together we stand, In BAM We Trust!</span>
                 </div>
-                {bamHolderData && (
-                  <div className="flex items-center justify-center space-x-2 bg-yellow-500/10 px-3 py-1.5 rounded-lg border border-yellow-500/20">
-                    <TrendingUp className="w-4 h-4" />
-                    <span className="font-semibold text-yellow-200">
-                      Join {bamHolderData.holderCount.toLocaleString()}+ BAM holders!
-                    </span>
-                  </div>
-                )}
+
                 <div className="flex items-center justify-center space-x-2">
                   <Heart className="w-4 h-4" />
                   <span>Thank you for helping our community grow!</span>
@@ -1945,11 +1938,7 @@ const SwapPage = () => {
                         formatCompactNumber(contractBalances.BAM) : 
                         '2.00B'
                       } Tokens Left</span> • $0.0000025/BAM
-                      {bamHolderData && (
-                        <span className="block mt-1 text-yellow-300 font-medium">
-                          🎯 {bamHolderData.holderCount.toLocaleString()}+ Active Holders
-                        </span>
-                      )}
+
                     </div>
                   </div>
                 </div>

@@ -408,35 +408,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // BAM Token contract address on BSC
       const BAM_TOKEN_ADDRESS = '0xa779f03b752fa2442e6a23f145b007f2160f9a7d';
       
-      // Try to fetch from BSCScan API (no API key needed for token info)
+      // Try alternative APIs and web scraping for real-time data
       try {
-        const response = await fetch(
-          `https://api.bscscan.com/api?module=token&action=tokeninfo&contractaddress=${BAM_TOKEN_ADDRESS}`
-        );
+        console.log('🔍 Attempting web scraping for real-time holder data...');
+        const scrapeResponse = await fetch(`https://bscscan.com/token/${BAM_TOKEN_ADDRESS}`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Cache-Control': 'no-cache'
+          }
+        });
         
-        if (response.ok) {
-          const data = await response.json();
+        if (scrapeResponse.ok) {
+          const html = await scrapeResponse.text();
+          console.log('📊 BSCScan page fetched, searching for holder data...');
           
-          if (data.status === '1' && data.result) {
-            const holderCount = parseInt(data.result.holderCount) || 0;
-            
-            res.json({
-              success: true,
-              data: {
-                holderCount,
-                totalSupply: data.result.totalSupply,
-                circulatingSupply: data.result.circulatingSupply,
-                contractAddress: BAM_TOKEN_ADDRESS,
-                lastUpdated: new Date().toISOString()
+          // Multiple patterns to match holder count from BSCScan meta tags and content
+          const patterns = [
+            /Holders:\s*(\d{1,3}(?:,\d{3})*)/i,
+            /(\d{1,3}(?:,\d{3})*)\s*holder/i,
+            /holders?\s*[:\-]?\s*(\d{1,3}(?:,\d{3})*)/i,
+            /"holderCount"[:\s]*"?(\d+)"?/i,
+            /holder[s]?\s*\([^\)]*(\d{1,3}(?:,\d{3})*)[^\)]*\)/i,
+            /content="[^"]*Holders:\s*(\d{1,3}(?:,\d{3})*)/i
+          ];
+          
+          for (const pattern of patterns) {
+            const match = html.match(pattern);
+            if (match) {
+              const holderCount = parseInt(match[1].replace(/,/g, '')) || 0;
+              
+              if (holderCount > 0 && holderCount < 1000000) { // Reasonable range
+                res.json({
+                  success: true,
+                  data: {
+                    holderCount,
+                    contractAddress: BAM_TOKEN_ADDRESS,
+                    lastUpdated: new Date().toISOString(),
+                    source: 'BSCScan Web Scraping'
+                  }
+                });
+                
+                console.log(`✅ Scraped BAM Holders: ${holderCount.toLocaleString()}`);
+                return;
+              }
+            }
+          }
+          
+          console.log('⚠️ Could not extract holder count from BSCScan page');
+        }
+      } catch (error) {
+        console.error('Web scraping failed:', error);
+      }
+      
+      // Try alternative data sources
+      try {
+        console.log('🔍 Trying alternative APIs...');
+        
+        // Try different API endpoints that might work
+        const alternatives = [
+          `https://api.pancakeswap.info/api/v2/tokens/${BAM_TOKEN_ADDRESS}`,
+          `https://api.coingecko.com/api/v3/coins/binance-smart-chain/contract/${BAM_TOKEN_ADDRESS}`,
+          `https://deep-index.moralis.io/api/v2/erc20/${BAM_TOKEN_ADDRESS}/owners?chain=bsc&limit=1`
+        ];
+        
+        for (const url of alternatives) {
+          try {
+            const response = await fetch(url, {
+              headers: {
+                'User-Agent': 'BAM-Ecosystem/1.0'
               }
             });
             
-            console.log(`✅ BAM Holders: ${holderCount.toLocaleString()}`);
-            return;
+            if (response.ok) {
+              const data = await response.json();
+              console.log('📊 Alternative API response:', data);
+              
+              // Try to extract holder data from various API response formats
+              if (data.holder_count || data.holderCount || data.holders) {
+                const holderCount = data.holder_count || data.holderCount || data.holders;
+                
+                res.json({
+                  success: true,
+                  data: {
+                    holderCount: parseInt(holderCount),
+                    contractAddress: BAM_TOKEN_ADDRESS,
+                    lastUpdated: new Date().toISOString(),
+                    source: 'Alternative API'
+                  }
+                });
+                
+                console.log(`✅ Alternative API BAM Holders: ${holderCount.toLocaleString()}`);
+                return;
+              }
+            }
+          } catch (apiError) {
+            console.log(`Alternative API failed: ${url}`);
+            continue;
           }
         }
       } catch (error) {
-        console.error('BSCScan API error:', error);
+        console.error('Alternative APIs failed:', error);
       }
       
       // Fallback to estimated count based on contract activity
