@@ -36,34 +36,38 @@ export default function Navigation() {
             <div className="hidden lg:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('home')}
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
+                className="text-gray-300 hover:text-yellow-400 transition-all duration-300 hover:scale-105"
               >
                 Home
               </button>
               <button 
                 onClick={() => scrollToSection('ecosystem')}
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
+                className="text-gray-300 hover:text-yellow-400 transition-all duration-300 hover:scale-105"
               >
                 Ecosystem
               </button>
               <button 
                 onClick={() => scrollToSection('tokenomics')}
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
+                className="text-gray-300 hover:text-yellow-400 transition-all duration-300 hover:scale-105"
               >
                 Tokenomics
               </button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="text-gray-300 hover:text-yellow-400 transition-colors flex items-center gap-1">
+                  <button className="text-gray-300 hover:text-yellow-400 transition-all duration-300 hover:scale-105 flex items-center gap-1">
                     Projects
                     <ChevronDown className="w-4 h-4" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-gray-900 border-gray-700 min-w-[200px]">
+                <DropdownMenuContent 
+                  align="end" 
+                  className="bg-gray-900 border-gray-700 min-w-[200px] animate-in fade-in-0 zoom-in-95 duration-200"
+                  sideOffset={5}
+                >
                   <DropdownMenuItem asChild>
                     <button 
                       onClick={() => scrollToSection('projects')}
-                      className="w-full text-left text-gray-300 hover:text-yellow-400 flex items-center gap-2"
+                      className="w-full text-left text-gray-300 hover:text-yellow-400 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2"
                     >
                       <Briefcase className="w-4 h-4" />
                       Project Overview
@@ -74,42 +78,42 @@ export default function Navigation() {
                     <div className="text-xs font-semibold text-yellow-400 mb-1">Platform Access</div>
                   </div>
                   <DropdownMenuItem asChild>
-                    <a href="/swap" className="w-full text-gray-300 hover:text-green-400 flex items-center gap-2">
+                    <a href="/swap" className="w-full text-gray-300 hover:text-green-400 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2">
                       <RefreshCw className="w-4 h-4" />
                       BAM Swap
                       <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full ml-auto">Live</span>
                     </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <a href="/ai-chat" className="w-full text-gray-300 hover:text-purple-400 flex items-center gap-2">
+                    <a href="/ai-chat" className="w-full text-gray-300 hover:text-purple-400 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2">
                       <Brain className="w-4 h-4" />
                       BAM AIChat
                       <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full ml-auto">Beta</span>
                     </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <a href="https://drops.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-blue-400 flex items-center gap-2">
+                    <a href="https://drops.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-blue-400 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2">
                       <Gift className="w-4 h-4" />
                       BAM Drops
                       <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full ml-auto">Soon</span>
                     </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <a href="https://play.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-pink-400 flex items-center gap-2">
+                    <a href="https://play.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-pink-400 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2">
                       <Gamepad2 className="w-4 h-4" />
                       BAM Play 2 Earn
                       <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full ml-auto">Soon</span>
                     </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <a href="https://apex.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-yellow-400 flex items-center gap-2">
+                    <a href="https://apex.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-yellow-400 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2">
                       <Crown className="w-4 h-4" />
                       BAM ApexMiner
                       <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full ml-auto">Live</span>
                     </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <a href="https://vip.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-yellow-400 flex items-center gap-2">
+                    <a href="https://vip.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-yellow-400 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2">
                       <Crown className="w-4 h-4" />
                       BAM VIP Access
                       <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full ml-auto">Live</span>
@@ -127,8 +131,12 @@ export default function Navigation() {
                     <Menu className="h-6 w-6 text-gray-300" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="!w-screen !h-screen p-0 bg-gray-900 border-0 !max-w-none !inset-0 !fixed !top-0 !left-0 !right-0 !bottom-0 sm:!w-80 !z-[9999]" style={{width: '100vw', height: '100vh', minHeight: '100vh'}}>
-                  <div className="flex flex-col w-screen bg-gray-900/98 backdrop-blur-sm relative z-[10000] !fixed !inset-0 overflow-hidden" style={{width: '100vw', height: '100vh', minHeight: '100vh'}}>
+                <SheetContent 
+                  side="right" 
+                  className="!w-screen !h-screen p-0 bg-gray-900 border-0 !max-w-none !inset-0 !fixed !top-0 !left-0 !right-0 !bottom-0 sm:!w-80 !z-[9999] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right duration-300" 
+                  style={{width: '100vw', height: '100vh', minHeight: '100vh'}}
+                >
+                  <div className="flex flex-col w-screen bg-gray-900/98 backdrop-blur-sm relative z-[10000] !fixed !inset-0 overflow-hidden animate-in fade-in-0 duration-200" style={{width: '100vw', height: '100vh', minHeight: '100vh'}}>
                     {/* Compact Header */}
                     <div className="flex items-center justify-between p-3 border-b border-gray-700 bg-gray-800/50 flex-shrink-0">
                       <div className="flex items-center gap-2">
@@ -151,19 +159,19 @@ export default function Navigation() {
                     <div className="flex-1 overflow-y-auto">
                       {/* Navigation Items */}
                       <div className="py-1">
-                        <a href="/" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                        <a href="/" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02] border-b border-gray-800/30">
                           <span className="text-sm">🏠</span>
                           <span className="text-sm font-medium">Home</span>
                         </a>
-                        <a href="/#ecosystem" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                        <a href="/#ecosystem" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02] border-b border-gray-800/30">
                           <span className="text-sm">🌐</span>
                           <span className="text-sm font-medium">Ecosystem</span>
                         </a>
-                        <a href="/#tokenomics" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                        <a href="/#tokenomics" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02] border-b border-gray-800/30">
                           <span className="text-sm">💰</span>
                           <span className="text-sm font-medium">Tokenomics</span>
                         </a>
-                        <a href="/#projects" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                        <a href="/#projects" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02] border-b border-gray-800/30">
                           <span className="text-sm">🚀</span>
                           <span className="text-sm font-medium">Projects</span>
                         </a>
@@ -175,7 +183,7 @@ export default function Navigation() {
                           <div className="text-xs font-semibold text-yellow-400">Platform Access</div>
                         </div>
                         <div className="pb-2">
-                          <div className="flex items-center justify-between w-full px-4 py-2 text-yellow-400 bg-gray-800/50">
+                          <div className="flex items-center justify-between w-full px-4 py-2 text-yellow-400 bg-gray-800/50 transition-all duration-300">
                             <div className="flex items-center gap-3">
                               <span className="text-sm">🔄</span>
                               <span className="text-sm font-semibold">BAM Swap</span>
@@ -184,7 +192,7 @@ export default function Navigation() {
                           </div>
                           <a
                             href="/ai-chat"
-                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02]"
                           >
                             <div className="flex items-center gap-3">
                               <span className="text-sm">🤖</span>
@@ -196,7 +204,7 @@ export default function Navigation() {
                             href="https://drops.bam-ecosystem.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02]"
                           >
                             <div className="flex items-center gap-3">
                               <span className="text-sm">🎁</span>
@@ -208,7 +216,7 @@ export default function Navigation() {
                             href="https://play.bam-ecosystem.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02]"
                           >
                             <div className="flex items-center gap-3">
                               <span className="text-sm">🎮</span>
@@ -220,7 +228,7 @@ export default function Navigation() {
                             href="https://apex.bam-ecosystem.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02]"
                           >
                             <div className="flex items-center gap-3">
                               <span className="text-sm">👑</span>
@@ -232,7 +240,7 @@ export default function Navigation() {
                             href="https://vip.bam-ecosystem.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02]"
                           >
                             <div className="flex items-center gap-3">
                               <span className="text-sm">👑</span>
