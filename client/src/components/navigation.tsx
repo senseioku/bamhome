@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
-import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown, Brain, Sparkles, Zap, Star, Coins } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown, Brain, Sparkles, Zap, Star, Coins, ChevronDown } from "lucide-react";
 
 export default function Navigation() {
   const scrollToSection = (sectionId: string) => {
@@ -51,12 +52,71 @@ export default function Navigation() {
               >
                 Tokenomics
               </button>
-              <button 
-                onClick={() => scrollToSection('projects')}
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
-              >
-                Projects
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="text-gray-300 hover:text-yellow-400 transition-colors flex items-center gap-1">
+                    Projects
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-gray-900 border-gray-700 min-w-[200px]">
+                  <DropdownMenuItem asChild>
+                    <button 
+                      onClick={() => scrollToSection('projects')}
+                      className="w-full text-left text-gray-300 hover:text-yellow-400 flex items-center gap-2"
+                    >
+                      <Briefcase className="w-4 h-4" />
+                      Project Overview
+                    </button>
+                  </DropdownMenuItem>
+                  <div className="border-t border-gray-700 my-1"></div>
+                  <div className="px-2 py-1">
+                    <div className="text-xs font-semibold text-yellow-400 mb-1">Platform Access</div>
+                  </div>
+                  <DropdownMenuItem asChild>
+                    <a href="/swap" className="w-full text-gray-300 hover:text-green-400 flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4" />
+                      BAM Swap
+                      <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full ml-auto">Live</span>
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href="/ai-chat" className="w-full text-gray-300 hover:text-purple-400 flex items-center gap-2">
+                      <Brain className="w-4 h-4" />
+                      BAM AIChat
+                      <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full ml-auto">Beta</span>
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href="https://drops.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-blue-400 flex items-center gap-2">
+                      <Gift className="w-4 h-4" />
+                      BAM Drops
+                      <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full ml-auto">Soon</span>
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href="https://play.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-pink-400 flex items-center gap-2">
+                      <Gamepad2 className="w-4 h-4" />
+                      BAM Play 2 Earn
+                      <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full ml-auto">Soon</span>
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href="https://apex.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-yellow-400 flex items-center gap-2">
+                      <Crown className="w-4 h-4" />
+                      BAM ApexMiner
+                      <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full ml-auto">Live</span>
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href="https://vip.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-yellow-400 flex items-center gap-2">
+                      <Crown className="w-4 h-4" />
+                      BAM VIP Access
+                      <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full ml-auto">Live</span>
+                    </a>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Mobile Navigation */}
@@ -91,33 +151,21 @@ export default function Navigation() {
                     <div className="flex-1 overflow-y-auto">
                       {/* Navigation Items */}
                       <div className="py-1">
-                        <a href="/#home" className="group flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 border-b border-gray-800/30">
-                          <div className="relative">
-                            <Home className="w-4 h-4 group-hover:text-yellow-400 transition-colors duration-300" />
-                            <div className="absolute -inset-1 bg-yellow-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                          </div>
-                          <span className="text-sm font-medium group-hover:text-yellow-400 transition-colors duration-300">Home</span>
+                        <a href="/" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                          <span className="text-sm">🏠</span>
+                          <span className="text-sm font-medium">Home</span>
                         </a>
-                        <a href="/#ecosystem" className="group flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 border-b border-gray-800/30">
-                          <div className="relative">
-                            <Globe className="w-4 h-4 group-hover:text-blue-400 group-hover:animate-pulse transition-all duration-300" />
-                            <div className="absolute -inset-1 bg-blue-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                          </div>
-                          <span className="text-sm font-medium group-hover:text-blue-400 transition-colors duration-300">Ecosystem</span>
+                        <a href="/#ecosystem" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                          <span className="text-sm">🌐</span>
+                          <span className="text-sm font-medium">Ecosystem</span>
                         </a>
-                        <a href="/#tokenomics" className="group flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 border-b border-gray-800/30">
-                          <div className="relative">
-                            <TrendingUp className="w-4 h-4 group-hover:text-green-400 group-hover:scale-110 transition-all duration-300" />
-                            <div className="absolute -inset-1 bg-green-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                          </div>
-                          <span className="text-sm font-medium group-hover:text-green-400 transition-colors duration-300">Tokenomics</span>
+                        <a href="/#tokenomics" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                          <span className="text-sm">💰</span>
+                          <span className="text-sm font-medium">Tokenomics</span>
                         </a>
-                        <a href="/#projects" className="group flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 border-b border-gray-800/30">
-                          <div className="relative">
-                            <Briefcase className="w-4 h-4 group-hover:text-purple-400 group-hover:rotate-12 transition-all duration-300" />
-                            <div className="absolute -inset-1 bg-purple-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                          </div>
-                          <span className="text-sm font-medium group-hover:text-purple-400 transition-colors duration-300">Projects</span>
+                        <a href="/#projects" className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors border-b border-gray-800/30">
+                          <span className="text-sm">🚀</span>
+                          <span className="text-sm font-medium">Projects</span>
                         </a>
                       </div>
 
@@ -127,77 +175,58 @@ export default function Navigation() {
                           <div className="text-xs font-semibold text-yellow-400">Platform Access</div>
                         </div>
                         <div className="pb-2">
-                          <a
-                            href="/swap"
-                            className="group flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300"
-                          >
+                          <div className="flex items-center justify-between w-full px-4 py-2 text-yellow-400 bg-gray-800/50">
                             <div className="flex items-center gap-3">
-                              <div className="relative">
-                                <RefreshCw className="w-4 h-4 group-hover:text-green-400 group-hover:animate-spin transition-all duration-500" />
-                                <div className="absolute -inset-1 bg-green-400/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                              </div>
-                              <span className="text-sm font-medium group-hover:text-green-400 transition-colors duration-300">BAM Swap</span>
+                              <span className="text-sm">🔄</span>
+                              <span className="text-sm font-semibold">BAM Swap</span>
                             </div>
-                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full group-hover:bg-green-500/30 group-hover:scale-105 transition-all duration-300">Live</span>
-                          </a>
+                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
+                          </div>
                           <a
                             href="/ai-chat"
-                            className="group flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="relative">
-                                <Brain className="w-4 h-4 group-hover:text-blue-400 group-hover:animate-pulse transition-all duration-300" />
-                                <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-blue-400 opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-all duration-300" />
-                                <div className="absolute -inset-1 bg-blue-400/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                              </div>
-                              <span className="text-sm font-medium group-hover:text-blue-400 transition-colors duration-300">BAM AIChat</span>
+                              <span className="text-sm">🤖</span>
+                              <span className="text-sm font-medium">BAM AIChat</span>
                             </div>
-                            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full group-hover:bg-blue-500/30 group-hover:scale-105 transition-all duration-300">Beta</span>
+                            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">Beta</span>
                           </a>
                           <a
-                            href="/#projects"
-                            className="group flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300"
+                            href="https://drops.bam-ecosystem.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="relative">
-                                <Gift className="w-4 h-4 group-hover:text-purple-400 group-hover:animate-bounce transition-all duration-300" />
-                                <Star className="absolute -top-1 -right-1 w-2 h-2 text-yellow-400 opacity-0 group-hover:opacity-100 group-hover:animate-spin transition-all duration-500" />
-                                <div className="absolute -inset-1 bg-purple-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                              </div>
-                              <span className="text-sm font-medium group-hover:text-purple-400 transition-colors duration-300">BAM Drops</span>
+                              <span className="text-sm">🎁</span>
+                              <span className="text-sm font-medium">BAM Drops</span>
                             </div>
-                            <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full group-hover:bg-purple-600/70 group-hover:scale-105 transition-all duration-300">Soon</span>
+                            <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">Soon</span>
                           </a>
                           <a
-                            href="#"
-                            onClick={(e) => { e.preventDefault(); }}
-                            className="group flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300"
+                            href="https://play.bam-ecosystem.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="relative">
-                                <Gamepad2 className="w-4 h-4 group-hover:text-pink-400 group-hover:scale-110 transition-all duration-300" />
-                                <Zap className="absolute -top-1 -right-1 w-2 h-2 text-yellow-400 opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-all duration-300" />
-                                <div className="absolute -inset-1 bg-pink-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                              </div>
-                              <span className="text-sm font-medium group-hover:text-pink-400 transition-colors duration-300">BAM Play 2 Earn</span>
+                              <span className="text-sm">🎮</span>
+                              <span className="text-sm font-medium">BAM Play 2 Earn</span>
                             </div>
-                            <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full group-hover:bg-purple-600/70 group-hover:scale-105 transition-all duration-300">Soon</span>
+                            <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full">Soon</span>
                           </a>
                           <a
                             href="https://apex.bam-ecosystem.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300"
+                            className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="relative">
-                                <Crown className="w-4 h-4 group-hover:text-yellow-400 group-hover:rotate-12 transition-all duration-300" />
-                                <Coins className="absolute -top-1 -right-1 w-2 h-2 text-yellow-400 opacity-0 group-hover:opacity-100 group-hover:animate-bounce transition-all duration-500" />
-                                <div className="absolute -inset-1 bg-yellow-400/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                              </div>
-                              <span className="text-sm font-medium group-hover:text-yellow-400 transition-colors duration-300">BAM ApexMiner</span>
+                              <span className="text-sm">👑</span>
+                              <span className="text-sm font-medium">BAM ApexMiner</span>
                             </div>
-                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full group-hover:bg-green-500/30 group-hover:scale-105 transition-all duration-300">Live</span>
+                            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
                           </a>
                           <a
                             href="https://vip.bam-ecosystem.com"
@@ -206,7 +235,7 @@ export default function Navigation() {
                             className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-colors"
                           >
                             <div className="flex items-center gap-3">
-                              <Crown className="w-4 h-4" />
+                              <span className="text-sm">👑</span>
                               <span className="text-sm font-medium">BAM VIP Access</span>
                             </div>
                             <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
