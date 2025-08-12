@@ -13,7 +13,6 @@ import { apiRequest } from '@/lib/queryClient';
 import { useToast } from "@/hooks/use-toast";
 import { walletSecurity, type WalletVerification } from '@/lib/walletSecurity';
 import { countries, searchCountries, getCountryByCode } from '@/lib/countries';
-import Navigation from '@/components/navigation';
 import { 
   MessageCircle, 
   Send, 
@@ -714,7 +713,6 @@ export default function AiChat() {
   if (!isVerified) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col">
-        <Navigation />
         
         {/* Compact Mobile Login */}
         <div className="flex-1 flex items-center justify-center p-3 pt-16">
@@ -794,7 +792,7 @@ export default function AiChat() {
   }
 
   return (
-    <div className="h-screen bg-gray-900 text-white flex">
+    <div className="h-screen text-white flex">
       {/* Left Sidebar - Full Height DeepSeek Style */}
       {showSidebar && (
         <div className={`${sidebarCollapsed ? 'w-16' : 'w-80 xl:w-96'} bg-gray-900 border-r border-gray-700 flex flex-col fixed lg:relative z-50 h-full transition-all duration-300`}>
