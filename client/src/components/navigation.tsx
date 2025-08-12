@@ -183,13 +183,16 @@ export default function Navigation() {
                           <div className="text-xs font-semibold text-yellow-400">Platform Access</div>
                         </div>
                         <div className="pb-2">
-                          <div className="flex items-center justify-between w-full px-4 py-2 text-yellow-400 bg-gray-800/50 transition-all duration-300">
+                          <a
+                            href="/swap"
+                            className="flex items-center justify-between w-full px-4 py-2 text-yellow-400 bg-gray-800/50 transition-all duration-300 hover:text-white hover:bg-gray-800/70 hover:scale-[1.02]"
+                          >
                             <div className="flex items-center gap-3">
                               <span className="text-sm">🔄</span>
                               <span className="text-sm font-semibold">BAM Swap</span>
                             </div>
                             <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
-                          </div>
+                          </a>
                           <a
                             href="/ai-chat"
                             className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02]"
