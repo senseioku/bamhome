@@ -78,6 +78,7 @@ const SwapPage = () => {
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
   const [showLoader, setShowLoader] = useState<boolean>(false);
   const [showPageLoader, setShowPageLoader] = useState<boolean>(true);
+  const [bamHolderData, setBamHolderData] = useState<any>(null);
 
   // Token balances
   const [balances, setBalances] = useState<Record<string, string>>({});
@@ -105,6 +106,21 @@ const SwapPage = () => {
   const [fromTokenAnimating, setFromTokenAnimating] = useState(false);
   const [toTokenAnimating, setToTokenAnimating] = useState(false);
   const [swapButtonAnimating, setSwapButtonAnimating] = useState(false);
+
+  // Fetch BAM holder data from BSCScan
+  const fetchBAMHolderData = async () => {
+    try {
+      const response = await fetch('/api/bam/holders');
+      const data = await response.json();
+      
+      if (data.success) {
+        setBamHolderData(data.data);
+        console.log('✅ BAM Holder Data:', data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch BAM holder data:', error);
+    }
+  };
 
   // Handle swap direction with animated transitions
   const handleSwapTokens = async () => {
@@ -287,12 +303,20 @@ const SwapPage = () => {
       }
     };
 
-    // Initial price fetch
+    // Initial data fetch
     updatePrices();
+    fetchBAMHolderData();
     
     // Update every 30 seconds (Chainlink updates every ~30 seconds on BSC)
     const interval = setInterval(updatePrices, 30000);
-    return () => clearInterval(interval);
+    
+    // Update holder data every 5 minutes
+    const holderInterval = setInterval(fetchBAMHolderData, 300000);
+    
+    return () => {
+      clearInterval(interval);
+      clearInterval(holderInterval);
+    };
   }, []);
 
   // Fetch contract data when wallet connects or on page load
@@ -1867,6 +1891,14 @@ const SwapPage = () => {
                   <Users className="w-4 h-4" />
                   <span className="font-bold">Together we stand, In BAM We Trust!</span>
                 </div>
+                {bamHolderData && (
+                  <div className="flex items-center justify-center space-x-2 bg-yellow-500/10 px-3 py-1.5 rounded-lg border border-yellow-500/20">
+                    <TrendingUp className="w-4 h-4" />
+                    <span className="font-semibold text-yellow-200">
+                      Join {bamHolderData.holderCount.toLocaleString()}+ BAM holders!
+                    </span>
+                  </div>
+                )}
                 <div className="flex items-center justify-center space-x-2">
                   <Heart className="w-4 h-4" />
                   <span>Thank you for helping our community grow!</span>

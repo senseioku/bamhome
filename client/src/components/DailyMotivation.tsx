@@ -284,7 +284,7 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
               onClick={handleClose}
               className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white/80 rounded-lg transition-colors"
             >
-              Later
+              Close
             </button>
           </div>
 
