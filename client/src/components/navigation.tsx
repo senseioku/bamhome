@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown, Brain, Sparkles, Zap, Star, Coins, ChevronDown } from "lucide-react";
+import { Menu, X, Home, Globe, TrendingUp, Briefcase, RefreshCw, Gift, Gamepad2, Crown, Brain, Sparkles, Zap, Star, Coins, ChevronDown, Pickaxe } from "lucide-react";
 
 export default function Navigation() {
   const scrollToSection = (sectionId: string) => {
@@ -107,7 +107,7 @@ export default function Navigation() {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <a href="https://apex.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-yellow-400 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2">
-                      <Crown className="w-4 h-4" />
+                      <Pickaxe className="w-4 h-4" />
                       BAM ApexMiner
                       <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full ml-auto">Live</span>
                     </a>
@@ -234,7 +234,7 @@ export default function Navigation() {
                             className="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02]"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="text-sm">👑</span>
+                              <span className="text-sm">⛏️</span>
                               <span className="text-sm font-medium">BAM ApexMiner</span>
                             </div>
                             <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Live</span>
