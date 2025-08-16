@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, TrendingUp, Zap, Target, Crown, Rocket, DollarSign, AlertTriangle, Users, Trophy } from 'lucide-react';
+import { X, TrendingUp, Zap, Target, Crown, Rocket, DollarSign, AlertTriangle, Users, Trophy, Coffee, Shield, Brain, Timer, Hammer } from 'lucide-react';
 
 const MOTIVATION_MESSAGES = [
   {
@@ -172,6 +172,196 @@ const MOTIVATION_MESSAGES = [
     icon: TrendingUp,
     color: "blue",
     bgGradient: "from-blue-500/20 via-indigo-500/20 to-purple-500/20"
+  },
+  // Aggressive Crypto Motivation Series
+  {
+    id: 20,
+    emoji: "🔥",
+    message: "While you're sleeping, someone else is buying the dip. While you're doubting, someone else is BUILDING WEALTH. The crypto market doesn't wait for the weak. WAKE UP, STACK SATS, AND DOMINATE!",
+    hashtags: "#WakeUpAndDominate #BAM",
+    icon: Zap,
+    color: "red",
+    bgGradient: "from-red-500/20 via-orange-500/20 to-yellow-500/20"
+  },
+  {
+    id: 21,
+    emoji: "⚡",
+    message: "Stop making excuses about 'not having enough money' for crypto. You have money for coffee, Netflix, and takeout, but not for your FREEDOM? Cut the BS and start building your portfolio TODAY!",
+    hashtags: "#NoExcusesOnlyResults #BAM",
+    icon: Coffee,
+    color: "orange",
+    bgGradient: "from-orange-500/20 via-red-500/20 to-pink-500/20"
+  },
+  {
+    id: 22,
+    emoji: "🛡️",
+    message: "Fear keeps you poor while courage makes you RICH. Every red candle is an opportunity, every crash is a GIFT. While others panic sell, YOU buy and hold like a SAVAGE!",
+    hashtags: "#FearIsTheMindKiller #BAM",
+    icon: Shield,
+    color: "purple",
+    bgGradient: "from-purple-500/20 via-indigo-500/20 to-blue-500/20"
+  },
+  {
+    id: 23,
+    emoji: "💎",
+    message: "Paper hands create REGRET. Diamond hands create GENERATIONAL WEALTH. Your future self is either thanking you or cursing you for the decisions you make TODAY. HOLD LIKE YOUR LIFE DEPENDS ON IT!",
+    hashtags: "#DiamondHandsOnly #BAM",
+    icon: Trophy,
+    color: "cyan",
+    bgGradient: "from-cyan-500/20 via-blue-500/20 to-indigo-500/20"
+  },
+  {
+    id: 24,
+    emoji: "⏱️",
+    message: "Every day you wait is another day closer to missing the next 100x. While you're 'researching' and overthinking, the train is LEAVING THE STATION. Stop being a spectator, START BEING A PLAYER!",
+    hashtags: "#TimeIsYourEnemy #BAM",
+    icon: Timer,
+    color: "red",
+    bgGradient: "from-red-500/20 via-pink-500/20 to-purple-500/20"
+  },
+  {
+    id: 25,
+    emoji: "🚨",
+    message: "Staying in your comfort zone with fiat is FINANCIAL SUICIDE. Inflation is eating your money alive while crypto creates MILLIONAIRES. Get uncomfortable or stay BROKE forever!",
+    hashtags: "#ComfortZoneIsDangerZone #BAM",
+    icon: AlertTriangle,
+    color: "yellow",
+    bgGradient: "from-yellow-500/20 via-orange-500/20 to-red-500/20"
+  },
+  {
+    id: 26,
+    emoji: "🦈",
+    message: "Small fish get eaten, SHARKS rule the ocean. Stop thinking in pennies, start thinking in PERCENTAGES. 1000% gains don't happen to people who play it safe. BE RUTHLESS!",
+    hashtags: "#ThinkLikeAShark #BAM",
+    icon: TrendingUp,
+    color: "blue",
+    bgGradient: "from-blue-500/20 via-cyan-500/20 to-teal-500/20"
+  },
+  {
+    id: 27,
+    emoji: "🧠",
+    message: "Poor mindset = Poor portfolio. Rich mindset = Rich portfolio. Stop thinking like a victim, start thinking like a PREDATOR. The market rewards the bold, not the TIMID!",
+    hashtags: "#YourMindsetIsYourWealth #BAM",
+    icon: Brain,
+    color: "purple",
+    bgGradient: "from-purple-500/20 via-violet-500/20 to-indigo-500/20"
+  },
+  {
+    id: 28,
+    emoji: "🍽️",
+    message: "Every dollar you spend on garbage today is a THOUSAND dollars you won't have tomorrow. Stop living paycheck to paycheck, start living CRYPTO to CRYPTO!",
+    hashtags: "#SacrificeTodayFeastTomorrow #BAM",
+    icon: DollarSign,
+    color: "green",
+    bgGradient: "from-green-500/20 via-emerald-500/20 to-teal-500/20"
+  },
+  {
+    id: 29,
+    emoji: "👑",
+    message: "99% of people will never understand crypto. 99% will stay poor. YOU have the opportunity to be the 1% that gets it. Don't waste it being AVERAGE!",
+    hashtags: "#BeThe1Percent #BAM",
+    icon: Crown,
+    color: "yellow",
+    bgGradient: "from-yellow-500/20 via-amber-500/20 to-orange-500/20"
+  },
+  {
+    id: 30,
+    emoji: "⚔️",
+    message: "Discipline in DCA creates FINANCIAL FREEDOM. Discipline in HODLING creates WEALTH. Discipline separates the winners from the whiners. BE DISCIPLINED OR BE BROKE!",
+    hashtags: "#DisciplineEqualsFredom #BAM",
+    icon: Target,
+    color: "blue",
+    bgGradient: "from-blue-500/20 via-indigo-500/20 to-purple-500/20"
+  },
+  {
+    id: 31,
+    emoji: "⚡",
+    message: "Ideas without ACTION are worthless. You can spend 10 years 'learning' about crypto or 10 minutes BUYING your first coin. Stop planning, START EXECUTING!",
+    hashtags: "#SpeedOfImplementation #BAM",
+    icon: Zap,
+    color: "orange",
+    bgGradient: "from-orange-500/20 via-yellow-500/20 to-red-500/20"
+  },
+  {
+    id: 32,
+    emoji: "🎲",
+    message: "The biggest risk is NOT taking any risk. Playing it safe is playing it POOR. You weren't born to be mediocre - you were born to be LEGENDARY!",
+    hashtags: "#RiskItForTheBiscuit #BAM",
+    icon: Target,
+    color: "red",
+    bgGradient: "from-red-500/20 via-orange-500/20 to-yellow-500/20"
+  },
+  {
+    id: 33,
+    emoji: "🌙",
+    message: "While you sleep, the crypto market is making millionaires in Asia. While you work your 9-5, DeFi is generating passive income. Your money should work HARDER than you do!",
+    hashtags: "#MoneyNeverSleeps #BAM",
+    icon: Rocket,
+    color: "purple",
+    bgGradient: "from-purple-500/20 via-pink-500/20 to-red-500/20"
+  },
+  {
+    id: 34,
+    emoji: "🐑",
+    message: "Everyone is buying stocks and bonds like it's 1995. YOU'RE buying the future. Separate yourself from the herd or get SLAUGHTERED with them!",
+    hashtags: "#SeparateYourself #BAM",
+    icon: Users,
+    color: "blue",
+    bgGradient: "from-blue-500/20 via-cyan-500/20 to-teal-500/20"
+  },
+  {
+    id: 35,
+    emoji: "📈",
+    message: "Compound interest is the 8th wonder of the world. Compound crypto gains are the 9th. Every day you're not compounding is a day you're LOSING to someone who is!",
+    hashtags: "#CompoundOrDie #BAM",
+    icon: TrendingUp,
+    color: "green",
+    bgGradient: "from-green-500/20 via-lime-500/20 to-emerald-500/20"
+  },
+  {
+    id: 36,
+    emoji: "👶",
+    message: "This isn't about quick gains, this is about GENERATIONAL WEALTH. Your grandchildren will either thank you for being early or question why you were LATE to the biggest wealth transfer in history!",
+    hashtags: "#ThinkGenerational #BAM",
+    icon: Crown,
+    color: "gold",
+    bgGradient: "from-yellow-500/20 via-amber-500/20 to-orange-500/20"
+  },
+  {
+    id: 37,
+    emoji: "🐻",
+    message: "Bear markets create MILLIONAIRES, bull markets reveal them. While others retreat, you ATTACK. While others cry, you BUY. Stay in attack mode ALWAYS!",
+    hashtags: "#AttackModeAlways #BAM",
+    icon: Hammer,
+    color: "red",
+    bgGradient: "from-red-500/20 via-pink-500/20 to-purple-500/20"
+  },
+  {
+    id: 38,
+    emoji: "🌍",
+    message: "While you're making excuses, a 20-year-old in Singapore just made their first million in crypto. Your competition isn't local anymore - it's GLOBAL. Step up or step aside!",
+    hashtags: "#YourCompetitionIsGlobal #BAM",
+    icon: Users,
+    color: "cyan",
+    bgGradient: "from-cyan-500/20 via-blue-500/20 to-indigo-500/20"
+  },
+  {
+    id: 39,
+    emoji: "🏆",
+    message: "You have two choices: Be remembered as the person who talked about crypto, or the person who ACTED on it. Your legacy starts with your next trade. MAKE IT COUNT!",
+    hashtags: "#LegacyModeActivated #BAM",
+    icon: Trophy,
+    color: "gold",
+    bgGradient: "from-yellow-500/20 via-gold-500/20 to-amber-500/20"
+  },
+  {
+    id: 40,
+    emoji: "🔬",
+    message: "DYOR (Do Your Own Research) but don't let research become PARALYSIS. Knowledge without action is just expensive entertainment. Research smart, act SMARTER!",
+    hashtags: "#ResearchSmartActSmarter #BAM",
+    icon: Brain,
+    color: "purple",
+    bgGradient: "from-purple-500/20 via-violet-500/20 to-indigo-500/20"
   },
   {
     id: 20,
