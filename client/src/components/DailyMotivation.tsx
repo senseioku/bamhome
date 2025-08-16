@@ -630,7 +630,7 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
                 </div>
               </div>
               <div className="mt-2 text-xs text-green-200">
-                Growing community strength • Live data
+                Growing community strength
               </div>
             </div>
           )}
