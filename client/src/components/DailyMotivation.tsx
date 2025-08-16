@@ -331,7 +331,7 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
                 </div>
               </div>
               <div className="mt-2 text-xs text-green-200">
-                Growing community strength • {bamHolderData.source || 'Live BSCScan Data'}
+                Growing community strength • Live data
               </div>
             </div>
           )}
