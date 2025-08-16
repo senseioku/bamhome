@@ -363,6 +363,115 @@ const MOTIVATION_MESSAGES = [
     color: "purple",
     bgGradient: "from-purple-500/20 via-violet-500/20 to-indigo-500/20"
   },
+  // Brutally Savage Crypto Motivation Series
+  {
+    id: 41,
+    emoji: "💀",
+    message: "Bitcoin went from $1 to $69,000 and you MISSED IT. ETH went from $8 to $4,800 and you WATCHED. How many more lifechanging opportunities will you let slip through your fingers while you 'wait for the perfect moment'? THE PERFECT MOMENT WAS YESTERDAY!",
+    hashtags: "#RealityCheck #BAM #YoureRunningOutOfTime",
+    icon: Timer,
+    color: "red",
+    bgGradient: "from-red-600/30 via-red-500/20 to-orange-500/20"
+  },
+  {
+    id: 42,
+    emoji: "☠️",
+    message: "Your broke friends telling you crypto is 'too risky' are the same people working dead-end jobs and complaining about rent. Stop taking financial advice from people who are FINANCIALLY FAILED. Surround yourself with winners or stay a LOSER!",
+    hashtags: "#YourBrokeFriendsArePoison #BAM",
+    icon: Users,
+    color: "red",
+    bgGradient: "from-red-500/20 via-pink-500/20 to-purple-500/20"
+  },
+  {
+    id: 43,
+    emoji: "🎭",
+    message: "You choose mediocrity every time you pick Netflix over researching altcoins. You choose poverty every time you buy Starbucks instead of stacking crypto. Your life is the SUM of your choices - and right now, your choices SUCK!",
+    hashtags: "#MediocrityIsAChoice #BAM",
+    icon: Target,
+    color: "orange",
+    bgGradient: "from-orange-500/20 via-red-500/20 to-pink-500/20"
+  },
+  {
+    id: 44,
+    emoji: "⚔️",
+    message: "The crypto market is a GLADIATOR ARENA. The weak get liquidated, the strong get RICH. Every pump separates the prepared from the unprepared. Every dump separates the believers from the PRETENDERS. Which are you?",
+    hashtags: "#TheWeakGetLiquidated #BAM #GladiatorArena",
+    icon: Hammer,
+    color: "red",
+    bgGradient: "from-red-600/30 via-orange-500/20 to-yellow-500/20"
+  },
+  {
+    id: 45,
+    emoji: "⛓️",
+    message: "Your boss got rich while you traded your TIME for pennies. You're making SOMEONE ELSE wealthy while your own portfolio looks pathetic. Every hour at that job is an hour NOT building your crypto empire. WAKE UP, SLAVE!",
+    hashtags: "#Your9to5IsFinancialPrison #BAM #WakeUpSlave",
+    icon: AlertTriangle,
+    color: "red",
+    bgGradient: "from-red-500/20 via-orange-500/20 to-yellow-500/20"
+  },
+  {
+    id: 46,
+    emoji: "🤡",
+    message: "'I can't afford crypto' - Meanwhile you spent $200 this month on subscriptions you barely use. Stop being a VICTIM of your own bad financial decisions. You're not broke, you're just STUPID with money!",
+    hashtags: "#StopBeingAVictim #BAM #StupidWithMoney",
+    icon: DollarSign,
+    color: "orange",
+    bgGradient: "from-orange-500/20 via-red-500/20 to-pink-500/20"
+  },
+  {
+    id: 47,
+    emoji: "🐺",
+    message: "Following the crowd got you NOWHERE. When everyone said crypto was dead at $3,200 Bitcoin, that was your chance to buy GENERATIONAL wealth. Stop following sheep to the slaughter, BE THE WOLF!",
+    hashtags: "#TheHerdGetsSlaughtered #BAM #BeTheWolf",
+    icon: Users,
+    color: "blue",
+    bgGradient: "from-blue-500/20 via-cyan-500/20 to-teal-500/20"
+  },
+  {
+    id: 48,
+    emoji: "👴",
+    message: "Your parents told you to 'get a good job and save money in the bank.' Look how that worked out - they're still working at 65! Their financial advice created their financial PRISON. Break the cycle or repeat their MISTAKES!",
+    hashtags: "#YourParentsWereWrong #BAM #BreakTheCycle",
+    icon: Shield,
+    color: "purple",
+    bgGradient: "from-purple-500/20 via-indigo-500/20 to-blue-500/20"
+  },
+  {
+    id: 49,
+    emoji: "🗡️",
+    message: "You want gentle advice? Go to a therapist. You want life-changing wealth? EMBRACE THE BRUTALITY of crypto volatility. Soft people make soft money. Hard people make STUPID money. Which are you?",
+    hashtags: "#SoftPeopleMakeSoftMoney #BAM #EmbraceTheBrutality",
+    icon: Zap,
+    color: "red",
+    bgGradient: "from-red-600/30 via-pink-500/20 to-purple-500/20"
+  },
+  {
+    id: 50,
+    emoji: "⚰️",
+    message: "'I'll buy when it dips more' - It pumped 500%. 'I'll wait for regulation' - You missed the 10x. 'I need to research more' - Analysis paralysis killed your wealth. You're not dying from bad investments, you're dying from NO INVESTMENTS!",
+    hashtags: "#DeathByAThousandExcuses #BAM #AnalysisParalysis",
+    icon: Brain,
+    color: "red",
+    bgGradient: "from-red-500/20 via-orange-500/20 to-yellow-500/20"
+  },
+  {
+    id: 51,
+    emoji: "🔥",
+    message: "The same people laughing at your crypto 'gambling' are the ones who will beg you for loans in 5 years. Remember their faces when they called you crazy - because they'll be the same faces asking for HANDOUTS when you're financially free!",
+    hashtags: "#SavageTruth #BAM #RememberTheirFaces",
+    icon: Trophy,
+    color: "gold",
+    bgGradient: "from-yellow-500/20 via-orange-500/20 to-red-500/20"
+  },
+  {
+    id: 52,
+    emoji: "💸",
+    message: "In 10 years, there will be two types of people: Those who understood crypto and got rich, and those who didn't and stayed POOR. The choice is yours, but the window is CLOSING. Stop reading motivational quotes and START BUYING THE FUTURE!",
+    hashtags: "#FinalBrutalReality #BAM #BuyTheFuture #WindowIsClosing",
+    icon: Rocket,
+    color: "red",
+    bgGradient: "from-red-600/30 via-orange-500/20 to-yellow-500/20"
+  },
   {
     id: 20,
     emoji: "🏆",
