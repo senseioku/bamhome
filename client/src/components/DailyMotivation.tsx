@@ -536,110 +536,91 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
   const IconComponent = currentMessage.icon;
 
   return (
-    <div className={`fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all duration-300 ${
+    <div className={`fixed inset-0 z-[10000] flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm transition-all duration-300 ${
       isVisible ? 'opacity-100' : 'opacity-0'
     }`}>
-      <div className={`relative max-w-md w-full transform transition-all duration-500 ${
+      <div className={`relative max-w-sm w-full transform transition-all duration-500 ${
         isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
       }`}>
-        {/* Main Card */}
-        <div className={`relative bg-gradient-to-br ${currentMessage.bgGradient} backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-2xl overflow-hidden`}>
+        {/* Main Card - Compact */}
+        <div className={`relative bg-gradient-to-br ${currentMessage.bgGradient} backdrop-blur-xl border border-white/20 rounded-xl p-4 shadow-2xl overflow-hidden`}>
           {/* Animated Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 pointer-events-none"></div>
-          <div className="absolute -top-10 -right-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute -top-6 -right-6 w-12 h-12 bg-white/10 rounded-full blur-lg animate-pulse"></div>
           
           {/* Close Button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+            className="absolute top-2 right-2 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
           >
-            <X className="w-4 h-4 text-white/80" />
+            <X className="w-3 h-3 text-white/80" />
           </button>
 
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-xl bg-yellow-500/20 border border-yellow-500/30">
-              <IconComponent className="w-6 h-6 text-yellow-400" />
+          {/* Header - Compact */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 rounded-lg bg-yellow-500/20 border border-yellow-500/30">
+              <IconComponent className="w-4 h-4 text-yellow-400" />
             </div>
             <div>
-              <div className="text-lg font-bold text-white">Daily Alpha</div>
-              <div className="text-sm text-yellow-300">Exclusive Insight</div>
+              <div className="text-sm font-bold text-white">Daily Alpha</div>
+              <div className="text-xs text-yellow-300">Exclusive Insight</div>
             </div>
           </div>
 
-          {/* Message */}
-          <div className="mb-4">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl" role="img" aria-label="emoji">
+          {/* Message - Compact */}
+          <div className="mb-3">
+            <div className="flex items-start gap-2">
+              <span className="text-lg flex-shrink-0" role="img" aria-label="emoji">
                 {currentMessage.emoji}
               </span>
-              <div>
-                <p className="text-white text-base leading-relaxed font-medium mb-2">
+              <div className="min-w-0">
+                <p className="text-white text-sm leading-snug font-medium mb-1">
                   {currentMessage.message}
                 </p>
-                <div className="text-yellow-300 text-sm font-semibold">
+                <div className="text-yellow-300 text-xs font-semibold">
                   {currentMessage.hashtags}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <div className="w-full bg-white/10 rounded-full h-1">
-              <div 
-                className="h-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full animate-pulse"
-                style={{ width: '75%' }}
-              ></div>
-            </div>
-            <div className="text-xs text-white/60 mt-1">Building momentum...</div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleClose}
-              className="flex-1 py-3 px-4 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
-            >
-              Let's Build! 🚀
-            </button>
-            <button
-              onClick={handleClose}
-              className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white/80 rounded-lg transition-colors"
-            >
-              Close
-            </button>
-          </div>
-
-          {/* BAM Holder Data Section */}
+          {/* BAM Holder Data Section - Compact */}
           {bamHolderData && (
-            <div className="mt-4 p-3 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg border border-green-500/30">
+            <div className="mb-3 p-2 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg border border-green-500/30">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-green-400" />
-                  <span className="text-sm font-semibold text-white">BAM Community</span>
+                <div className="flex items-center space-x-1.5">
+                  <Users className="w-3 h-3 text-green-400" />
+                  <span className="text-xs font-semibold text-white">BAM Community</span>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-green-400">
+                  <div className="text-sm font-bold text-green-400">
                     {bamHolderData.holderCount.toLocaleString()}+
                   </div>
                   <div className="text-xs text-green-300">
-                    {bamHolderData.isEstimate ? 'Estimated Holders' : 'Active Holders'}
+                    {bamHolderData.isEstimate ? 'Est. Holders' : 'Active Holders'}
                   </div>
                 </div>
               </div>
-              <div className="mt-2 text-xs text-green-200">
+              <div className="mt-1 text-xs text-green-200">
                 Growing community strength
               </div>
             </div>
           )}
 
-          {/* Footer */}
-          <div className="mt-4 pt-3 border-t border-white/10">
-            <div className="text-xs text-white/50 text-center">
-              💡 New alpha drops daily • Join the movement
-            </div>
+          {/* Action Buttons - Compact */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleClose}
+              className="flex-1 py-2 px-3 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold rounded-lg transition-all duration-200 text-sm"
+            >
+              Let's Build! 🚀
+            </button>
+            <button
+              onClick={handleClose}
+              className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white/80 rounded-lg transition-colors text-sm"
+            >
+              Close
+            </button>
           </div>
         </div>
 
