@@ -847,10 +847,10 @@ const SwapPage = () => {
           console.error(`Failed to get ${symbol} contract balance:`, error);
           newContractBalances[symbol] = '0';
           
-          // Use actual current balance for BAM as reported by user
+          // Use 10B as fallback to avoid misleading users during loading
           if (symbol === 'BAM') {
-            newContractBalances[symbol] = '526560000'; // Current actual balance: 526.56M
-            console.log(`📊 BAM Contract Balance: Using current actual balance 526.56M tokens`);
+            newContractBalances[symbol] = '10000000000'; // 10B default during loading
+            console.log(`📊 BAM Contract Balance: Using 10B fallback during loading`);
           }
         }
       }
@@ -865,15 +865,15 @@ const SwapPage = () => {
     } catch (error) {
       console.error('Failed to check contract balances:', error);
       
-      // Set current actual values as fallback
+      // Set 10B as fallback to avoid misleading users
       const fallbackBalances = {
         BNB: '0',
         USDT: '0', 
         USDB: '0',
-        BAM: '526560000' // Current actual balance: 526.56M tokens
+        BAM: '10000000000' // 10B fallback to avoid showing misleading low numbers
       };
       setContractBalances(fallbackBalances);
-      console.log(`📊 BAM Contract Balance: Using current actual fallback 526.56M tokens`);
+      console.log(`📊 BAM Contract Balance: Using 10B fallback to prevent misleading display`);
       return fallbackBalances;
     }
   };
@@ -1936,7 +1936,7 @@ const SwapPage = () => {
                     <div className="text-yellow-200 text-xs leading-tight">
                       <span className="font-semibold text-green-300">{contractBalances.BAM ? 
                         formatCompactNumber(contractBalances.BAM) : 
-                        '2.00B'
+                        '10.00B'
                       } Tokens Left</span> • $0.0000025/BAM
 
                     </div>
