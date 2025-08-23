@@ -115,6 +115,8 @@ export default function AiChat() {
   const [editProfileError, setEditProfileError] = useState<string | null>(null);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const countryDropdownRef = useRef<HTMLDivElement>(null);
   const editCountryDropdownRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
@@ -679,6 +681,44 @@ export default function AiChat() {
     }
   });
 
+  // Auto-resize textarea
+  const adjustTextareaHeight = () => {
+    if (messageInputRef.current) {
+      messageInputRef.current.style.height = 'auto';
+      const scrollHeight = messageInputRef.current.scrollHeight;
+      const maxHeight = 200; // Max height in pixels (about 8 lines)
+      messageInputRef.current.style.height = Math.min(scrollHeight, maxHeight) + 'px';
+      messageInputRef.current.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden';
+    }
+  };
+
+  // Handle input change with auto-resize
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessageInput(e.target.value);
+    adjustTextareaHeight();
+  };
+
+  // Check if user is near bottom of messages
+  const isNearBottom = () => {
+    if (!messagesContainerRef.current) return true;
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    return scrollHeight - scrollTop - clientHeight < 100; // Within 100px of bottom
+  };
+
+  // Scroll to bottom of messages
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Smart scroll: only auto-scroll if user was already near bottom
+  const smartScrollToBottom = () => {
+    if (isNearBottom()) {
+      scrollToBottom();
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!messageInput.trim()) return;
 
@@ -686,6 +726,14 @@ export default function AiChat() {
       await sendMessageMutation.mutateAsync({
         content: messageInput.trim()
       });
+      
+      // Reset textarea height after sending
+      if (messageInputRef.current) {
+        messageInputRef.current.style.height = 'auto';
+      }
+      
+      // Always scroll to bottom after sending a message
+      setTimeout(scrollToBottom, 100);
     } catch (error) {
       console.error('Failed to send message:', error);
     }
@@ -709,6 +757,18 @@ export default function AiChat() {
     { id: 'learn', name: 'Learn DeFi', icon: BookOpen, color: 'bg-purple-500' },
     { id: 'general', name: 'General Chat', icon: MessageCircle, color: 'bg-gray-500' }
   ];
+
+  // Auto-resize textarea on mount and content change
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [messageInput]);
+
+  // Scroll to bottom when new messages are received (only if user was near bottom)
+  useEffect(() => {
+    if (conversationData?.messages?.length) {
+      setTimeout(smartScrollToBottom, 100);
+    }
+  }, [conversationData?.messages?.length]);
 
   if (!isVerified) {
     return (
@@ -1196,11 +1256,12 @@ export default function AiChat() {
               <div className="sticky bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0 z-10">
                 <div className="max-w-4xl mx-auto">
                   <div className="flex gap-2 sm:gap-3">
-                    <Input
+                    <Textarea
+                      ref={messageInputRef}
                       value={messageInput}
-                      onChange={(e) => setMessageInput(e.target.value)}
+                      onChange={handleInputChange}
                       placeholder="Message BAM AIChat"
-                      className="flex-1 bg-gray-800 border-gray-600 text-white text-sm sm:text-base py-3 px-3 sm:px-4 rounded-xl min-h-[44px] sm:min-h-[48px]"
+                      className="flex-1 bg-gray-800 border-gray-600 text-white text-sm sm:text-base py-3 px-3 sm:px-4 rounded-xl min-h-[44px] sm:min-h-[48px] max-h-[200px] resize-none"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -1208,7 +1269,13 @@ export default function AiChat() {
                             handleNewConversation();
                           }
                         }
+                        if (e.key === 'Enter' && e.shiftKey) {
+                          // Allow Shift+Enter for new lines
+                          setTimeout(adjustTextareaHeight, 0);
+                        }
                       }}
+                      rows={1}
+                      style={{ lineHeight: '1.5' }}
                     />
                     <Button
                       onClick={() => {
@@ -1260,7 +1327,7 @@ export default function AiChat() {
               </div>
 
               {/* Messages - DeepSeek Style */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0">
+              <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0 scroll-smooth">
                 <div className="max-w-4xl mx-auto space-y-6">
                   {loadingConversation ? (
                     <div className="flex items-center justify-center py-4">
@@ -1391,17 +1458,24 @@ export default function AiChat() {
               <div className="sticky bottom-0 left-0 right-0 p-4 border-t border-gray-700 bg-gray-900/95 backdrop-blur-sm flex-shrink-0 z-10">
                 <div className="max-w-4xl mx-auto">
                   <div className="flex gap-3">
-                    <Input
+                    <Textarea
+                      ref={messageInputRef}
                       value={messageInput}
-                      onChange={(e) => setMessageInput(e.target.value)}
+                      onChange={handleInputChange}
                       placeholder="Message BAM AIChat"
-                      className="flex-1 bg-gray-800 border-gray-600 text-white text-base py-3 px-4 rounded-xl min-h-[48px]"
+                      className="flex-1 bg-gray-800 border-gray-600 text-white text-base py-3 px-4 rounded-xl min-h-[48px] max-h-[200px] resize-none"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
                           handleSendMessage();
                         }
+                        if (e.key === 'Enter' && e.shiftKey) {
+                          // Allow Shift+Enter for new lines
+                          setTimeout(adjustTextareaHeight, 0);
+                        }
                       }}
+                      rows={1}
+                      style={{ lineHeight: '1.5' }}
                     />
                     <Button
                       onClick={handleSendMessage}
