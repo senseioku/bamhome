@@ -256,6 +256,7 @@ export default function AiChat() {
       return response.json();
     },
     onSuccess: (data) => {
+      setUserProfile(data);
       setShowUsernameDialog(false);
       setUsername('');
       setDisplayName('');
@@ -265,11 +266,17 @@ export default function AiChat() {
       setUsernameError(null);
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
+      // Force refresh conversations for newly registered users
+      if (walletAddress) {
+        queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', walletAddress] });
+        queryClient.refetchQueries({ queryKey: ['/api/chat/conversations', walletAddress] });
+      }
+      
       // Show success confirmation
-      console.log('✅ Username successfully created and linked to wallet:', data);
+      console.log('✅ Profile created and linked to wallet:', data);
       toast({
-        title: "Username Created Successfully!",
-        description: `Username "${data.username}" is now linked to your wallet address.`,
+        title: "Profile Created Successfully!",
+        description: "Welcome to BAM AIChat! You can now start chatting.",
         duration: 5000,
       });
     },
@@ -522,11 +529,24 @@ export default function AiChat() {
         // Create BAM Swap session for compatibility
         await walletSecurity.createSessionForBamSwap(normalizedAddress);
         
-        // Force refresh conversations after wallet connection
-        console.log('🔄 Force refreshing conversations after wallet verification...');
-        setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', normalizedAddress] });
-          queryClient.refetchQueries({ queryKey: ['/api/chat/conversations', normalizedAddress] });
+        // Check if user has profile - force registration for new users
+        setTimeout(async () => {
+          try {
+            const profileResponse = await fetch(`/api/user/profile?walletAddress=${normalizedAddress}`);
+            if (profileResponse.status === 404) {
+              console.log('🔄 New user detected, enforcing registration...');
+              setShowUsernameDialog(true);
+            } else {
+              // Force refresh conversations after wallet connection
+              console.log('🔄 Force refreshing conversations after wallet verification...');
+              queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', normalizedAddress] });
+              queryClient.refetchQueries({ queryKey: ['/api/chat/conversations', normalizedAddress] });
+            }
+          } catch (error) {
+            console.error('Error checking user profile:', error);
+            // If error checking profile, still force registration to be safe
+            setShowUsernameDialog(true);
+          }
         }, 100);
       } else {
         console.warn('❌ AIChat wallet verification failed:', verification.error);
@@ -1293,8 +1313,24 @@ export default function AiChat() {
 
         {/* Chat Content Area */}
         <div className="flex-1 flex flex-col min-h-0">
-          {!selectedConversation ? (
-            // Welcome Screen - DeepSeek Style
+          {showUsernameDialog && !userProfile ? (
+            // Registration Required Screen
+            <div className="flex-1 flex items-center justify-center p-4">
+              <div className="text-center max-w-md">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold mb-4">Welcome to BAM AIChat</h2>
+                <p className="text-gray-400 text-lg mb-6 leading-relaxed">
+                  To get started, please create your profile with a username and email address.
+                </p>
+                <p className="text-sm text-gray-500 mb-4">
+                  This is required for all new users to ensure secure access to BAM AIChat features.
+                </p>
+              </div>
+            </div>
+          ) : !selectedConversation ? (
+            // Welcome Screen - DeepSeek Style  
             <div className="flex-1 flex flex-col">
               <div className="flex-1 flex items-center justify-center p-3 sm:p-8">
                 <div className="text-center max-w-2xl w-full">
@@ -1312,6 +1348,10 @@ export default function AiChat() {
                       <Button
                         key={category.id}
                         onClick={() => {
+                          if (!userProfile) {
+                            setShowUsernameDialog(true);
+                            return;
+                          }
                           console.log('🔄 Category selected:', category.id);
                           setSelectedCategory(category.id);
                           handleNewConversation();
@@ -1361,6 +1401,10 @@ export default function AiChat() {
                     />
                     <Button
                       onClick={() => {
+                        if (!userProfile) {
+                          setShowUsernameDialog(true);
+                          return;
+                        }
                         if (messageInput.trim()) {
                           handleNewConversation();
                         }
@@ -1586,13 +1630,24 @@ export default function AiChat() {
         </div>
       </div>
       
-      {/* Username Creation Dialog */}
-      <Dialog open={showUsernameDialog} onOpenChange={setShowUsernameDialog}>
+      {/* Username Creation Dialog - Mandatory for new users */}
+      <Dialog open={showUsernameDialog} onOpenChange={(open) => {
+        // Only allow closing if user already has profile (editing scenario)
+        if (!open && userProfile) {
+          setShowUsernameDialog(false);
+          setUsernameError(null);
+        }
+      }}>
         <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold">Create Username</DialogTitle>
+            <DialogTitle className="text-lg font-semibold">
+              {userProfile ? 'Edit Profile' : 'Complete Registration'}
+            </DialogTitle>
             <DialogDescription className="text-gray-400">
-              Create a unique username for your BAM AIChat profile
+              {userProfile 
+                ? 'Update your BAM AIChat profile information'
+                : 'Create your profile to access BAM AIChat features'
+              }
             </DialogDescription>
           </DialogHeader>
           
@@ -1678,25 +1733,27 @@ export default function AiChat() {
           
           {/* Dialog Footer with buttons */}
           <div className="flex gap-3 pt-6 border-t border-gray-700 mt-4">
-            <Button
-              onClick={() => {
-                setShowUsernameDialog(false);
-                setUsernameError(null);
-              }}
-              variant="outline"
-              className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
-            >
-              Cancel
-            </Button>
+            {userProfile && (
+              <Button
+                onClick={() => {
+                  setShowUsernameDialog(false);
+                  setUsernameError(null);
+                }}
+                variant="outline"
+                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+            )}
             <Button
               onClick={handleCreateUsername}
               disabled={!username.trim() || username.length < 3 || !email.trim() || !country || createUsernameMutation.isPending}
-              className="flex-1 bg-purple-600 hover:bg-purple-700"
+              className={`${userProfile ? 'flex-1' : 'w-full'} bg-purple-600 hover:bg-purple-700`}
             >
               {createUsernameMutation.isPending ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                'Create'
+                userProfile ? 'Update Profile' : 'Complete Registration'
               )}
             </Button>
           </div>
