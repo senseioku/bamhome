@@ -521,6 +521,13 @@ export default function AiChat() {
         
         // Create BAM Swap session for compatibility
         await walletSecurity.createSessionForBamSwap(normalizedAddress);
+        
+        // Force refresh conversations after wallet connection
+        console.log('🔄 Force refreshing conversations after wallet verification...');
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', normalizedAddress] });
+          queryClient.refetchQueries({ queryKey: ['/api/chat/conversations', normalizedAddress] });
+        }, 100);
       } else {
         console.warn('❌ AIChat wallet verification failed:', verification.error);
         setVerificationError(verification.error || 'Verification failed');
@@ -558,13 +565,16 @@ export default function AiChat() {
         throw new Error('Failed to fetch conversations');
       }
       const data = await response.json();
-      console.log('✅ Conversations fetched:', data);
-      return data;
+      console.log('✅ Conversations fetched for wallet:', normalizedWallet, 'Data:', data);
+      console.log('📊 Conversation count:', Array.isArray(data) ? data.length : 'Not an array');
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!walletAddress && isVerified,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    staleTime: 0
+    staleTime: 0,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
   });
 
   const conversations = Array.isArray(conversationsQuery?.data) ? conversationsQuery.data : [];
@@ -576,7 +586,9 @@ export default function AiChat() {
       if (!selectedConversation || !walletAddress) return undefined;
       
       console.log('🔄 Fetching conversation:', selectedConversation);
-      const response = await fetch(`/api/chat/conversations/${selectedConversation}?walletAddress=${walletAddress}`);
+      // Ensure wallet address is normalized for consistency  
+      const normalizedWallet = walletAddress.toLowerCase();
+      const response = await fetch(`/api/chat/conversations/${selectedConversation}?walletAddress=${normalizedWallet}`);
       if (!response.ok) {
         console.error('❌ Failed to fetch conversation:', response.status);
         throw new Error('Failed to fetch conversation');
