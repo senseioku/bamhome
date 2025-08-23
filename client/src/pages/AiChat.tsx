@@ -1290,7 +1290,7 @@ export default function AiChat() {
                       <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Button>
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-500 mt-2 text-center">
+                  <div className="text-xs text-gray-500 mt-2 text-center">
                     BAM AIChat can make mistakes. Check important info.
                   </div>
                 </div>
@@ -1490,7 +1490,7 @@ export default function AiChat() {
                       )}
                     </Button>
                   </div>
-                  <div className="text-sm text-gray-500 mt-2 text-center">
+                  <div className="text-xs text-gray-500 mt-2 text-center">
                     BAM AIChat can make mistakes. Check important info.
                   </div>
                 </div>
