@@ -256,7 +256,7 @@ export const conversationValidation = [
     .trim(),
   body('category')
     .optional()
-    .isIn(['general', 'crypto', 'defi', 'trading', 'technology'])
+    .isIn(['general', 'crypto', 'research', 'learn'])
     .withMessage('Invalid category'),
   body('walletAddress')
     .isLength({ min: 42, max: 42 })

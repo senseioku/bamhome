@@ -647,9 +647,19 @@ export default function AiChat() {
       return newConversation;
     },
     onSuccess: (conversation: Conversation) => {
+      console.log('✅ Conversation created, refreshing list and selecting conversation');
       // Refresh conversations list
       queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations', walletAddress] });
       setSelectedConversation(conversation.id);
+    },
+    onError: (error: any) => {
+      console.error('❌ Create conversation failed:', error);
+      toast({
+        title: "Failed to create conversation",
+        description: error.message || "Please try again in a moment",
+        variant: "destructive",
+        duration: 5000
+      });
     }
   });
 
@@ -709,6 +719,7 @@ export default function AiChat() {
       queryClient.invalidateQueries({ 
         queryKey: ['/api/chat/conversations', walletAddress] 
       });
+      console.log('✅ Message sent successfully');
     },
     onError: (error: any) => {
       console.error('Send message error:', error);

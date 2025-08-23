@@ -210,8 +210,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = await storage.upsertUser({
           id: normalizedWallet,
           walletAddress: normalizedWallet,
-          email: '',
-          country: '',
+          email: `${normalizedWallet}@temp.local`,
+          country: 'US',
           firstName: null,
           lastName: null,
           username: null,
