@@ -598,6 +598,11 @@ export default function AiChat() {
   const createConversationMutation = useMutation({
     mutationFn: async ({ title, category }: { title: string; category: string }) => {
       console.log('🔄 Creating new conversation:', { title, category, walletAddress });
+      
+      // Create a timeout controller for the request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      
       const response = await fetch('/api/chat/conversations', {
         method: 'POST',
         headers: {
@@ -607,13 +612,22 @@ export default function AiChat() {
           title, 
           category, 
           walletAddress: walletAddress.toLowerCase() 
-        })
+        }),
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
+      
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Failed to create conversation' }));
-        console.error('❌ Failed to create conversation:', error);
-        throw new Error(error.message || 'Failed to create conversation');
+        const error = await response.json().catch(() => ({ 
+          message: response.status === 429 ? 'Rate limit exceeded. Please wait a moment.' : 'Failed to create conversation' 
+        }));
+        console.error('❌ Failed to create conversation:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: error
+        });
+        throw new Error(error.message || `HTTP ${response.status}: Failed to create conversation`);
       }
       
       const newConversation = await response.json();
@@ -635,6 +649,11 @@ export default function AiChat() {
       }
 
       console.log('🔄 Sending message to conversation:', selectedConversation);
+      
+      // Create a timeout controller for the request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch(`/api/chat/conversations/${selectedConversation}/messages`, {
         method: 'POST',
         headers: {
@@ -643,13 +662,22 @@ export default function AiChat() {
         body: JSON.stringify({
           content: content.trim(),
           walletAddress: walletAddress.toLowerCase()
-        })
+        }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Failed to send message' }));
-        console.error('❌ Failed to send message:', error);
-        throw new Error(error.message || 'Failed to send message');
+        const error = await response.json().catch(() => ({ 
+          message: response.status === 429 ? 'Rate limit exceeded. Please wait a moment.' : 'Failed to send message' 
+        }));
+        console.error('❌ Failed to send message:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: error
+        });
+        throw new Error(error.message || `HTTP ${response.status}: Failed to send message`);
       }
 
       const result = await response.json();
@@ -720,8 +748,18 @@ export default function AiChat() {
   };
 
   const handleSendMessage = async () => {
-    if (!messageInput.trim()) return;
+    if (!messageInput.trim()) {
+      console.log('⚠️ Empty message, skipping send');
+      return;
+    }
 
+    if (sendMessageMutation.isPending) {
+      console.log('🔄 Already sending message, skipping duplicate request');
+      return;
+    }
+
+    console.log('🔄 Sending message:', messageInput.trim());
+    
     try {
       await sendMessageMutation.mutateAsync({
         content: messageInput.trim()
@@ -734,20 +772,35 @@ export default function AiChat() {
       
       // Always scroll to bottom after sending a message
       setTimeout(scrollToBottom, 100);
+      console.log('✅ Message sent and UI updated');
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error('❌ Failed to send message:', error);
     }
   };
 
   const handleNewConversation = async () => {
+    if (createConversationMutation.isPending) {
+      console.log('🔄 Already creating conversation, skipping duplicate request');
+      return;
+    }
+
     const title = `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Chat ${Date.now()}`;
+    console.log('🔄 Creating new conversation:', { title, category: selectedCategory });
+    
     try {
       await createConversationMutation.mutateAsync({
         title,
         category: selectedCategory
       });
+      console.log('✅ Conversation created successfully');
     } catch (error) {
-      console.error('Failed to create conversation:', error);
+      console.error('❌ Failed to create conversation:', error);
+      toast({
+        title: "Failed to create conversation",
+        description: "Please try again in a moment",
+        variant: "destructive",
+        duration: 5000
+      });
     }
   };
 
@@ -1236,14 +1289,20 @@ export default function AiChat() {
                       <Button
                         key={category.id}
                         onClick={() => {
+                          console.log('🔄 Category selected:', category.id);
                           setSelectedCategory(category.id);
                           handleNewConversation();
                         }}
+                        disabled={createConversationMutation.isPending}
                         variant="outline"
-                        className="p-4 sm:p-6 h-auto border-gray-600 hover:bg-gray-800 hover:border-purple-500 rounded-xl transition-all"
+                        className="p-4 sm:p-6 h-auto border-gray-600 hover:bg-gray-800 hover:border-purple-500 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <div className="flex flex-col items-center gap-2 sm:gap-3">
-                          <category.icon className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
+                          {createConversationMutation.isPending && selectedCategory === category.id ? (
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin" />
+                          ) : (
+                            <category.icon className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
+                          )}
                           <div className="font-medium text-xs sm:text-sm text-center leading-tight">{category.name}</div>
                         </div>
                       </Button>
@@ -1283,11 +1342,15 @@ export default function AiChat() {
                           handleNewConversation();
                         }
                       }}
-                      disabled={!messageInput.trim()}
-                      className="bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-3 rounded-xl flex-shrink-0"
+                      disabled={!messageInput.trim() || createConversationMutation.isPending}
+                      className="bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-3 rounded-xl flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                       size="lg"
                     >
-                      <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                      {createConversationMutation.isPending ? (
+                        <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                      )}
                     </Button>
                   </div>
                   <div className="text-xs text-gray-500 mt-2 text-center">
