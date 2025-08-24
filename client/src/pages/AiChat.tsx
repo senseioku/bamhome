@@ -256,7 +256,6 @@ export default function AiChat() {
       return response.json();
     },
     onSuccess: (data) => {
-      setUserProfile(data);
       setShowUsernameDialog(false);
       setUsername('');
       setDisplayName('');
@@ -264,6 +263,9 @@ export default function AiChat() {
       setCountry('');
       setCountrySearch('');
       setUsernameError(null);
+      
+      // Refresh user profile data
+      queryClient.invalidateQueries({ queryKey: ['user-profile', walletAddress] });
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       
       // Force refresh conversations for newly registered users
@@ -281,18 +283,33 @@ export default function AiChat() {
       });
     },
     onError: (error: any) => {
-      // Enhanced error message for rate limits
-      const isRateLimit = error.message?.includes('limit') || error.message?.includes('wait') || error.message?.includes('time');
-      setUsernameError(error.message || 'Failed to create username');
+      console.error('Profile creation failed:', error);
       
-      if (isRateLimit) {
-        toast({
-          title: "Rate Limit Reached",
-          description: error.message,
-          variant: "destructive",
-          duration: 6000
-        });
+      let friendlyMessage = 'Unable to create your profile. Please try again.';
+      
+      if (error.message?.includes('already exists') || error.message?.includes('Username already taken')) {
+        friendlyMessage = 'This username is already taken. Please choose a different one.';
+      } else if (error.message?.includes('validation') || error.message?.includes('invalid')) {
+        friendlyMessage = 'Please check your information and make sure all required fields are filled correctly.';
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        friendlyMessage = 'Connection issue. Please check your internet and try again.';
+      } else if (error.message?.includes('rate limit') || error.message?.includes('429')) {
+        friendlyMessage = 'Please wait a moment before trying again.';
+      } else if (error.message?.includes('email') && error.message?.includes('invalid')) {
+        friendlyMessage = 'Please enter a valid email address.';
+      } else if (error.message?.includes('username') && (error.message?.includes('short') || error.message?.includes('long'))) {
+        friendlyMessage = 'Username must be between 3-20 characters long.';
       }
+      
+      setUsernameError(friendlyMessage);
+      
+      // Show user-friendly toast notification
+      toast({
+        title: "Registration Failed",
+        description: friendlyMessage,
+        variant: "destructive",
+        duration: 6000,
+      });
     }
   });
 
@@ -554,13 +571,22 @@ export default function AiChat() {
       }
     } catch (error: any) {
       console.error('AIChat verification error:', error);
+      
+      let friendlyMessage = 'Unable to verify your wallet. Please try again.';
+      
       if (error.message?.includes('insufficient') || error.message?.includes('10M')) {
-        setVerificationError('You need at least 10M BAM tokens to access BAM AIChat.');
+        friendlyMessage = 'You need at least 10M BAM tokens to access BAM AIChat.';
       } else if (error.message?.includes('signature') || error.message?.includes('rejected')) {
-        setVerificationError('Wallet signature required for access verification.');
-      } else {
-        setVerificationError('Failed to verify wallet. Please try again.');
+        friendlyMessage = 'Please approve the wallet signature to verify ownership.';
+      } else if (error.message?.includes('network') || error.message?.includes('connection')) {
+        friendlyMessage = 'Network error. Please check your connection and try again.';
+      } else if (error.message?.includes('wallet') && error.message?.includes('connect')) {
+        friendlyMessage = 'Please connect your wallet and try again.';
+      } else if (error.message?.includes('MetaMask') || error.message?.includes('provider')) {
+        friendlyMessage = 'Please install MetaMask or connect a compatible wallet.';
       }
+      
+      setVerificationError(friendlyMessage);
     } finally {
       setVerificationLoading(false);
     }
@@ -674,11 +700,24 @@ export default function AiChat() {
     },
     onError: (error: any) => {
       console.error('❌ Create conversation failed:', error);
+      
+      let friendlyMessage = 'Unable to start a new conversation. Please try again.';
+      
+      if (error.message?.includes('rate limit') || error.message?.includes('429')) {
+        friendlyMessage = 'Please wait a moment before starting a new conversation.';
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        friendlyMessage = 'Connection issue. Please check your internet and try again.';
+      } else if (error.message?.includes('timeout')) {
+        friendlyMessage = 'Request timed out. Please try again.';
+      } else if (error.message?.includes('validation')) {
+        friendlyMessage = 'Please make sure you have completed your profile setup.';
+      }
+      
       toast({
-        title: "Failed to create conversation",
-        description: error.message || "Please try again in a moment",
+        title: "Conversation Creation Failed",
+        description: friendlyMessage,
         variant: "destructive",
-        duration: 5000
+        duration: 6000
       });
     }
   });
@@ -743,9 +782,24 @@ export default function AiChat() {
     },
     onError: (error: any) => {
       console.error('Send message error:', error);
+      
+      let friendlyMessage = 'Unable to send your message. Please try again.';
+      
+      if (error.message?.includes('rate limit') || error.message?.includes('429')) {
+        friendlyMessage = 'Please wait a moment before sending another message.';
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        friendlyMessage = 'Connection issue. Please check your internet and try again.';
+      } else if (error.message?.includes('timeout')) {
+        friendlyMessage = 'Request timed out. Please try sending your message again.';
+      } else if (error.message?.includes('conversation')) {
+        friendlyMessage = 'Conversation error. Please try starting a new conversation.';
+      } else if (error.message?.includes('long') || error.message?.includes('length')) {
+        friendlyMessage = 'Your message is too long. Please try a shorter message.';
+      }
+      
       toast({
-        title: "Failed to send message",
-        description: error.message || "Please try again",
+        title: "Message Failed",
+        description: friendlyMessage,
         variant: "destructive",
         duration: 5000
       });
