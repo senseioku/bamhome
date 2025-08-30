@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, TrendingUp, Zap, Target, Crown, Rocket, DollarSign, AlertTriangle, Users, Trophy, Coffee, Shield, Brain, Timer, Hammer } from 'lucide-react';
+import { X, TrendingUp, Zap, Target, Crown, Rocket, DollarSign, AlertTriangle, Users, Trophy, Coffee, Shield, Brain, Timer, Hammer, Twitter } from 'lucide-react';
 
 const MOTIVATION_MESSAGES = [
   {
@@ -623,6 +623,21 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
             >
               Close
             </button>
+          </div>
+
+          {/* Social Link Footer */}
+          <div className="mt-2 pt-2 border-t border-white/10">
+            <div className="flex items-center justify-center">
+              <a
+                href="https://x.com/bamecosystem"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-white/60 hover:text-white text-xs transition-colors group"
+              >
+                <Twitter className="w-3 h-3 group-hover:scale-110 transition-transform" />
+                <span>Follow @bamecosystem</span>
+              </a>
+            </div>
           </div>
         </div>
 
