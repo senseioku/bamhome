@@ -1,6 +1,26 @@
 import { Github, Twitter, MessageCircle, Zap } from "lucide-react";
 
 export default function Footer() {
+  const handleTwitterClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Try to open X app first, fallback to web
+    const appUrl = "twitter://user?screen_name=bamecosystem";
+    const webUrl = "https://x.com/bamecosystem";
+    
+    // For mobile devices, try app first
+    if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      window.location.href = appUrl;
+      
+      // Fallback to web after a short delay if app doesn't open
+      setTimeout(() => {
+        window.open(webUrl, '_blank');
+      }, 500);
+    } else {
+      // For desktop, open in new tab
+      window.open(webUrl, '_blank');
+    }
+  };
   const ecosystemLinks = [
     { label: "BAM Token", href: "#" },
     { label: "BAM ApexMiner", href: "https://apex.bam-ecosystem.com" },
@@ -16,7 +36,7 @@ export default function Footer() {
   ];
 
   const socialLinks = [
-    { icon: <Twitter className="h-5 w-5" />, href: "https://x.com/bamecosystem", label: "Twitter" },
+    { icon: <Twitter className="h-5 w-5" />, href: "#", label: "Twitter", onClick: handleTwitterClick },
     { icon: <MessageCircle className="h-5 w-5" />, href: "#", label: "Telegram" },
     { icon: <Zap className="h-5 w-5" />, href: "#", label: "Discord" },
     { icon: <Github className="h-5 w-5" />, href: "#", label: "GitHub" }
@@ -84,6 +104,7 @@ export default function Footer() {
                 <a
                   key={index}
                   href={social.href}
+                  onClick={social.onClick}
                   className="text-muted-foreground hover:text-primary text-xl transition-colors"
                   aria-label={social.label}
                   target={social.href.startsWith('http') ? '_blank' : undefined}

@@ -495,6 +495,26 @@ interface BamHolderData {
 }
 
 export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => {
+  const handleTwitterClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Try to open X app first, fallback to web
+    const appUrl = "twitter://user?screen_name=bamecosystem";
+    const webUrl = "https://x.com/bamecosystem";
+    
+    // For mobile devices, try app first
+    if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      window.location.href = appUrl;
+      
+      // Fallback to web after a short delay if app doesn't open
+      setTimeout(() => {
+        window.open(webUrl, '_blank');
+      }, 500);
+    } else {
+      // For desktop, open in new tab
+      window.open(webUrl, '_blank');
+    }
+  };
   const [currentMessage, setCurrentMessage] = useState<typeof MOTIVATION_MESSAGES[0] | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [bamHolderData, setBamHolderData] = useState<BamHolderData | null>(null);
@@ -629,10 +649,9 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
           <div className="mt-2 pt-2 border-t border-white/10">
             <div className="flex items-center justify-center">
               <a
-                href="https://x.com/bamecosystem"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-white/60 hover:text-white text-xs transition-colors group"
+                href="#"
+                onClick={handleTwitterClick}
+                className="flex items-center gap-1.5 text-white/60 hover:text-white text-xs transition-colors group cursor-pointer"
               >
                 <Twitter className="w-3 h-3 group-hover:scale-110 transition-transform" />
                 <span>Follow @bamecosystem</span>
