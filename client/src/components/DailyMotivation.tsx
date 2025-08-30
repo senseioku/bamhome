@@ -498,18 +498,37 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
   const handleTwitterClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
-    // Try to open X app first, fallback to web
-    const appUrl = "twitter://user?screen_name=bamecosystem";
     const webUrl = "https://x.com/bamecosystem";
+    const appUrl = "twitter://user?screen_name=bamecosystem";
     
-    // For mobile devices, try app first
+    // Check if we're in a wallet DApp browser or other restricted environment
+    const isWalletBrowser = /Trust|MetaMask|Coinbase|Rainbow|WalletConnect|imToken/i.test(navigator.userAgent);
+    const isInAppBrowser = /FB|FBAN|FBAV|Instagram|LinkedIn|Twitter|WeChat/i.test(navigator.userAgent);
+    
+    // If in wallet browser or in-app browser, use web URL directly
+    if (isWalletBrowser || isInAppBrowser) {
+      window.open(webUrl, '_blank');
+      return;
+    }
+    
+    // For mobile devices, try app first with better error handling
     if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      window.location.href = appUrl;
-      
-      // Fallback to web after a short delay if app doesn't open
-      setTimeout(() => {
+      try {
+        // Create a hidden iframe to test if the app URL works
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = appUrl;
+        document.body.appendChild(iframe);
+        
+        // Remove iframe and fallback to web if app doesn't open
+        setTimeout(() => {
+          document.body.removeChild(iframe);
+          window.open(webUrl, '_blank');
+        }, 1000);
+      } catch (error) {
+        // If any error, just open web version
         window.open(webUrl, '_blank');
-      }, 500);
+      }
     } else {
       // For desktop, open in new tab
       window.open(webUrl, '_blank');
