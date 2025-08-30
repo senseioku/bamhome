@@ -501,12 +501,13 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
     const webUrl = "https://x.com/bamecosystem";
     const appUrl = "twitter://user?screen_name=bamecosystem";
     
-    // Check if we're in a wallet DApp browser or other restricted environment
-    const isWalletBrowser = /Trust|MetaMask|Coinbase|Rainbow|WalletConnect|imToken/i.test(navigator.userAgent);
-    const isInAppBrowser = /FB|FBAN|FBAV|Instagram|LinkedIn|Twitter|WeChat/i.test(navigator.userAgent);
+    // Check if we're in a mobile DApp browser or wallet browser
+    const isMobileDAppBrowser = /Trust|MetaMask|Coinbase|Rainbow|WalletConnect|imToken|SafePal|Phantom|TokenPocket|Binance|OKX|Huobi|Gate|KuCoin|Crypto\.com|1inch|Uniswap|PancakeSwap|SushiSwap|DeFiWallet|AtomicWallet|Exodus|Brave|Opera/i.test(navigator.userAgent);
+    const isInAppBrowser = /FB|FBAN|FBAV|Instagram|LinkedIn|Twitter|WeChat|TikTok|Snapchat|Pinterest|Reddit/i.test(navigator.userAgent);
+    const isMobileWebView = /wv|WebView/i.test(navigator.userAgent);
     
-    // If in wallet browser or in-app browser, use web URL directly
-    if (isWalletBrowser || isInAppBrowser) {
+    // If in mobile DApp browser, wallet browser, in-app browser, or mobile webview, use web URL directly
+    if (isMobileDAppBrowser || isInAppBrowser || isMobileWebView) {
       window.open(webUrl, '_blank');
       return;
     }
@@ -522,7 +523,9 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
         
         // Remove iframe and fallback to web if app doesn't open
         setTimeout(() => {
-          document.body.removeChild(iframe);
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
           window.open(webUrl, '_blank');
         }, 1000);
       } catch (error) {
