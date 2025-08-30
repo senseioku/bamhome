@@ -16,7 +16,7 @@ export default function Footer() {
   ];
 
   const socialLinks = [
-    { icon: <Twitter className="h-5 w-5" />, href: "#", label: "Twitter" },
+    { icon: <Twitter className="h-5 w-5" />, href: "https://x.com/bamecosystem", label: "Twitter" },
     { icon: <MessageCircle className="h-5 w-5" />, href: "#", label: "Telegram" },
     { icon: <Zap className="h-5 w-5" />, href: "#", label: "Discord" },
     { icon: <Github className="h-5 w-5" />, href: "#", label: "GitHub" }
@@ -86,6 +86,8 @@ export default function Footer() {
                   href={social.href}
                   className="text-muted-foreground hover:text-primary text-xl transition-colors"
                   aria-label={social.label}
+                  target={social.href.startsWith('http') ? '_blank' : undefined}
+                  rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 >
                   {social.icon}
                 </a>
@@ -95,7 +97,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2024 BAM Ecosystem. All rights reserved. Where Communities Build and Multiply Wealth Together.</p>
+          <p>&copy; 2025 BAM Ecosystem. All rights reserved. Where Communities Build and Multiply Wealth Together.</p>
         </div>
       </div>
     </footer>
