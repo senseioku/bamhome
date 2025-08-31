@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, TrendingUp, Zap, Target, Crown, Rocket, DollarSign, AlertTriangle, Users, Trophy, Coffee, Shield, Brain, Timer, Hammer, Twitter } from 'lucide-react';
+import { TwitterRedirect } from './TwitterRedirect';
 
 const MOTIVATION_MESSAGES = [
   {
@@ -495,11 +496,12 @@ interface BamHolderData {
 }
 
 export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => {
+  const [showTwitterRedirect, setShowTwitterRedirect] = useState(false);
+
   const handleTwitterClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
     const webUrl = "https://x.com/bamecosystem";
-    const appUrl = "twitter://user?screen_name=bamecosystem";
     
     // Enhanced mobile device detection
     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -512,20 +514,12 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
     // Check if we're in a restricted browser environment
     const isRestrictedBrowser = isMobileDAppBrowser || isInAppBrowser || isMobileWebView;
     
-    if (isMobile) {
-      if (isRestrictedBrowser) {
-        // For restricted browsers, use web URL with _blank to force external opening
-        window.open(webUrl, '_blank');
-      } else {
-        // For regular mobile browsers, try deep link first
-        // Use location.href for immediate redirect attempt
-        window.location.href = appUrl;
-        
-        // Fallback to web version after delay if app doesn't open
-        setTimeout(() => {
-          window.open(webUrl, '_blank');
-        }, 2000); // Increased timeout as recommended
-      }
+    if (isRestrictedBrowser) {
+      // For DApp browsers, show the redirect modal to give users options
+      setShowTwitterRedirect(true);
+    } else if (isMobile) {
+      // For regular mobile browsers, show the redirect modal for choice
+      setShowTwitterRedirect(true);
     } else {
       // For desktop, always open web version in new tab
       window.open(webUrl, '_blank');
@@ -679,6 +673,11 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
         {/* Glow Effect */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-yellow-500/20 to-transparent rounded-2xl blur-xl"></div>
       </div>
+
+      <TwitterRedirect 
+        isOpen={showTwitterRedirect} 
+        onClose={() => setShowTwitterRedirect(false)} 
+      />
     </div>
   );
 };

@@ -1,11 +1,14 @@
+import React, { useState } from 'react';
 import { Github, Twitter, MessageCircle, Zap } from "lucide-react";
+import { TwitterRedirect } from './TwitterRedirect';
 
 export default function Footer() {
+  const [showTwitterRedirect, setShowTwitterRedirect] = useState(false);
+
   const handleTwitterClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
     const webUrl = "https://x.com/bamecosystem";
-    const appUrl = "twitter://user?screen_name=bamecosystem";
     
     // Enhanced mobile device detection
     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -18,20 +21,12 @@ export default function Footer() {
     // Check if we're in a restricted browser environment
     const isRestrictedBrowser = isMobileDAppBrowser || isInAppBrowser || isMobileWebView;
     
-    if (isMobile) {
-      if (isRestrictedBrowser) {
-        // For restricted browsers, use web URL with _blank to force external opening
-        window.open(webUrl, '_blank');
-      } else {
-        // For regular mobile browsers, try deep link first
-        // Use location.href for immediate redirect attempt
-        window.location.href = appUrl;
-        
-        // Fallback to web version after delay if app doesn't open
-        setTimeout(() => {
-          window.open(webUrl, '_blank');
-        }, 2000); // Increased timeout as recommended
-      }
+    if (isRestrictedBrowser) {
+      // For DApp browsers, show the redirect modal to give users options
+      setShowTwitterRedirect(true);
+    } else if (isMobile) {
+      // For regular mobile browsers, show the redirect modal for choice
+      setShowTwitterRedirect(true);
     } else {
       // For desktop, always open web version in new tab
       window.open(webUrl, '_blank');
@@ -137,6 +132,11 @@ export default function Footer() {
           <p>&copy; 2025 BAM Ecosystem. All rights reserved. Where Communities Build and Multiply Wealth Together.</p>
         </div>
       </div>
+
+      <TwitterRedirect 
+        isOpen={showTwitterRedirect} 
+        onClose={() => setShowTwitterRedirect(false)} 
+      />
     </footer>
   );
 }
