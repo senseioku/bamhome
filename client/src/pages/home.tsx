@@ -17,7 +17,7 @@ export default function Home() {
 
   // Show announcement modal on first visit (with session storage to not spam)
   useEffect(() => {
-    const hasSeenAnnouncement = sessionStorage.getItem('bam-announcement-seen');
+    const hasSeenAnnouncement = sessionStorage.getItem('bam-announcement-seen-v2');
     if (!hasSeenAnnouncement) {
       const timer = setTimeout(() => {
         setShowAnnouncement(true);
@@ -28,7 +28,8 @@ export default function Home() {
 
   const handleCloseAnnouncement = () => {
     setShowAnnouncement(false);
-    sessionStorage.setItem('bam-announcement-seen', 'true');
+    // Update session storage key to force showing the updated announcement
+    sessionStorage.setItem('bam-announcement-seen-v2', 'true');
   };
 
   return (
@@ -103,10 +104,21 @@ export default function Home() {
             <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 rounded-lg p-4 border border-green-500/30">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5 text-green-400" />
-                <span className="font-bold text-green-400">LIQUIDITY INJECTION ACTIVE!</span>
+                <span className="font-bold text-green-400">💰 LIQUIDITY INJECTION ACTIVE!</span>
               </div>
               <p className="text-sm text-gray-200">
                 Check your Trading & News sections NOW to see real income flowing in!
+              </p>
+            </div>
+
+            {/* ApexMiner Update */}
+            <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-lg p-4 border border-orange-500/30">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="h-5 w-5 text-orange-400" />
+                <span className="font-bold text-orange-400">📢 APEXMINER UPDATE⚠️</span>
+              </div>
+              <p className="text-sm text-gray-200">
+                ❌ Plan 3 entries will soon retire while those activated continues to enjoy until max capping reached.
               </p>
             </div>
 
