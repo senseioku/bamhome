@@ -501,39 +501,33 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ onClose }) => 
     const webUrl = "https://x.com/bamecosystem";
     const appUrl = "twitter://user?screen_name=bamecosystem";
     
-    // Check if we're in a mobile DApp browser or wallet browser
+    // Enhanced mobile device detection
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Comprehensive DApp browser and in-app browser detection
     const isMobileDAppBrowser = /Trust|MetaMask|Coinbase|Rainbow|WalletConnect|imToken|SafePal|Phantom|TokenPocket|Binance|OKX|Huobi|Gate|KuCoin|Crypto\.com|1inch|Uniswap|PancakeSwap|SushiSwap|DeFiWallet|AtomicWallet|Exodus|Brave|Opera/i.test(navigator.userAgent);
     const isInAppBrowser = /FB|FBAN|FBAV|Instagram|LinkedIn|Twitter|WeChat|TikTok|Snapchat|Pinterest|Reddit/i.test(navigator.userAgent);
     const isMobileWebView = /wv|WebView/i.test(navigator.userAgent);
     
-    // If in mobile DApp browser, wallet browser, in-app browser, or mobile webview, use web URL directly
-    if (isMobileDAppBrowser || isInAppBrowser || isMobileWebView) {
-      window.open(webUrl, '_blank');
-      return;
-    }
+    // Check if we're in a restricted browser environment
+    const isRestrictedBrowser = isMobileDAppBrowser || isInAppBrowser || isMobileWebView;
     
-    // For mobile devices, try app first with better error handling
-    if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      try {
-        // Create a hidden iframe to test if the app URL works
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = appUrl;
-        document.body.appendChild(iframe);
-        
-        // Remove iframe and fallback to web if app doesn't open
-        setTimeout(() => {
-          if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-          }
-          window.open(webUrl, '_blank');
-        }, 1000);
-      } catch (error) {
-        // If any error, just open web version
+    if (isMobile) {
+      if (isRestrictedBrowser) {
+        // For restricted browsers, use web URL with _blank to force external opening
         window.open(webUrl, '_blank');
+      } else {
+        // For regular mobile browsers, try deep link first
+        // Use location.href for immediate redirect attempt
+        window.location.href = appUrl;
+        
+        // Fallback to web version after delay if app doesn't open
+        setTimeout(() => {
+          window.open(webUrl, '_blank');
+        }, 2000); // Increased timeout as recommended
       }
     } else {
-      // For desktop, open in new tab
+      // For desktop, always open web version in new tab
       window.open(webUrl, '_blank');
     }
   };
