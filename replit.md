@@ -153,13 +153,6 @@ Preferred communication style: Senior engineer level - technical, direct, AI-pow
 - ✅ X/Twitter social media link (https://x.com/bamecosystem) added to website footer and daily alpha card
 - ✅ Footer copyright year updated from 2024 to 2025 for current year compliance
 - ✅ Social media integration includes proper external link security attributes and hover animations
-- ✅ Enhanced X link deep linking implementation following mobile DApp browser best practices
-- ✅ Comprehensive wallet browser detection (20+ wallets) with direct web fallback for restricted environments
-- ✅ Improved mobile app redirect with increased timeout and proper user interaction handling
-- ✅ TwitterRedirect modal component eliminates URL scheme errors completely
-- ✅ User-friendly choice interface with "Open in X App" and "Open in Browser" options
-- ✅ 5-second auto-redirect countdown ensures seamless UX without getting stuck
-- ✅ Modal-based approach prevents net::ERR_UNKNOWN_URL_SCHEME errors in DApp browsers
-- ✅ Implementation follows industry best practices from comprehensive deep linking guide
-- ✅ User gesture requirement ensures higher success rate for custom URL scheme redirections
-- ✅ Clear fallback instructions and dual-option interface maximizes compatibility
+- ✅ X/Twitter links simplified to direct web redirect (https://x.com/bamecosystem)
+- ✅ Eliminated URL scheme complexity for maximum DApp browser compatibility
+- ✅ Clean implementation using window.open for all environments

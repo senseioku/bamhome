@@ -1,36 +1,9 @@
-import React, { useState } from 'react';
 import { Github, Twitter, MessageCircle, Zap } from "lucide-react";
-import { TwitterRedirect } from './TwitterRedirect';
 
 export default function Footer() {
-  const [showTwitterRedirect, setShowTwitterRedirect] = useState(false);
-
   const handleTwitterClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    
-    const webUrl = "https://x.com/bamecosystem";
-    
-    // Enhanced mobile device detection
-    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // Comprehensive DApp browser and in-app browser detection
-    const isMobileDAppBrowser = /Trust|MetaMask|Coinbase|Rainbow|WalletConnect|imToken|SafePal|Phantom|TokenPocket|Binance|OKX|Huobi|Gate|KuCoin|Crypto\.com|1inch|Uniswap|PancakeSwap|SushiSwap|DeFiWallet|AtomicWallet|Exodus|Brave|Opera/i.test(navigator.userAgent);
-    const isInAppBrowser = /FB|FBAN|FBAV|Instagram|LinkedIn|Twitter|WeChat|TikTok|Snapchat|Pinterest|Reddit/i.test(navigator.userAgent);
-    const isMobileWebView = /wv|WebView/i.test(navigator.userAgent);
-    
-    // Check if we're in a restricted browser environment
-    const isRestrictedBrowser = isMobileDAppBrowser || isInAppBrowser || isMobileWebView;
-    
-    if (isRestrictedBrowser) {
-      // For DApp browsers, show the redirect modal to give users options
-      setShowTwitterRedirect(true);
-    } else if (isMobile) {
-      // For regular mobile browsers, show the redirect modal for choice
-      setShowTwitterRedirect(true);
-    } else {
-      // For desktop, always open web version in new tab
-      window.open(webUrl, '_blank');
-    }
+    window.open('https://x.com/bamecosystem', '_blank');
   };
   const ecosystemLinks = [
     { label: "BAM Token", href: "#" },
@@ -133,10 +106,6 @@ export default function Footer() {
         </div>
       </div>
 
-      <TwitterRedirect 
-        isOpen={showTwitterRedirect} 
-        onClose={() => setShowTwitterRedirect(false)} 
-      />
     </footer>
   );
 }
