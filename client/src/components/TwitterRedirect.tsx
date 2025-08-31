@@ -29,13 +29,32 @@ export const TwitterRedirect: React.FC<TwitterRedirectProps> = ({ isOpen, onClos
   if (!isOpen) return null;
 
   const handleAppRedirect = () => {
-    // Try to open the app
-    window.location.href = 'twitter://user?screen_name=bamecosystem';
-    
-    // Close modal after attempting redirect
-    setTimeout(() => {
+    // For DApp browsers, redirect to web instead of risking URL scheme error
+    // The user explicitly chose "Open in X App" so we'll try the safest approach
+    try {
+      // Try to open the app with a safer method
+      const appUrl = 'twitter://user?screen_name=bamecosystem';
+      
+      // Create a temporary iframe to test the scheme without triggering errors
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = appUrl;
+      document.body.appendChild(iframe);
+      
+      // Clean up and fallback to web if needed
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+        // If we reach here, assume app didn't open and go to web
+        window.open('https://x.com/bamecosystem', '_blank');
+        onClose();
+      }, 1500);
+    } catch (error) {
+      // If any error occurs, fall back to web
+      window.open('https://x.com/bamecosystem', '_blank');
       onClose();
-    }, 1000);
+    }
   };
 
   const handleWebRedirect = () => {
