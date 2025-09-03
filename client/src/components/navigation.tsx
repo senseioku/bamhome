@@ -102,7 +102,7 @@ export default function Navigation() {
                     <a href="https://play.bam-ecosystem.com" target="_blank" rel="noopener noreferrer" className="w-full text-gray-300 hover:text-pink-400 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2">
                       <Gamepad2 className="w-4 h-4" />
                       BAM Play 2 Earn
-                      <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full ml-auto">Soon</span>
+                      <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full ml-auto">Beta</span>
                     </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -225,7 +225,7 @@ export default function Navigation() {
                               <span className="text-sm">🎮</span>
                               <span className="text-sm font-medium">BAM Play 2 Earn</span>
                             </div>
-                            <span className="text-xs bg-purple-600/50 text-purple-400 px-2 py-0.5 rounded-full">Soon</span>
+                            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">Beta</span>
                           </a>
                           <a
                             href="https://apex.bam-ecosystem.com"

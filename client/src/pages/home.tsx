@@ -10,14 +10,14 @@ import Footer from "@/components/footer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, Rocket, Zap, Star, TrendingUp } from "lucide-react";
+import { X, Rocket, Zap, Star, TrendingUp, Gamepad2, Crown } from "lucide-react";
 
 export default function Home() {
   const [showAnnouncement, setShowAnnouncement] = useState(false);
 
   // Show announcement modal on first visit (with session storage to not spam)
   useEffect(() => {
-    const hasSeenAnnouncement = sessionStorage.getItem('bam-announcement-seen-v2');
+    const hasSeenAnnouncement = sessionStorage.getItem('bam-announcement-seen-v3');
     if (!hasSeenAnnouncement) {
       const timer = setTimeout(() => {
         setShowAnnouncement(true);
@@ -29,7 +29,7 @@ export default function Home() {
   const handleCloseAnnouncement = () => {
     setShowAnnouncement(false);
     // Update session storage key to force showing the updated announcement
-    sessionStorage.setItem('bam-announcement-seen-v2', 'true');
+    sessionStorage.setItem('bam-announcement-seen-v3', 'true');
   };
 
   return (
@@ -108,6 +108,28 @@ export default function Home() {
               </div>
               <p className="text-sm text-gray-200">
                 Check your Trading & News sections NOW to see real income flowing in!
+              </p>
+            </div>
+
+            {/* BAMers Playground Play & Earn */}
+            <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg p-4 border border-blue-500/30">
+              <div className="flex items-center gap-2 mb-2">
+                <Gamepad2 className="h-5 w-5 text-blue-400" />
+                <span className="font-bold text-blue-400">🎮 BAMers Playground Play & Earn (Beta)</span>
+              </div>
+              <p className="text-sm text-gray-200">
+                The ultimate gaming experience is now LIVE! Start earning while you play!
+              </p>
+            </div>
+
+            {/* BAM Staking Live */}
+            <div className="bg-gradient-to-r from-purple-900/30 to-indigo-900/30 rounded-lg p-4 border border-purple-500/30">
+              <div className="flex items-center gap-2 mb-2">
+                <Crown className="h-5 w-5 text-purple-400" />
+                <span className="font-bold text-purple-400">👑 BAM Staking Live in VIP Lounge</span>
+              </div>
+              <p className="text-sm text-gray-200">
+                Exclusive staking rewards are now available! Join the VIP Lounge and maximize your earnings.
               </p>
             </div>
 
