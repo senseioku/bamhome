@@ -100,14 +100,14 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Liquidity Injection */}
-            <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 rounded-lg p-4 border border-green-500/30">
+            {/* ApexMiner Update */}
+            <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-lg p-4 border border-orange-500/30">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-5 w-5 text-green-400" />
-                <span className="font-bold text-green-400">💰 LIQUIDITY INJECTION ACTIVE!</span>
+                <Zap className="h-5 w-5 text-orange-400" />
+                <span className="font-bold text-orange-400">📢 APEXMINER UPDATE⚠️</span>
               </div>
               <p className="text-sm text-gray-200">
-                Check your Trading & News sections NOW to see real income flowing in!
+                ❌ Plan 3 entries will soon retire while those activated continues to enjoy until max capping reached.
               </p>
             </div>
 
@@ -133,14 +133,14 @@ export default function Home() {
               </p>
             </div>
 
-            {/* ApexMiner Update */}
-            <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-lg p-4 border border-orange-500/30">
+            {/* Liquidity Injection */}
+            <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 rounded-lg p-4 border border-green-500/30">
               <div className="flex items-center gap-2 mb-2">
-                <Zap className="h-5 w-5 text-orange-400" />
-                <span className="font-bold text-orange-400">📢 APEXMINER UPDATE⚠️</span>
+                <TrendingUp className="h-5 w-5 text-green-400" />
+                <span className="font-bold text-green-400">💰 LIQUIDITY INJECTION ACTIVE!</span>
               </div>
               <p className="text-sm text-gray-200">
-                ❌ Plan 3 entries will soon retire while those activated continues to enjoy until max capping reached.
+                Check your Trading & News sections NOW to see real income flowing in!
               </p>
             </div>
 
