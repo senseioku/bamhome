@@ -1,0 +1,78 @@
+{
+  "title": "BAM Ecosystem Documentation",
+  "description": "Comprehensive documentation for the BAM Ecosystem - Build and Multiply wealth together through innovative DeFi solutions",
+  "author": "BAM Ecosystem Team",
+  "language": "en",
+  "gitbook": ">=3.2.0",
+  "root": ".",
+  "structure": {
+    "readme": "README.md",
+    "summary": "SUMMARY.md"
+  },
+  "plugins": [
+    "search",
+    "highlight",
+    "sharing",
+    "fontsettings",
+    "theme-default",
+    "livereload",
+    "prism",
+    "-lunr",
+    "search-pro",
+    "github",
+    "edit-link",
+    "back-to-top-button",
+    "copy-code-button",
+    "expandable-chapters"
+  ],
+  "pluginsConfig": {
+    "github": {
+      "url": "https://github.com/bam-ecosystem/platform"
+    },
+    "edit-link": {
+      "base": "https://github.com/bam-ecosystem/platform/edit/main",
+      "label": "Edit This Page"
+    },
+    "sharing": {
+      "facebook": false,
+      "twitter": true,
+      "google": false,
+      "linkedin": false,
+      "weibo": false,
+      "instapaper": false,
+      "vk": false,
+      "all": [
+        "twitter"
+      ]
+    },
+    "fontsettings": {
+      "theme": "white",
+      "family": "sans",
+      "size": 2
+    },
+    "prism": {
+      "css": [
+        "prismjs/themes/prism-tomorrow.css"
+      ],
+      "lang": [
+        "javascript",
+        "typescript",
+        "json",
+        "bash",
+        "sql",
+        "solidity",
+        "python"
+      ]
+    },
+    "theme-default": {
+      "showLevel": true
+    }
+  },
+  "variables": {
+    "platform_name": "BAM Ecosystem",
+    "website_url": "https://bam-ecosystem.com",
+    "api_url": "https://bam-ecosystem.com/api",
+    "support_email": "support@bam-ecosystem.com",
+    "version": "2.0.0"
+  }
+}
